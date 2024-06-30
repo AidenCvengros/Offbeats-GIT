@@ -123,9 +123,12 @@ public:
 	/*!
 		\brief
 			Draws the system to the screen. Virtual function that must be overwritten by derived class
+			
+		\param window
+			The window being drawn to
 	*/
 	/*************************************************************************************************/
-	void Draw() {}
+	void Draw(Window* window) {}
 
 	/*************************************************************************************************/
 	/*!

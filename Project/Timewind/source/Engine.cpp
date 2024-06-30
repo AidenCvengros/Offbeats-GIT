@@ -118,7 +118,7 @@ void Engine::Init()
 
 	// Adds essential game systems to the system list
 	InputManager* inputManager = new InputManager(gameWindow);
-	GameObjectManager* objectManager = new GameObjectManager(gameWindow, inputManager);
+	GameObjectManager* objectManager = new GameObjectManager(inputManager);
 	TextureManager* texManager = new TextureManager(gameWindow);
 	SceneManager* sceneManager = new SceneManager(this);
 	MapMatrix* mapMatrix = new MapMatrix(25, 15);
@@ -170,7 +170,7 @@ void Engine::Update()
 		}
 
 		// After updating, draws to screen
-		Draw();
+		Draw(gameWindow);
 	}
 }
 
@@ -178,17 +178,20 @@ void Engine::Update()
 /*!
 	\brief
 		Draws the engine updates to the screen.
+
+	\param window_
+		The window to draw the engine to
 */
 /*********************************************************************************************/
-void Engine::Draw()
+void Engine::Draw(Window* window_)
 {
 	// Sets up the window to draw
-	gameWindow->Draw();
+	gameWindow->Draw(window_);
 
 	// Loops through, drawing each system
 	for (size_t i = 0; i < systemList.size(); i++)
 	{
-		systemList[i]->Draw();
+		systemList[i]->Draw(window_);
 	}
 
 	// Finishes the drawing commands for this frame

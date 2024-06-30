@@ -82,14 +82,11 @@ public:
 		\brief
 			Constructor for the game object manager class
 
-		\param window_
-			The window to draw game objects to
-
 		\param inputManager_
 			The input manager to communicate to game objects
 	*/
 	/*************************************************************************************************/
-	GameObjectManager(Window* window_, InputManager* inputManager_) : window(window_), inputManager(inputManager_) {}
+	GameObjectManager(InputManager* inputManager_) : inputManager(inputManager_) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -122,9 +119,12 @@ public:
 	/*!
 		\brief
 			Draws the game objects in the manager to the screen.
+
+		\param window
+			The window being drawn to
 	*/
 	/*************************************************************************************************/
-	void Draw();
+	void Draw(Window* window);
 
 	/*************************************************************************************************/
 	/*!
@@ -157,7 +157,7 @@ private:
 	
 	std::multimap<int, GameObject*> gameObjectList;			// The list of game objects being managed
 
-	Window* window;											// Pointer to the window being drawn to
+	//Window* window;											// Pointer to the window being drawn to
 	InputManager* inputManager;								// Pointer to the input manager to communicate to the game objects
 
 	//---------------------------------------------------------------------------------------------

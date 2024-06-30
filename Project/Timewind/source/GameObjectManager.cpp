@@ -81,9 +81,12 @@ void GameObjectManager::Update(double dt)
 /*!
 	\brief
 		Draws the game objects in the manager to the screen.
+
+	\param window
+		The window being drawn to
 */
 /*************************************************************************************************/
-void GameObjectManager::Draw()
+void GameObjectManager::Draw(Window* window)
 {
 	// Walks through the game object list
 	for (std::multimap<int, GameObject*>::iterator it = gameObjectList.begin(); it != gameObjectList.end();)

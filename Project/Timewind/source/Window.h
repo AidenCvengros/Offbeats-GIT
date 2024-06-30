@@ -51,6 +51,9 @@ Copyright (c) 2023 Aiden Cvengros
 // The camera class for displaying to the screen
 #include "Camera.h"
 
+// The texture class for the default texture
+#include "Texture.h"
+
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
@@ -115,6 +118,7 @@ public:
 		logicalDevice(NULL),
 		graphicsQueue(NULL),
 		surface(NULL),
+		blankTexture(NULL),
 		width(initWidth),
 		height(initHeight),
 		name(initWindowName) {}
@@ -150,9 +154,12 @@ public:
 	/*!
 		\brief
 			Begins the drawing sequence
+
+		\param
+			The window being drawn to
 	*/
-	/*********************************************************************************************/
-	void Draw();
+	/*************************************************************************************************/
+	void Draw(Window* window);
 
 	/*********************************************************************************************/
 	/*!
@@ -465,6 +472,7 @@ private:
 	std::vector<VkCommandBuffer> commandBuffer;			// Gets the commands
 	VkDebugUtilsMessengerEXT debugMessenger;			// The debug messenger
 	Camera* camera;										// The main camera object
+	Texture* blankTexture;								// Default texture used to draw game objects without a texture
 
 	VkBuffer vertexBuffer;								// The vertex buffer
 	VkDeviceMemory vertexBufferMemory;					// The memory pointer for the vertex buffer

@@ -132,12 +132,11 @@ void Window::Init()
 	createGraphicsPipeline();
 	CreateFramebuffers();
 	CreateCommandPool();
-	//CreateTextureSampler();
-	//textureImageView = CreateImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
 	CreateUniformBuffers();
 	CreateDescriptorPool();
 	CreateDescriptorSets();
 	CreateSyncObjects();
+	blankTexture = new Texture(this, "Assets/Sprites/Blank.png");
 }
 
 /*********************************************************************************************/
@@ -158,9 +157,12 @@ void Window::Update(double dt)
 /*!
 	\brief
 		Draws the window
+
+	\param window_
+		The window being drawn to
 */
 /*********************************************************************************************/
-void Window::Draw()
+void Window::Draw(Window* window_)
 {
 	// Makes sure that the previous frame has finished before drawing the next one
 	vkWaitForFences(logicalDevice, 1, &inFlightFence[currentFrame], VK_TRUE, UINT64_MAX);
@@ -242,10 +244,21 @@ void Window::DrawGameObject(GameObject gameObject)
 	{
 		// Sets the dynamic offset and draws the first object
 		glm::mat4 tempMat = gameObject.GetTranformationMatrix();
+		glm::vec4 tempColor = gameObject.GetColor();
 		vkCmdPushConstants(commandBuffer[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &tempMat);
+		vkCmdPushConstants(commandBuffer[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 64, sizeof(glm::vec4), &tempColor);
 
-		// Binds the texture descriptor set
-		vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, gameObject.GetTexture()->GetDescriptorSet(), 0, NULL);
+		// Checks if the game object has a texture
+		if (gameObject.GetTexture())
+		{
+			// Binds the texture descriptor set and color
+			vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, gameObject.GetTexture()->GetDescriptorSet(), 0, NULL);
+		}
+		// Otherwise uses the default blank texture
+		else
+		{
+			vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, blankTexture->GetDescriptorSet(), 0, NULL);
+		}
 
 		// Records the draw command to the command buffer
 		RecordCommandBuffer(commandBuffer[currentFrame]);
@@ -331,6 +344,10 @@ void Window::Shutdown()
 {
 	// Waits for any existing draw operations to be finished
 	vkDeviceWaitIdle(logicalDevice);
+
+	// Deletes the blank texture
+	blankTexture->Free(this);
+	delete blankTexture;
 
 	// Cleans up the swap chain
 	CleanupSwapChain();
@@ -1170,19 +1187,20 @@ void Window::createGraphicsPipeline()
 	// Sets the color blend attachment
 	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-	colorBlendAttachment.blendEnable = VK_FALSE;
+	colorBlendAttachment.blendEnable = VK_TRUE;
+	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+	colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
 
 	// Sets up the color blend constants (currently no blending)
 	VkPipelineColorBlendStateCreateInfo colorBlending{};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlending.logicOpEnable = VK_FALSE;
-	colorBlending.logicOp = VK_LOGIC_OP_COPY;
 	colorBlending.attachmentCount = 1;
 	colorBlending.pAttachments = &colorBlendAttachment;
-	colorBlending.blendConstants[0] = 0.0f;
-	colorBlending.blendConstants[1] = 0.0f;
-	colorBlending.blendConstants[2] = 0.0f;
-	colorBlending.blendConstants[3] = 0.0f;
 
 	// The list of things that should be dynamic
 	std::vector<VkDynamicState> dynamicStates =
@@ -1200,7 +1218,7 @@ void Window::createGraphicsPipeline()
 	// Sets the push constants for the pipeline
 	VkPushConstantRange psRange;
 	psRange.offset = 0;
-	psRange.size = sizeof(glm::mat4);
+	psRange.size = sizeof(glm::mat4) + sizeof(glm::vec4);
 	psRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
 	// Initializes the pipeline layout
@@ -1343,6 +1361,9 @@ VkSurfaceFormatKHR Window::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFo
 			return availableFormat;
 		}
 	}
+
+	// Otherwise returns the first available format
+	return availableFormats[0];
 }
 
 /*********************************************************************************************/
@@ -1814,7 +1835,7 @@ void Window::CreateBuffer(
 
 	// Gets the memory requirements for what we want to do
 	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
+ 	vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
 
 	// Info block for allocating graphics memory
 	VkMemoryAllocateInfo allocInfo{};
@@ -1885,7 +1906,6 @@ void Window::CreateDescriptorSetLayout()
 	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 	// Sets the layout for the descriptor set
-	//std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	layoutInfo.bindingCount = 1;

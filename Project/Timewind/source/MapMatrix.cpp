@@ -21,6 +21,12 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "MapMatrix.h"
 
+// Uses game object for drawing the map
+#include "GameObject.h"
+
+// Includes window class to be drawn to
+#include "Window.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -88,18 +94,38 @@ MapMatrix::~MapMatrix()
 /*************************************************************************************************/
 void MapMatrix::Init()
 {
-
+	
 }
 
 /*************************************************************************************************/
 /*!
 	\brief
 		Draws the map. Only used for debug purposes
+
+	\param window
+		The window being drawn to
 */
 /*************************************************************************************************/
-void MapMatrix::Draw()
+void MapMatrix::Draw(Window* window)
 {
+	// Creates a square game object that's gonna be the drawing
+	GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, { 1.0f, 0.0f, 0.0f, 0.5f });
+	debugSquare.SetRender(true);
 
+	// Draws the map
+	for (int i = 0; i < mapMatrix.size(); i++)
+	{
+		for (int j = 0; j < mapMatrix[i].size(); j++)
+		{
+			// Checks for a non-empty space
+			if (mapMatrix[i][j] == TileStatus::Wall)
+			{
+				// Sets the square's position and draws it
+				debugSquare.SetPosition({ -4.0f + (2.0f * i), 4.0f - (2.0f * j) });
+				window->DrawGameObject(debugSquare);
+			}
+		}
+	}
 }
 
 /*************************************************************************************************/

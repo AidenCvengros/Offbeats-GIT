@@ -38,9 +38,6 @@ Copyright (c) 2023 Aiden Cvengros
 // The vectors that make up the map grid
 #include <vector>
 
-// The pair for tracking specific coordinates
-
-
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
@@ -131,9 +128,12 @@ public:
 	/*!
 		\brief
 			Draws the map. Only used for debug purposes
+
+		\param window
+			The window being drawn to
 	*/
 	/*************************************************************************************************/
-	void Draw();
+	void Draw(Window* window);
 
 	/*************************************************************************************************/
 	/*!

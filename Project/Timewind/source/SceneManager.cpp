@@ -113,9 +113,12 @@ void SceneManager::Update(double dt)
 /*!
 	\brief
 		Draws the current scene (currently empty)
+
+	\param window
+		The window being drawn to
 */
 /*************************************************************************************************/
-void SceneManager::Draw()
+void SceneManager::Draw(Window* window)
 {
 
 }

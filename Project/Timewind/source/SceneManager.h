@@ -119,9 +119,12 @@ public:
 	/*!
 		\brief
 			Draws the current scene (currently empty)
+			
+		\param window
+			The window being drawn to
 	*/
 	/*************************************************************************************************/
-	void Draw();
+	void Draw(Window* window);
 
 	/*************************************************************************************************/
 	/*!

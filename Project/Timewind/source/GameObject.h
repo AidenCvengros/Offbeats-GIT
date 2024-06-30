@@ -91,7 +91,7 @@ public:
 			Higher draw priorities are drawn in front of objects with lower priority
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_) :
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, glm::vec4 color_ = { 0.0f, 0.0f, 0.0f, 0.0f }) :
 		position(pos), rotation(rot), scale(sca),
 		drawPriority(drawPriority_),
 		moving(false),
@@ -100,7 +100,8 @@ public:
 		moveTime(0.0), moveTimeLeft(0.0),
 		moveSmooth(false),
 		render(false),
-		texture(NULL) {}
+		texture(NULL),
+		color(color_) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -123,7 +124,7 @@ public:
 			The texture for the game object
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_) :
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, glm::vec4 color_ = { 1.0f, 1.0f, 1.0f, 1.0f }) :
 		position(pos), rotation(rot), scale(sca),
 		drawPriority(drawPriority_),
 		moving(false),
@@ -132,7 +133,8 @@ public:
 		moveTime(0.0), moveTimeLeft(0.0),
 		moveSmooth(false),
 		render(true),
-		texture(texture_) {}
+		texture(texture_),
+		color(color_) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -236,6 +238,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the object's color
+
+		\return
+			The object's color
+	*/
+	/*************************************************************************************************/
+	glm::vec4 GetColor() { return color; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets the position of the game object
 
 		\param newPosition
@@ -243,6 +256,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void SetPosition(glm::vec2 newPosition);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets whether the game object should be drawn
+
+		\param newRender
+			The game object's new render boolean
+	*/
+	/*************************************************************************************************/
+	void SetRender(bool newRender) { render = newRender; }
 
 	/*************************************************************************************************/
 	/*!
@@ -299,6 +323,7 @@ private:
 
 	bool render;								// Says whether this game object should be rendered
 	Texture* texture;							// Pointer to the object's texture (will not be referenced if render is false)
+	glm::vec4 color;							// The color of the game object
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

@@ -97,9 +97,12 @@ void InputManager::Update(double dt)
 /*!
 	\brief
 		Draws the system to the screen.
+
+	\param window_
+		The window being drawn to
 */
 /*************************************************************************************************/
-void InputManager::Draw()
+void InputManager::Draw(Window* window_)
 {
 
 }
