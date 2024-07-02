@@ -97,6 +97,8 @@ public:
 		GameObject(pos, rot, sca, drawPriority_, texture_),
 		facingRight(true),
 		jumpPhase(0),
+		playerPrevPos({ 2, 2 }),
+		timeSinceMove(0.0),
 		mapMatrix(mapMatrix_) {}
 	
 	/*************************************************************************************************/
@@ -147,6 +149,8 @@ private:
 	
 	bool facingRight;							// Whether the player is facing to the right
 	int jumpPhase;								// Tracks the progress of a jump
+	std::pair<int, int> playerPrevPos;			// The previous player position in map coordinates
+	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
 
 	MapMatrix* mapMatrix;						// The map that the player is in
 
@@ -192,7 +196,30 @@ private:
 			Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
 	*/
 	/*************************************************************************************************/
-	bool MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, float moveSpeed);
+	bool MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, double moveSpeed);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Helper function to manage moving the player
+
+		\param playerPosition
+			The current position of the player (will be modified if the player moves)
+
+		\param horizontalMove
+			The horizontal movement (positive for right, negative for left)
+
+		\param verticalMove
+			The vertical movement (positive for up, negative for left)
+
+		\param moveSpeed
+			How long the movement takes
+
+		\return
+			Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+	*/
+	/*************************************************************************************************/
+	//bool OverwriteMove(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, float moveSpeed);
 };
 
 //-------------------------------------------------------------------------------------------------

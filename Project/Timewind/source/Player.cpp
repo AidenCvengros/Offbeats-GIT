@@ -65,6 +65,22 @@ void Player::Update(double dt, InputManager* inputManager)
 	}
 
 	std::pair playerPosition = mapMatrix->GetPlayerPosition();
+
+	// The buffer zone
+	if (GetIsMoving() == true)
+	{
+		// Jump buffer for having just started a grounded movement
+		if (jumpPhase == 0 && timeSinceMove < 0.125 && CheckInput(inputManager, InputManager::Inputs::Jump))
+		{
+			if (MovePlayer(playerPrevPos, 0, 1, 0.07))
+			{
+				jumpPhase = 1;
+			}
+		}
+	
+		// Updates the time since move tracker
+		timeSinceMove += dt;
+	}
 	
 	// Checks that the previous movement finished
 	if (GetIsMoving() == false && jumpPhase == 0)
@@ -79,7 +95,7 @@ void Player::Update(double dt, InputManager* inputManager)
 		// Checks for a jump (start of jump is quick up one tile
 		else if (CheckInput(inputManager, InputManager::Inputs::Jump))
 		{
-			if (MovePlayer(playerPosition, 0, 1, 0.07f))
+			if (MovePlayer(playerPosition, 0, 1, 0.07))
 			{
 				jumpPhase = 1;
 			}
@@ -88,12 +104,12 @@ void Player::Update(double dt, InputManager* inputManager)
 		// Checks for moving right
 		else if (CheckInput(inputManager, InputManager::Inputs::Right))
 		{
-			MovePlayer(playerPosition, 1, 0, 0.25f);
+			MovePlayer(playerPosition, 1, 0, 0.25);
 		}
 		// Checks for moving left
 		else if (CheckInput(inputManager, InputManager::Inputs::Left))
 		{
-			MovePlayer(playerPosition, -1, 0, 0.25f);
+			MovePlayer(playerPosition, -1, 0, 0.25);
 		}
 	}
 
@@ -113,10 +129,10 @@ void Player::Update(double dt, InputManager* inputManager)
 				if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second + 1) == MapMatrix::TileStatus::Empty)
 				{
 					// Attempt to move the player up and to the right
-					if (MovePlayer(playerPosition, 1, 2, 0.225f) == false)
+					if (MovePlayer(playerPosition, 1, 2, 0.225) == false)
 					{
 						// If the move was unsuccessful, then we move to the open space diagonally up
-						MovePlayer(playerPosition, 1, 1, 0.15f);
+						MovePlayer(playerPosition, 1, 1, 0.15);
 					}
 
 					// Either way we should have moved, so we don't need the jump up routine
@@ -130,10 +146,10 @@ void Player::Update(double dt, InputManager* inputManager)
 				if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1) == MapMatrix::TileStatus::Empty)
 				{
 					// Attempt to move the player up and to the left
-					if (MovePlayer(playerPosition, -1, 2, 0.225f) == false)
+					if (MovePlayer(playerPosition, -1, 2, 0.225) == false)
 					{
 						// If the move was unsuccessful, then we move to the open space diagonally up
-						MovePlayer(playerPosition, -1, 1, 0.15f);
+						MovePlayer(playerPosition, -1, 1, 0.15);
 					}
 
 					// Either way we should have moved, so we don't need the jump up routine
@@ -144,10 +160,10 @@ void Player::Update(double dt, InputManager* inputManager)
 			if (jumpUp)
 			{
 				// Attempts to move the full distance up
-				if (MovePlayer(playerPosition, 0, 2, 0.225f) == false)
+				if (MovePlayer(playerPosition, 0, 2, 0.225) == false)
 				{
 					// If the full upward movement fails, only goes up one space
-					MovePlayer(playerPosition, 0, 1, 0.15f);
+					MovePlayer(playerPosition, 0, 1, 0.15);
 				}
 			}
 		}
@@ -160,17 +176,17 @@ void Player::Update(double dt, InputManager* inputManager)
 		// Checks for moving right
 		if (CheckInput(inputManager, InputManager::Inputs::Right))
 		{
-			MovePlayer(playerPosition, 1, 0, 0.15f);
+			MovePlayer(playerPosition, 1, 0, 0.15);
 		}
 		// Checks for moving left
 		else if (CheckInput(inputManager, InputManager::Inputs::Left))
 		{
-			MovePlayer(playerPosition, -1, 0, 0.15f);
+			MovePlayer(playerPosition, -1, 0, 0.15);
 		}
 		// Otherwise hangs in the air
 		else
 		{
-			MoveTo(GetPosition(), 0.15f, false);
+			MoveTo(GetPosition(), 0.15, false);
 		}
 
 		// Afterwards continues the jump
@@ -197,10 +213,10 @@ void Player::Update(double dt, InputManager* inputManager)
 				if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second - 1) == MapMatrix::TileStatus::Empty)
 				{
 					// Attempt to move the player down and to the right
-					if (MovePlayer(playerPosition, 1, -2, 0.225f) == false)
+					if (MovePlayer(playerPosition, 1, -2, 0.225) == false)
 					{
 						// If the move was unsuccessful, then we move to the open space diagonally down
-						MovePlayer(playerPosition, 1, -1, 0.15f);
+						MovePlayer(playerPosition, 1, -1, 0.15);
 					}
 
 					// Either way we should have moved, so we don't need the fall down routine
@@ -214,10 +230,10 @@ void Player::Update(double dt, InputManager* inputManager)
 				if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1) == MapMatrix::TileStatus::Empty)
 				{
 					// Attempt to move the player down and to the left
-					if (MovePlayer(playerPosition, -1, -2, 0.225f) == false)
+					if (MovePlayer(playerPosition, -1, -2, 0.225) == false)
 					{
 						// If the move was unsuccessful, then we move to the open space diagonally down
-						MovePlayer(playerPosition, -1, -1, 0.15f);
+						MovePlayer(playerPosition, -1, -1, 0.15);
 					}
 
 					// Either way we should have moved, so we don't need the fall down routine
@@ -228,10 +244,10 @@ void Player::Update(double dt, InputManager* inputManager)
 			if (fallDown)
 			{
 				// Attempts to move the full distance down
-				if (MovePlayer(playerPosition, 0, -2, 0.225f) == false)
+				if (MovePlayer(playerPosition, 0, -2, 0.225) == false)
 				{
 					// If the full downward movement fails, only goes down one space
-					MovePlayer(playerPosition, 0, -1, 0.15f);
+					MovePlayer(playerPosition, 0, -1, 0.15);
 				}
 			}
 
@@ -243,7 +259,7 @@ void Player::Update(double dt, InputManager* inputManager)
 	if (GetIsMoving() == false && jumpPhase == 4)
 	{
 		// Attempts to move down
-		if (MovePlayer(playerPosition, 0, -1, 0.07f) == false)
+		if (MovePlayer(playerPosition, 0, -1, 0.07) == false)
 		{
 			// If there is ground below, becomes grounded
 			jumpPhase = 0;
@@ -297,24 +313,28 @@ bool Player::CheckInput(InputManager* inputManager, InputManager::Inputs input)
 		Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
 */
 /*************************************************************************************************/
-bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, float moveSpeed)
+bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, double moveSpeed)
 {
+	// Corrects if the player is facing right or left
+	if (horizontalMove > 0)
+	{
+		facingRight = true;
+	}
+	else if (horizontalMove < 0)
+	{
+		facingRight = false;
+	}
+
 	// Moves the player in logic
 	if (mapMatrix->SetPlayerPosition(playerPosition.first + horizontalMove, playerPosition.second + verticalMove))
 	{
+		playerPrevPos = playerPosition;
 		playerPosition.first += horizontalMove;
 		playerPosition.second += verticalMove;
-		MoveTo(GetPosition() + glm::vec2(2.0f * horizontalMove, -2.0f * verticalMove), moveSpeed, false);
+		MoveTo(glm::vec2(mapMatrix->GetMinMapX() + (2.0f * playerPosition.first), mapMatrix->GetMinMapY() - (2.0f * playerPosition.second)), moveSpeed, false);
 
-		// Corrects if the player is facing right or left
-		if (horizontalMove > 0)
-		{
-			facingRight = true;
-		}
-		else if (horizontalMove < 0)
-		{
-			facingRight = false;
-		}
+		// Resets time since moving
+		timeSinceMove = 0.0;
 
 		// Since the move was successful, returns true
 		return true;

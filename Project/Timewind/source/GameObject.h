@@ -249,6 +249,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the original position of the current move
+
+		\return
+			The original position of the current move
+	*/
+	/*************************************************************************************************/
+	glm::vec2 GetOriginalMovePosition() { return moveOriginalPosition; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets the position of the game object
 
 		\param newPosition

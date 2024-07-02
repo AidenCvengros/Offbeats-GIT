@@ -73,6 +73,10 @@ MapMatrix::MapMatrix(int width, int height)
 		column.resize(height, TileStatus::Empty);
 		mapMatrix.push_back(column);
 	}
+
+	// Sets the minimum dimensions
+	minX = -4.0f;
+	minY = 4.0f;
 }
 
 /*************************************************************************************************/
@@ -121,7 +125,7 @@ void MapMatrix::Draw(Window* window)
 			if (mapMatrix[i][j] == TileStatus::Wall)
 			{
 				// Sets the square's position and draws it
-				debugSquare.SetPosition({ -4.0f + (2.0f * i), 4.0f - (2.0f * j) });
+				debugSquare.SetPosition({ minX + (2.0f * i), minY - (2.0f * j) });
 				window->DrawGameObject(debugSquare);
 			}
 		}

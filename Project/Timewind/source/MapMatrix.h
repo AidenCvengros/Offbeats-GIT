@@ -249,6 +249,28 @@ public:
 	/*************************************************************************************************/
 	int GetMaxMapHeight();
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns that farthest left edge of the map
+
+		\return
+			The left-most edge of the map in world coordinates
+	*/
+	/*************************************************************************************************/
+	float GetMinMapX() { return minX; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns that lowest edge of the map
+
+		\return
+			The lowest of the map in world coordinates
+	*/
+	/*************************************************************************************************/
+	float GetMinMapY() { return minY; }
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
@@ -265,6 +287,9 @@ private:
 	std::vector<std::vector<TileStatus>> mapMatrix;	// The map grid
 
 	std::pair<int, int> playerPos;					// The position of the player
+
+	float minX;										// The farthest left you can go
+	float minY;										// The farthest down you can go (y is inverted btw)
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

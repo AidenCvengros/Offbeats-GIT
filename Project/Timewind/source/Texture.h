@@ -155,7 +155,6 @@ private:
 	VkSampler textureSampler;					// The texture image sampler
 	
 	VkDescriptorSet descriptorSet;				// The base descriptor set memory
-	
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
