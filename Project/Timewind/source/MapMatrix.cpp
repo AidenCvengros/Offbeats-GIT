@@ -113,7 +113,7 @@ void MapMatrix::Init()
 void MapMatrix::Draw(Window* window)
 {
 	// Creates a square game object that's gonna be the drawing
-	GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, { 1.0f, 0.0f, 0.0f, 0.5f });
+	GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, { 0.0f, 0.0f, 0.0f, 0.5f });
 	debugSquare.SetRender(true);
 
 	// Draws the map
@@ -121,10 +121,42 @@ void MapMatrix::Draw(Window* window)
 	{
 		for (int j = 0; j < mapMatrix[i].size(); j++)
 		{
-			// Checks for a non-empty space
-			if (mapMatrix[i][j] == TileStatus::Wall)
+			// Boolean to track whether a square should be drawn on this tile
+			bool shouldDraw = false;
+
+			// Checks for the player
+			switch (mapMatrix[i][j])
 			{
-				// Sets the square's position and draws it
+			// Does nothing because the spot is empty
+			case TileStatus::Empty:
+				break;
+			// Uses green for the player
+			case TileStatus::Player:
+				debugSquare.SetColor({ 0.0f, 1.0f, 0.0f, 0.5f });
+				shouldDraw = true;
+				break;
+			// Uses red for enemies
+			case TileStatus::Enemy:
+				debugSquare.SetColor({ 1.0f, 0.0f, 0.0f, 0.5f });
+				shouldDraw = true;
+				break;
+			// Uses light blue for destructibles
+			case TileStatus::Destructible:
+				debugSquare.SetColor({ 0.2f, 0.2f, 1.0f, 0.5f });
+				shouldDraw = true;
+				break;
+			// Uses light grey for walls
+			case TileStatus::Wall:
+				debugSquare.SetColor({ 0.6f, 0.6f, 0.6f, 0.5f });
+				shouldDraw = true;
+				break;
+			default:
+				break;
+			}
+
+			// Checks if the square should be drawn
+			if (shouldDraw)
+			{
 				debugSquare.SetPosition({ minX + (2.0f * i), minY - (2.0f * j) });
 				window->DrawGameObject(debugSquare);
 			}
@@ -203,7 +235,7 @@ bool MapMatrix::SetPlayerPosition(int xCoord, int yCoord)
 	if (xCoord >= 0 && xCoord < mapMatrix.size() && yCoord >= 0 && yCoord < mapMatrix[xCoord].size())
 	{
 		// Checks that the target location is a valid place to move to
-		if (mapMatrix[xCoord][yCoord] == TileStatus::Empty)
+		if (mapMatrix[xCoord][yCoord] < TileStatus::Player)
 		{
 			// Resets the old player position tile
 			mapMatrix[playerPos.first][playerPos.second] = TileStatus::Empty;
@@ -274,7 +306,7 @@ std::pair<int, int> MapMatrix::GetPlayerPosition()
 /*************************************************************************************************/
 int MapMatrix::GetMaxMapWidth()
 {
-	return mapMatrix.size();
+	return (int)mapMatrix.size();
 }
 
 /*************************************************************************************************/

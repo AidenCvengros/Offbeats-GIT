@@ -62,10 +62,15 @@ void InputManager::Init()
 	}
 
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_LEFT));
+	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_A));
 	keybinds.insert(std::pair(Inputs::Right, GLFW_KEY_RIGHT));
+	keybinds.insert(std::pair(Inputs::Right, GLFW_KEY_D));
 	keybinds.insert(std::pair(Inputs::Up, GLFW_KEY_UP));
+	keybinds.insert(std::pair(Inputs::Up, GLFW_KEY_W));
 	keybinds.insert(std::pair(Inputs::Down, GLFW_KEY_DOWN));
+	keybinds.insert(std::pair(Inputs::Down, GLFW_KEY_S));
 	keybinds.insert(std::pair(Inputs::Jump, GLFW_KEY_SPACE));
+	keybinds.insert(std::pair(Inputs::Attack, GLFW_KEY_E));
 }
 
 /*************************************************************************************************/

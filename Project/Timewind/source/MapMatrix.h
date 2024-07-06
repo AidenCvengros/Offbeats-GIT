@@ -69,9 +69,11 @@ public:
 
 	enum class TileStatus
 	{
-		Empty,
-		Wall,
+		Empty,									// The player can walk through spaces on this side ^^^
 		Player,
+		Enemy,									// The player cannot walk through spaces on this side vvv
+		Destructible,
+		Wall,
 		Max
 	};
 

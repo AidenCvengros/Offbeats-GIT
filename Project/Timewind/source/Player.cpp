@@ -70,7 +70,7 @@ void Player::Update(double dt, InputManager* inputManager)
 	if (GetIsMoving() == true)
 	{
 		// Jump buffer for having just started a grounded movement
-		if (jumpPhase == 0 && timeSinceMove < 0.125 && CheckInput(inputManager, InputManager::Inputs::Jump))
+		if (jumpPhase == 0 && timeSinceMove < 0.125 && inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
 		{
 			if (MovePlayer(playerPrevPos, 0, 1, 0.07))
 			{
@@ -81,12 +81,25 @@ void Player::Update(double dt, InputManager* inputManager)
 		// Updates the time since move tracker
 		timeSinceMove += dt;
 	}
+
+	// Checks for attacks being pressed
+	if (inputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
+	{
+		attackQueued = 1;
+	}
+
+	// Performs attacks if queued
+	Attack(dt, playerPosition);
 	
 	// Checks that the previous movement finished
 	if (GetIsMoving() == false && jumpPhase == 0)
 	{
+		// Resets the grounded check for jump attacks
+		jumpAttacked = false;
+		attackQueued = 0;
+
 		// Checks if the player isn't grounded
-		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second - 1) == MapMatrix::TileStatus::Empty)
+		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second - 1) < MapMatrix::TileStatus::Player)
 		{
 			// Begin falling
 			jumpPhase = 3;
@@ -342,4 +355,66 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 
 	// If the move failed, returns false
 	return false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to manage moving the player
+
+	\param dt
+		The time elapsed since the previous frame
+
+	\param playerPosition
+		The current position of the player (will be modified if the player moves)
+*/
+/*************************************************************************************************/
+void Player::Attack(double dt, std::pair<int, int>& playerPosition)
+{
+	// Checks if the player is open for an attack
+	// Basic attack, hits ahead 2 spaces															UNFINISHED BEHAVIORS
+	if (attackQueued != 0 && GetIsMoving() == false && jumpAttacked == false)
+	{
+		attackTimer = 0.2;
+		attackQueued = 0;
+		MoveTo(GetPosition(), 0.2, false);
+
+		// Checks if the player is jumping
+		if (jumpPhase > 0)
+		{
+			jumpAttacked = true;
+		}
+	}
+
+	// Decrements the attack timer
+	if (attackTimer > 0.0)
+	{
+		attackTimer -= dt;
+
+		// Checks if the player is attacking to the right or left
+		if (facingRight)
+		{
+			if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second) == MapMatrix::TileStatus::Enemy)
+			{
+
+			}
+			if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second) == MapMatrix::TileStatus::Destructible)
+			{
+				mapMatrix->SetTile(playerPosition.first + 1, playerPosition.second, MapMatrix::TileStatus::Empty);
+			}
+		}
+		// Otherwise does attacks facing left
+		else
+		{
+			if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second) == MapMatrix::TileStatus::Enemy)
+			{
+
+			}
+			if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second) == MapMatrix::TileStatus::Destructible)
+			{
+				mapMatrix->SetTile(playerPosition.first - 1, playerPosition.second, MapMatrix::TileStatus::Empty);
+				jumpAttacked = 0;
+			}
+		}
+	}
 }

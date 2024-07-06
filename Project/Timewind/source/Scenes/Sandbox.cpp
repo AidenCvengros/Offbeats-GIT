@@ -101,6 +101,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     mapMatrix->SetTile(5, 2, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(7, 3, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(9, 4, MapMatrix::TileStatus::Wall);
+    mapMatrix->SetTile(4, 2, MapMatrix::TileStatus::Destructible);
 }
 
 /*************************************************************************************************/

@@ -99,6 +99,9 @@ public:
 		jumpPhase(0),
 		playerPrevPos({ 2, 2 }),
 		timeSinceMove(0.0),
+		attackQueued(0),
+		attackTimer(0.0),
+		jumpAttacked(false),
 		mapMatrix(mapMatrix_) {}
 	
 	/*************************************************************************************************/
@@ -152,6 +155,10 @@ private:
 	std::pair<int, int> playerPrevPos;			// The previous player position in map coordinates
 	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
 
+	int attackQueued;							// Denotes whether an attack has been pressed (0 is no attack, it should activate the next time the player is at a tile)
+	double attackTimer;							// The active time on the attack
+	bool jumpAttacked;							// Boolean to prevent the player from whiffing multiple times in a jump
+
 	MapMatrix* mapMatrix;						// The map that the player is in
 
 	//---------------------------------------------------------------------------------------------
@@ -203,23 +210,14 @@ private:
 		\brief
 			Helper function to manage moving the player
 
+		\param dt
+			The time elapsed since the previous frame
+
 		\param playerPosition
 			The current position of the player (will be modified if the player moves)
-
-		\param horizontalMove
-			The horizontal movement (positive for right, negative for left)
-
-		\param verticalMove
-			The vertical movement (positive for up, negative for left)
-
-		\param moveSpeed
-			How long the movement takes
-
-		\return
-			Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
 	*/
 	/*************************************************************************************************/
-	//bool OverwriteMove(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, float moveSpeed);
+	void Attack(double dt, std::pair<int, int>& playerPosition);
 };
 
 //-------------------------------------------------------------------------------------------------

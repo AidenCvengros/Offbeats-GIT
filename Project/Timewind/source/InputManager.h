@@ -64,6 +64,7 @@ public:
 		Up,
 		Down,
 		Jump,
+		Attack,
 		Max
 	};
 
@@ -174,7 +175,7 @@ private:
 	
 	Window* window;								// The window recieving input
 	std::vector<InputStatus> inputTracker;		// Keeps track of the different input and they're statuses
-	std::vector<double> timeSincePressed;			// Functions as a buffer by mapping when this button was most recently pressed (doesn't count held)
+	std::vector<double> timeSincePressed;		// Functions as a buffer by mapping when this button was most recently pressed (doesn't count held)
 	std::multimap<Inputs, int> keybinds;		// Holds the different keys that map to a certain input
 
 	//---------------------------------------------------------------------------------------------
