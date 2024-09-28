@@ -38,6 +38,9 @@ Copyright (c) 2023 Aiden Cvengros
 // The vectors that make up the map grid
 #include <vector>
 
+// The game object class
+#include "GameObject.h"
+
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
@@ -63,10 +66,6 @@ public:
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 
-	//---------------------------------------------------------------------------------------------
-	// Public Structures
-	//---------------------------------------------------------------------------------------------
-
 	enum class TileStatus
 	{
 		Empty,									// The player can walk through spaces on this side ^^^
@@ -76,6 +75,16 @@ public:
 		Wall,
 		Max
 	};
+
+	//---------------------------------------------------------------------------------------------
+	// Public Structures
+	//---------------------------------------------------------------------------------------------
+
+	typedef struct
+	{
+		TileStatus tileStatus;
+		GameObject* tileObject;
+	}MapTile;
 
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -166,14 +175,34 @@ public:
 
 		\param newStatus
 			The new state of the tile
+
+		\param gameObject
+			The game object associated with the tile. Defaults to null if there's not meant to be a game object
 	*/
 	/*************************************************************************************************/
-	void SetTile(int xCoord, int yCoord, TileStatus newStatus);
+	void SetTile(int xCoord, int yCoord, TileStatus newStatus, GameObject* gameObject = NULL);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Moves the player to a specific position. Returns false if the move would be illegal
+			Sets the value of a given tile position
+
+		\param coordinates
+			The coordinates of the given tile
+
+		\param newStatus
+			The new state of the tile
+
+		\param gameObject
+			The game object associated with the tile. Defaults to null if there's not meant to be a game object
+	*/
+	/*************************************************************************************************/
+	void SetTile(std::pair<int, int> coordinates, TileStatus newStatus, GameObject* gameObject = NULL) { SetTile(coordinates.first, coordinates.second, newStatus, gameObject); }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Moves the player to a specific position. Returns false if the move would be illegal (oob, wall, etc.)
 
 		\param xCoord
 			The x coordinate of the tile to be changed
@@ -181,25 +210,83 @@ public:
 		\param yCoord
 			The y coordinate of the tile to be changed
 
+		\param playerObject
+			The player game object
+
 		\return
 			Whether the player was moved successfully
 	*/
 	/*************************************************************************************************/
-	bool SetPlayerPosition(int xCoord, int yCoord);
+	bool SetPlayerPosition(int xCoord, int yCoord, GameObject* playerObject);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Moves the player to a specific position. Returns false if the move would be illegal
+			Moves the player to a specific position. Returns false if the move would be illegal (oob, wall, etc.)
 
 		\param posCoords
 			The new position coordinates for the player
+
+		\param playerObject
+			The player game object
 
 		\return
 			Whether the player was moved successfully
 	*/
 	/*************************************************************************************************/
-	bool SetPlayerPosition(std::pair<int, int> posCoords) { return SetPlayerPosition(posCoords.first, posCoords.second); }
+	bool SetPlayerPosition(std::pair<int, int> posCoords, GameObject* playerObject) { return SetPlayerPosition(posCoords.first, posCoords.second, playerObject); }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Moves an object that's on a tile to a new tile. Returns false if the move would be illegal (oob, wall, etc.)
+
+		\param prevXCoord
+			The x coordinate of the previous tile
+
+		\param prevYCoord
+			The y coordinate of the previous tile
+
+		\param newXCoord
+			The x coordinate of the new tile
+
+		\param newYCoord
+			The y coordinate of the new tile
+
+		\param tileStatus
+			The status of the new tile
+
+		\param object
+			The game being moved
+
+		\return
+			Whether the object was moved successfully
+	*/
+	/*************************************************************************************************/
+	bool MoveTile(int prevXCoord, int prevYCoord, int newXCoord, int newYCoord, TileStatus tileStatus, GameObject* object);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Moves an object that's on a tile to a new tile. Returns false if the move would be illegal (oob, wall, etc.)
+
+		\param prevTile
+			The previous tile the object was on
+
+		\param newTile
+			The new tile the object is moving to
+
+		\param object
+			The game object being moved
+
+		\param tileStatus
+			The status of the new tile
+
+		\return
+			Whether the object was moved successfully
+	*/
+	/*************************************************************************************************/
+	bool MoveTile(std::pair<int, int> prevTile, std::pair<int, int> newTile, TileStatus tileStatus, GameObject* object) { return MoveTile(prevTile.first, prevTile.second, newTile.first, newTile.second, tileStatus, object); }
 
 	/*************************************************************************************************/
 	/*!
@@ -216,7 +303,7 @@ public:
 			The status of the given tile
 	*/
 	/*************************************************************************************************/
-	TileStatus GetTile(int xCoord, int yCoord);
+	MapTile GetTile(int xCoord, int yCoord);
 
 	/*************************************************************************************************/
 	/*!
@@ -273,6 +360,26 @@ public:
 	/*************************************************************************************************/
 	float GetMinMapY() { return minY; }
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Finds the coordinates of a tile associated with the given game object
+
+		\param xCoord
+			The x coordinate of the tile to be changed
+
+		\param yCoord
+			The y coordinate of the tile to be changed
+
+		\param newStatus
+			The new state of the tile
+
+		\param gameObject
+			The game object associated with the tile. Defaults to null if there's not meant to be a game object
+	*/
+	/*************************************************************************************************/
+	//std::pair<int, int> FindTileCoords(GameObject* gameObject);
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
@@ -286,16 +393,33 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 
-	std::vector<std::vector<TileStatus>> mapMatrix;	// The map grid
+	std::vector<std::vector<MapTile>> mapMatrix;	// The map grid
 
-	std::pair<int, int> playerPos;					// The position of the player
+	std::pair<int, int> playerPos;											// The position of the player
 
-	float minX;										// The farthest left you can go
-	float minY;										// The farthest down you can go (y is inverted btw)
+	float minX;																// The farthest left you can go
+	float minY;																// The farthest down you can go (y is inverted btw)
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Checks if the given coordinates are within the map
+
+		\param xCoord
+			The x coordinate
+
+		\param yCoord
+			The y coordinate
+
+		\return
+			True if the coordinates are within the map, false otherwise
+	*/
+	/*************************************************************************************************/
+	bool ValidateCoordinates(int xCoord, int yCoord);
 };
 
 //-------------------------------------------------------------------------------------------------

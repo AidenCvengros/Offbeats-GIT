@@ -69,8 +69,8 @@ MapMatrix::MapMatrix(int width, int height)
 	for (int i = 0; i < width; i++)
 	{
 		// Makes the columns height tall
-		std::vector<TileStatus> column;
-		column.resize(height, TileStatus::Empty);
+		std::vector<MapTile> column;
+		column.resize(height, { TileStatus::Empty, NULL });
 		mapMatrix.push_back(column);
 	}
 
@@ -113,7 +113,7 @@ void MapMatrix::Init()
 void MapMatrix::Draw(Window* window)
 {
 	// Creates a square game object that's gonna be the drawing
-	GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, { 0.0f, 0.0f, 0.0f, 0.5f });
+	GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, false, { 0.0f, 0.0f, 0.0f, 0.3f });
 	debugSquare.SetRender(true);
 
 	// Draws the map
@@ -125,7 +125,7 @@ void MapMatrix::Draw(Window* window)
 			bool shouldDraw = false;
 
 			// Checks for the player
-			switch (mapMatrix[i][j])
+			switch (mapMatrix[i][j].tileStatus)
 			{
 			// Does nothing because the spot is empty
 			case TileStatus::Empty:
@@ -158,7 +158,7 @@ void MapMatrix::Draw(Window* window)
 			if (shouldDraw)
 			{
 				debugSquare.SetPosition({ minX + (2.0f * i), minY - (2.0f * j) });
-				window->DrawGameObject(debugSquare);
+				window->DrawGameObject(&debugSquare);
 			}
 		}
 	}
@@ -189,7 +189,7 @@ void MapMatrix::Clear()
 	{
 		// Clears the contents of the column, then refills it with empty tiles
 		mapMatrix[i].clear();
-		mapMatrix[i].resize(mapMatrix.capacity(), TileStatus::Empty);
+		mapMatrix[i].resize(mapMatrix.capacity(), { TileStatus::Empty, NULL });
 	}
 }
 
@@ -206,12 +206,19 @@ void MapMatrix::Clear()
 
 	\param newStatus
 		The new state of the tile
+
+	\param gameObject
+		The game object associated with the tile. Defaults to null if there's not meant to be a game object
 */
 /*************************************************************************************************/
-void MapMatrix::SetTile(int xCoord, int yCoord, TileStatus newStatus)
+void MapMatrix::SetTile(int xCoord, int yCoord, TileStatus newStatus, GameObject* gameObject)
 {
-	// Updates the relevant tile
-	mapMatrix[xCoord][yCoord] = newStatus;
+	// Checks if the coordinates are valid
+	if (ValidateCoordinates(xCoord, yCoord))
+	{
+		// Updates the relevant tile
+		mapMatrix[xCoord][yCoord] = { newStatus, gameObject };
+	}
 }
 
 /*************************************************************************************************/
@@ -225,24 +232,77 @@ void MapMatrix::SetTile(int xCoord, int yCoord, TileStatus newStatus)
 	\param yCoord
 		The y coordinate of the tile to be changed
 
+	\param playerObject
+		The player game object
+
 	\return
 		Whether the player was moved successfully
 */
 /*************************************************************************************************/
-bool MapMatrix::SetPlayerPosition(int xCoord, int yCoord)
+bool MapMatrix::SetPlayerPosition(int xCoord, int yCoord, GameObject* playerObject)
 {
 	// Checks that the coordinates are within the map
-	if (xCoord >= 0 && xCoord < mapMatrix.size() && yCoord >= 0 && yCoord < mapMatrix[xCoord].size())
+	if (ValidateCoordinates(xCoord, yCoord))
 	{
 		// Checks that the target location is a valid place to move to
-		if (mapMatrix[xCoord][yCoord] < TileStatus::Player)
+		if (mapMatrix[xCoord][yCoord].tileStatus < TileStatus::Player)
 		{
 			// Resets the old player position tile
-			mapMatrix[playerPos.first][playerPos.second] = TileStatus::Empty;
+			mapMatrix[playerPos.first][playerPos.second] = { TileStatus::Empty, NULL };
 
 			// Sets the new player position
-			mapMatrix[xCoord][yCoord] = TileStatus::Player;
+			mapMatrix[xCoord][yCoord] = { TileStatus::Player, playerObject };
 			playerPos = std::pair(xCoord, yCoord);
+
+			// Returns that the player was moved
+			return true;
+		}
+	}
+
+	// Otherwise returns that the player wasn't moved
+	return false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Moves an object that's on a tile to a new tile. Returns false if the move would be illegal (oob, wall, etc.)
+
+	\param prevXCoord
+		The x coordinate of the previous tile
+
+	\param prevYCoord
+		The y coordinate of the previous tile
+
+	\param newXCoord
+		The x coordinate of the new tile
+
+	\param newYCoord
+		The y coordinate of the new tile
+
+	\param tileStatus
+		The status of the new tile
+
+	\param object
+		The game being moved
+
+	\return
+		Whether the object was moved successfully
+*/
+/*************************************************************************************************/
+bool MapMatrix::MoveTile(int prevXCoord, int prevYCoord, int newXCoord, int newYCoord, MapMatrix::TileStatus tileStatus, GameObject* object)
+{
+	// Checks that the coordinates are within the map
+	if (ValidateCoordinates(prevXCoord, prevYCoord) && ValidateCoordinates(newXCoord, newYCoord))
+	{
+		// Checks that the target location is a valid place to move to
+		if (mapMatrix[newXCoord][newYCoord].tileStatus < tileStatus)
+		{
+			// Resets the old position's tile
+			SetTile(prevXCoord, prevYCoord, TileStatus::Empty);
+
+			// Sets the new player position
+			SetTile(newXCoord, newYCoord, tileStatus, object);
 
 			// Returns that the player was moved
 			return true;
@@ -268,17 +328,17 @@ bool MapMatrix::SetPlayerPosition(int xCoord, int yCoord)
 		The status of the given tile
 */
 /*************************************************************************************************/
-MapMatrix::TileStatus MapMatrix::GetTile(int xCoord, int yCoord)
+MapMatrix::MapTile MapMatrix::GetTile(int xCoord, int yCoord)
 {
 	// Checks that the coordinates are within the map
-	if (xCoord >= 0 && xCoord < mapMatrix.size() && yCoord >= 0 && yCoord < mapMatrix[xCoord].size())
+	if (ValidateCoordinates(xCoord, yCoord))
 	{
 		// Returns the tile's status
 		return mapMatrix[xCoord][yCoord];
 	}
 
 	// Otherwise return a wall
-	return TileStatus::Wall;
+	return { TileStatus::Wall, NULL };
 }
 
 /*************************************************************************************************/
@@ -323,6 +383,49 @@ int MapMatrix::GetMaxMapHeight()
 	return mapMatrix[0].capacity();
 }
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets the value of a given tile position
+
+	\param xCoord
+		The x coordinate of the tile to be changed
+
+	\param yCoord
+		The y coordinate of the tile to be changed
+
+	\param newStatus
+		The new state of the tile
+
+	\param gameObject
+		The game object associated with the tile. Defaults to null if there's not meant to be a game object
+*/
+/*************************************************************************************************/
+//std::pair<int, int> MapMatrix::FindTileCoords(GameObject* gameObject)
+//{
+//
+//}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Checks if the given coordinates are within the map
+
+	\param xCoord
+		The x coordinate
+
+	\param yCoord
+		The y coordinate
+
+	\return
+		True if the coordinates are within the map, false otherwise
+*/
+/*************************************************************************************************/
+bool MapMatrix::ValidateCoordinates(int xCoord, int yCoord)
+{
+	return xCoord >= 0 && xCoord < mapMatrix.size() && yCoord >= 0 && yCoord < mapMatrix[xCoord].size();
+}

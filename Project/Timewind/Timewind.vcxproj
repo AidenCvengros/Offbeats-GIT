@@ -155,13 +155,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="source\AttackManager.h" />
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\Engine.h" />
     <ClInclude Include="source\GameObject.h" />
     <ClInclude Include="source\GameObjectManager.h" />
+    <ClInclude Include="source\Game_Objects\Enemy.h" />
     <ClInclude Include="source\InputManager.h" />
     <ClInclude Include="source\MapMatrix.h" />
     <ClInclude Include="source\Player.h" />
+    <ClInclude Include="source\Pool.h" />
     <ClInclude Include="source\Scene.h" />
     <ClInclude Include="source\SceneManager.h" />
     <ClInclude Include="source\Scenes\Sandbox.h" />
@@ -173,14 +176,17 @@
     <ClInclude Include="source\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\AttackManager.cpp" />
     <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\Engine.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\GameObjectManager.cpp" />
+    <ClCompile Include="source\Game_Objects\Enemy.cpp" />
     <ClCompile Include="source\InputManager.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\MapMatrix.cpp" />
     <ClCompile Include="source\Player.cpp" />
+    <ClCompile Include="source\Pool.cpp" />
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\SceneManager.cpp" />
     <ClCompile Include="source\Scenes\Sandbox.cpp" />

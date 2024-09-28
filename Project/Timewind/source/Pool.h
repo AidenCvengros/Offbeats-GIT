@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Camera.h
+\file Pool.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.9
+\date 2024.7.14
 \brief
-    Camera game object
+    The pool game object that helps track resources
 
     Public Functions:
         + FILL
@@ -17,8 +17,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Camera_H_
-#define Syncopatience_Camera_H_
+#ifndef Syncopatience_Pool_H_
+#define Syncopatience_Pool_H_
 
 #pragma once
 
@@ -28,16 +28,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "stdafx.h"
 
-// Base game object class
+// The base game object class
 #include "GameObject.h"
-
-// glm matrix and math functionality
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-// Player class for the camera to be centered on
-#include "Player.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -54,10 +46,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The camera game object class
+		The pool object class
 */
 /*************************************************************************************************/
-class Camera : public GameObject
+class Pool : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -79,8 +71,8 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the camera class
-			
+			Constructor for the pool object class
+
 		\param pos
 			The position of the game object
 
@@ -90,87 +82,82 @@ public:
 		\param sca
 			The scale of the game object
 
-		\param centeredObject_
-			The game object to center the camera on
+		\param maxValue_
+			The maximum value of the resource in the pool
 
-		\param windowWidth_
-			The width of the view space
-
-		\param windowHeight_
-			The height of the view space
+		\param overflow_
+			Whether the pool value can go over the normal maximum
 	*/
 	/*************************************************************************************************/
-	Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_, float aspectRatio_, float fieldOfView) :
-		GameObject(pos, rot, sca, 0, false),
-		//rotationChanged(true),
-		perspectiveChanged(true),
-		upVector(glm::vec3(0.0f, -1.0f, 0.0f)),
-		centeredObject(centeredObject_),
-		viewMat(glm::mat4(0.0f)),
-		perspMat(glm::mat4(0.0f)),
-		aspectRatio(aspectRatio_),
-		fov(fieldOfView) {}
+	Pool(glm::vec2 pos, float rot, glm::vec2 sca, float maxValue_, bool overflow_, glm::vec4 color_ = { 0.0f, 0.0f, 0.0f, 0.0f }) :
+		GameObject(pos, rot, sca, 60, false, color_),
+		maxValue(maxValue_),
+		currValue(maxValue_),
+		overflow(overflow_) {}
 	
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Destructor for the camera class
+			Destructor for the game object class
 	*/
 	/*************************************************************************************************/
-	~Camera() {}
+	~Pool() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the game object.
-	
-		\param dt
-			The time elapsed since the previous frame
-	
-		\param inputManager
-			The input manager
-	*/
-	/*************************************************************************************************/
-	void Update(double dt, InputManager* inputManager);
+			Adds the given amount to the pool
 
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the view matrix of the camera
+		\param addAmount
+			The amount to add to the pool
 
 		\return
-			The view matrix
+			How much was added to the pool (for instance will differ from addAmount if it hits max)
 	*/
 	/*************************************************************************************************/
-	glm::mat4 GetViewMatrix();
+	float AddToPool(float addAmount);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the perspective matrix of the camera
+			Subtracts the given amount from the pool
+
+		\param subtractAmount
+			The amount to subtract from the pool
 
 		\return
-			The perspective matrix
+			How much was subtracted from the pool (for instance will differ from subtractAmount if it hits min)
 	*/
 	/*************************************************************************************************/
-	glm::mat4 GetPerspectiveMatrix();
+	float SubtractFromPool(float subtractAmount);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Sets a game object for the camera to center on
+			Return the amount of resources in this pool object
 
-		\param object
-			The new centered object
+		\return
+			The current amount in the pool
 	*/
 	/*************************************************************************************************/
-	void SetCenteredObject(Player* object);
+	float GetPoolValue() { return currValue; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Return the percentage of the pool that is filled
+
+		\return
+			The current ratio of the amount in the pool
+	*/
+	/*************************************************************************************************/
+	float GetPoolRatio() { return currValue / maxValue; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
@@ -179,17 +166,9 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	//bool rotationChanged;						// Boolean for updating camera rotation				THIS VARIABLE NEEDS TO TRACK WHETHER THE TARGET GO HAS CHANGED BEFORE IT WORKS
-	bool perspectiveChanged;					// Boolean for updating camera perspective matrix
-
-	glm::vec3 upVector;							// The up vector for the camera
-	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
-
-	glm::mat4 viewMat;							// The view matrix for the camera
-	glm::mat4 perspMat;							// The perspective matrix for the camera
-
-	float aspectRatio;							// The aspect ratio of the camera view
-	float fov;									// The field of view of the camera view
+	float maxValue;								// The maximum value of the resource
+	float currValue;							// The current amount of resource in the pool
+	bool overflow;								// Whether the current value can go above the maximum
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -204,4 +183,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Camera_H_
+#endif // Syncopatience_Pool_H_

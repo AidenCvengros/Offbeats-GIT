@@ -170,7 +170,7 @@ public:
 			The given object to be drawn
 	*/
 	/*********************************************************************************************/
-	void DrawGameObject(GameObject gameObject);
+	void DrawGameObject(GameObject* gameObject);
 
 	/*********************************************************************************************/
 	/*!

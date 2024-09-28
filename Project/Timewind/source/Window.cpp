@@ -238,21 +238,21 @@ void Window::Draw(Window* window_)
 		The given object to be drawn
 */
 /*********************************************************************************************/
-void Window::DrawGameObject(GameObject gameObject)
+void Window::DrawGameObject(GameObject* gameObject)
 {
-	if (gameObject.GetRender())
+	if (gameObject->GetRender())
 	{
 		// Sets the dynamic offset and draws the first object
-		glm::mat4 tempMat = gameObject.GetTranformationMatrix();
-		glm::vec4 tempColor = gameObject.GetColor();
+		glm::mat4 tempMat = gameObject->GetTranformationMatrix();
+		glm::vec4 tempColor = gameObject->GetColor();
 		vkCmdPushConstants(commandBuffer[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &tempMat);
 		vkCmdPushConstants(commandBuffer[currentFrame], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 64, sizeof(glm::vec4), &tempColor);
 
 		// Checks if the game object has a texture
-		if (gameObject.GetTexture())
+		if (gameObject->GetTexture())
 		{
 			// Binds the texture descriptor set and color
-			vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, gameObject.GetTexture()->GetDescriptorSet(), 0, NULL);
+			vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, gameObject->GetTexture()->GetDescriptorSet(), 0, NULL);
 		}
 		// Otherwise uses the default blank texture
 		else

@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Camera.h
+\file Enemy.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.9
+\date 2024.7.11
 \brief
-    Camera game object
+    The base game object class representing enemies
 
     Public Functions:
         + FILL
@@ -17,8 +17,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Camera_H_
-#define Syncopatience_Camera_H_
+#ifndef Syncopatience_Enemy_H_
+#define Syncopatience_Enemy_H_
 
 #pragma once
 
@@ -26,18 +26,13 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "stdafx.h"
+#include "../stdafx.h"
 
-// Base game object class
-#include "GameObject.h"
+#include "../GameObject.h"
 
-// glm matrix and math functionality
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../MapMatrix.h"
 
-// Player class for the camera to be centered on
-#include "Player.h"
+#include "../Pool.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -54,10 +49,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The camera game object class
+		The base enemy game object class
 */
 /*************************************************************************************************/
-class Camera : public GameObject
+class Enemy : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -79,7 +74,7 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the camera class
+			Constructor for the base enemy game object class
 			
 		\param pos
 			The position of the game object
@@ -90,81 +85,112 @@ public:
 		\param sca
 			The scale of the game object
 
-		\param centeredObject_
-			The game object to center the camera on
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority
 
-		\param windowWidth_
-			The width of the view space
+		\param texture_
+			The texture of the enemy object
 
-		\param windowHeight_
-			The height of the view space
+		\param mapMatrix_
+			The map that the enemy object is in
+
+		\param mapCoords
+			The starting coordinates of the enemy
 	*/
 	/*************************************************************************************************/
-	Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_, float aspectRatio_, float fieldOfView) :
-		GameObject(pos, rot, sca, 0, false),
-		//rotationChanged(true),
-		perspectiveChanged(true),
-		upVector(glm::vec3(0.0f, -1.0f, 0.0f)),
-		centeredObject(centeredObject_),
-		viewMat(glm::mat4(0.0f)),
-		perspMat(glm::mat4(0.0f)),
-		aspectRatio(aspectRatio_),
-		fov(fieldOfView) {}
+	Enemy(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_, std::pair<int, int> mapCoords);
 	
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Destructor for the camera class
+			Destructor for base enemy class
 	*/
 	/*************************************************************************************************/
-	~Camera() {}
+	~Enemy();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
 			Updates the game object.
-	
+
 		\param dt
 			The time elapsed since the previous frame
-	
+
 		\param inputManager
 			The input manager
 	*/
 	/*************************************************************************************************/
-	void Update(double dt, InputManager* inputManager);
+	virtual void Update(double dt, InputManager* inputManager);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the view matrix of the camera
+			Draws the child game objects
+
+		\param window
+			The game window the objects are being drawn to
+	*/
+	/*************************************************************************************************/
+	virtual void DrawChildObjects(Window* window);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Helper function to manage moving the enemy
+
+		\param enemyPosition
+			The current position of the enemy (will be modified if the enemy moves)
+
+		\param horizontalMove
+			The horizontal movement (positive for right, negative for left)
+
+		\param verticalMove
+			The vertical movement (positive for up, negative for left)
+
+		\param moveSpeed
+			How long the movement takes
 
 		\return
-			The view matrix
+			Returns true if the move was successful, false if not (enemyPosition is not changed if false is returned)
 	*/
 	/*************************************************************************************************/
-	glm::mat4 GetViewMatrix();
+	bool MoveEnemy(std::pair<int, int>& enemyPosition, int horizontalMove, int verticalMove, double moveSpeed);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the perspective matrix of the camera
+			Helper function to manage moving the enemy
+
+		\param dt
+			The time elapsed since the previous frame
+
+		\param enemyPosition
+			The current position of the enemy (will be modified if the enemy moves)
+	*/
+	/*************************************************************************************************/
+	virtual void Attack(double dt, std::pair<int, int>& enemyPosition);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Deals the given amount of damage to the enemy
+
+		\param damage
+			The amount of damage to deal
+	*/
+	/*************************************************************************************************/
+	void DamageEnemy(float damage);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns whether the enemy is facing right
 
 		\return
-			The perspective matrix
+			Whether the enemy is facing to the right
 	*/
 	/*************************************************************************************************/
-	glm::mat4 GetPerspectiveMatrix();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets a game object for the camera to center on
-
-		\param object
-			The new centered object
-	*/
-	/*************************************************************************************************/
-	void SetCenteredObject(Player* object);
+	bool IsFacingRight() { return facingRight; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -179,21 +205,18 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	//bool rotationChanged;						// Boolean for updating camera rotation				THIS VARIABLE NEEDS TO TRACK WHETHER THE TARGET GO HAS CHANGED BEFORE IT WORKS
-	bool perspectiveChanged;					// Boolean for updating camera perspective matrix
+	bool facingRight;							// Whether the player is facing to the right
 
-	glm::vec3 upVector;							// The up vector for the camera
-	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
+	double attackTimer;							// The active time on the attack
 
-	glm::mat4 viewMat;							// The view matrix for the camera
-	glm::mat4 perspMat;							// The perspective matrix for the camera
+	Pool* healthPool;							// The health pool of the enemy
 
-	float aspectRatio;							// The aspect ratio of the camera view
-	float fov;									// The field of view of the camera view
+	MapMatrix* mapMatrix;						// The map that the player is in
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
+
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -204,4 +227,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Camera_H_
+#endif // Syncopatience_Enemy_H_

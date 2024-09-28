@@ -1,24 +1,26 @@
 /*************************************************************************************************/
 /*!
-\file Camera.h
+\file AttackManager.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.9
+\date 2024.9.6
 \brief
-    Camera game object
+    Manages the player's attacks.
 
-    Public Functions:
-        + FILL
-		
-	Private Functions:
-		+ FILL
+    Functions include:
+        + AttackManager
+		+ ~AttackManager
+		+ UpdateAttacks
+		+ StartAttack
+		+ EndAttack
+		+ GetAttackStatus
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Camera_H_
-#define Syncopatience_Camera_H_
+#ifndef Syncopatience_AttackManager_H_
+#define Syncopatience_AttackManager_H_
 
 #pragma once
 
@@ -28,16 +30,9 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "stdafx.h"
 
-// Base game object class
-#include "GameObject.h"
+#include <vector>
 
-// glm matrix and math functionality
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-// Player class for the camera to be centered on
-#include "Player.h"
+#include "MapMatrix.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -54,19 +49,51 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The camera game object class
+		Manages the players attacks
 */
 /*************************************************************************************************/
-class Camera : public GameObject
+class AttackManager
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
+
+	enum class AttackTypes
+	{
+		NullAttack,
+		Slash1,
+		Slash2,
+		Slash3,
+		ConductingStrike,
+		UpwardsSlash,
+		Slamdown,
+		Max
+	};
+
+	enum class AttackPhase
+	{
+		NullAttack = -1,
+		Startup,
+		Active,
+		Ending,
+		Max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
+
+	typedef struct 
+	{
+		AttackTypes attackType;						// The type of attack
+		AttackPhase attackPhase;				// The stage of this attack
+		int xCoord;								// The X map coordinate of the attack (Coordinate usage is attack specific)
+		int yCoord;								// The y map coordinate of the attack
+		bool facingRight;						// Whether the attack is aimed right or left
+		double phaseTimer;						// How much time is left in the current phase
+		std::vector<GameObject*> targetList;	// After an attack hits a target, tracks that game object so it isn't hit again
+	}AttackStruct;
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -75,96 +102,89 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-	
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the camera class
-			
-		\param pos
-			The position of the game object
-
-		\param rot
-			The rotation of the game object
-
-		\param sca
-			The scale of the game object
-
-		\param centeredObject_
-			The game object to center the camera on
-
-		\param windowWidth_
-			The width of the view space
-
-		\param windowHeight_
-			The height of the view space
+			Constructor for the attack manager class
 	*/
 	/*************************************************************************************************/
-	Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_, float aspectRatio_, float fieldOfView) :
-		GameObject(pos, rot, sca, 0, false),
-		//rotationChanged(true),
-		perspectiveChanged(true),
-		upVector(glm::vec3(0.0f, -1.0f, 0.0f)),
-		centeredObject(centeredObject_),
-		viewMat(glm::mat4(0.0f)),
-		perspMat(glm::mat4(0.0f)),
-		aspectRatio(aspectRatio_),
-		fov(fieldOfView) {}
-	
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Destructor for the camera class
-	*/
-	/*************************************************************************************************/
-	~Camera() {}
+	AttackManager();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the game object.
-	
+			Destructor for attack manager class
+	*/
+	/*************************************************************************************************/
+	~AttackManager();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates all currently active attacks checking within the given map matrix
+
+		\param mapMatrix
+			The given map matrix
+
 		\param dt
-			The time elapsed since the previous frame
-	
-		\param inputManager
-			The input manager
+			How much time elapsed since the previous frame
 	*/
 	/*************************************************************************************************/
-	void Update(double dt, InputManager* inputManager);
+	void UpdateAttacks(MapMatrix* mapMatrix, double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the view matrix of the camera
+			Starts the given attack regardless of current attack status
+
+		\param attack
+			The attack to start
+
+		\param attackXCoordinate
+			The x coordinate of the attack
+
+		\param attackYCoordinate
+			The y coordinate of the attack
+
+		\param attackFacingRight
+			Boolean for whether the attack is going to the right (true) or the left (false)
+	*/
+	/*************************************************************************************************/
+	void StartAttack(AttackTypes attack, int attackXCoordinate, int attackYCoordinate, bool attackFacingRight);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Ends the given attack regardless of current attack status
+	*/
+	/*************************************************************************************************/
+	void EndAttack();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the current attack
 
 		\return
-			The view matrix
+			The current attack
 	*/
 	/*************************************************************************************************/
-	glm::mat4 GetViewMatrix();
+	AttackStruct GetCurrentAttackStatus();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the perspective matrix of the camera
+			Returns how long the given type of attack takes to execute
+
+		\param attackType
+			The type of attack
 
 		\return
-			The perspective matrix
+			The total time for the attack in seconds
 	*/
 	/*************************************************************************************************/
-	glm::mat4 GetPerspectiveMatrix();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets a game object for the camera to center on
-
-		\param object
-			The new centered object
-	*/
-	/*************************************************************************************************/
-	void SetCenteredObject(Player* object);
+	double GetAttackLength(AttackTypes attackType);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -178,22 +198,54 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+
+	AttackStruct currentAttack;					// The current attack the player is performing
+
+	std::vector<AttackStruct> activeAttacks;	// Holds the active attacks (like projectiles that linger)
 	
-	//bool rotationChanged;						// Boolean for updating camera rotation				THIS VARIABLE NEEDS TO TRACK WHETHER THE TARGET GO HAS CHANGED BEFORE IT WORKS
-	bool perspectiveChanged;					// Boolean for updating camera perspective matrix
-
-	glm::vec3 upVector;							// The up vector for the camera
-	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
-
-	glm::mat4 viewMat;							// The view matrix for the camera
-	glm::mat4 perspMat;							// The perspective matrix for the camera
-
-	float aspectRatio;							// The aspect ratio of the camera view
-	float fov;									// The field of view of the camera view
-
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Checks if an active attack hits
+
+		\param mapMatrix
+			The map the attack is in
+
+		\param activeAttack
+			The attack being checked
+
+		\return
+			Whether the attack hit anything
+	*/
+	/*************************************************************************************************/
+	bool CheckActiveAttack(MapMatrix* mapMatrix, AttackStruct activeAttack);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Calculates tile coordinates with a left or right offset
+
+		\param xCoord
+			The X coordinate of the center tile
+
+		\param yCoord
+			The Y coordinate of the center tile
+
+		\param facingRight
+			Whether the attack is facing right
+
+		\param xOffset
+			The offset from the center tile. Will be used in conjunction with the facingRight variable to check the correct tile
+
+		\return
+			Returns the tile coordinates
+	*/
+	/*************************************************************************************************/
+	std::pair<int, int> CalculateOffsetTile(int xCoord, int yCoord, bool facingRight, int xOffset);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -204,4 +256,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Camera_H_
+#endif // Syncopatience_AttackManager_H_

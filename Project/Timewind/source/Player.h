@@ -32,6 +32,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "MapMatrix.h"
 
+#include "AttackManager.h"
+
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
@@ -91,18 +93,12 @@ public:
 
 		\param mapMatrix_
 			The map that the player object is in
+
+		\param mapCoords
+			The starting coordinates of the player
 	*/
 	/*************************************************************************************************/
-	Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_) :
-		GameObject(pos, rot, sca, drawPriority_, texture_),
-		facingRight(true),
-		jumpPhase(0),
-		playerPrevPos({ 2, 2 }),
-		timeSinceMove(0.0),
-		attackQueued(0),
-		attackTimer(0.0),
-		jumpAttacked(false),
-		mapMatrix(mapMatrix_) {}
+	Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_, std::pair<int, int> mapCoords);
 	
 	/*************************************************************************************************/
 	/*!
@@ -156,8 +152,8 @@ private:
 	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
 
 	int attackQueued;							// Denotes whether an attack has been pressed (0 is no attack, it should activate the next time the player is at a tile)
-	double attackTimer;							// The active time on the attack
 	bool jumpAttacked;							// Boolean to prevent the player from whiffing multiple times in a jump
+	AttackManager attackManager;				// Keeps track of attacks the player uses
 
 	MapMatrix* mapMatrix;						// The map that the player is in
 
@@ -218,6 +214,14 @@ private:
 	*/
 	/*************************************************************************************************/
 	void Attack(double dt, std::pair<int, int>& playerPosition);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Starts and manages the three hit basic attack combo
+	*/
+	/*************************************************************************************************/
+	void ProgressBasicAttack();
 };
 
 //-------------------------------------------------------------------------------------------------

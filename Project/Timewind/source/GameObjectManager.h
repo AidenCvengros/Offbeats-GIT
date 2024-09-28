@@ -157,7 +157,7 @@ private:
 	
 	std::multimap<int, GameObject*> gameObjectList;			// The list of game objects being managed
 
-	//Window* window;											// Pointer to the window being drawn to
+	//Window* window;										// Pointer to the window being drawn to
 	InputManager* inputManager;								// Pointer to the input manager to communicate to the game objects
 
 	//---------------------------------------------------------------------------------------------

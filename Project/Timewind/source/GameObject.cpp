@@ -140,6 +140,34 @@ void GameObject::SetPosition(glm::vec2 newPosition)
 /*************************************************************************************************/
 /*!
 	\brief
+		Sets the rotation of the game object
+
+	\param newRotation
+		The game object's new rotation
+*/
+/*************************************************************************************************/
+void GameObject::SetRotation(float newRotation)
+{
+	rotation = newRotation;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets the scale of the game object
+
+	\param newScale
+		The game object's new scale
+*/
+/*************************************************************************************************/
+void GameObject::SetScale(glm::vec2 newScale)
+{
+	scale = newScale;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Sets a new movement
 
 	\param newPosition

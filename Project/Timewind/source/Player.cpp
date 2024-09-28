@@ -20,6 +20,9 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "Player.h"
 
+// Includes the enemy class for interacting with them
+#include "Game_Objects/Enemy.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -43,6 +46,46 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Constructor for the player game object class
+
+	\param pos
+		The position of the game object
+
+	\param rot
+		The rotation of the game object
+
+	\param sca
+		The scale of the game object
+
+	\param drawPriority_
+		Higher draw priorities are drawn in front of objects with lower priority
+
+	\param texture_
+		The texture of the player object
+
+	\param mapMatrix_
+		The map that the player object is in
+
+	\param mapCoords
+		The starting coordinates of the player
+*/
+/*************************************************************************************************/
+Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_, std::pair<int, int> mapCoords) :
+	GameObject(pos, rot, sca, drawPriority_, texture_, true, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
+	facingRight(true),
+	jumpPhase(0),
+	playerPrevPos({ 2, 2 }),
+	timeSinceMove(0.0),
+	attackQueued(0),
+	jumpAttacked(false),
+	mapMatrix(mapMatrix_)
+{
+	mapMatrix->SetPlayerPosition(mapCoords, this);
+}
 
 /*************************************************************************************************/
 /*!
@@ -99,7 +142,7 @@ void Player::Update(double dt, InputManager* inputManager)
 		attackQueued = 0;
 
 		// Checks if the player isn't grounded
-		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second - 1) < MapMatrix::TileStatus::Player)
+		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second - 1).tileStatus < MapMatrix::TileStatus::Player)
 		{
 			// Begin falling
 			jumpPhase = 3;
@@ -130,7 +173,7 @@ void Player::Update(double dt, InputManager* inputManager)
 	if (GetIsMoving() == false && jumpPhase == 1)
 	{
 		// First checks if the space directly above is occupied (if it is we hit a ceiling and start falling)
-		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second + 1) == MapMatrix::TileStatus::Empty)
+		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
 		{
 			// Boolean to save on rewriting the code for jumping straight up if certain spaces are preventing sideways movement
 			bool jumpUp = true;
@@ -139,7 +182,7 @@ void Player::Update(double dt, InputManager* inputManager)
 			if (CheckInput(inputManager, InputManager::Inputs::Right))
 			{
 				// Checks if the space diagonally up is occupied (if it is we'll just treat it as a jump straight up)
-				if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second + 1) == MapMatrix::TileStatus::Empty)
+				if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
 				{
 					// Attempt to move the player up and to the right
 					if (MovePlayer(playerPosition, 1, 2, 0.225) == false)
@@ -156,7 +199,7 @@ void Player::Update(double dt, InputManager* inputManager)
 			else if (CheckInput(inputManager, InputManager::Inputs::Left))
 			{
 				// Checks if the space diagonally up is occupied (if it is we'll just treat it as a jump straight up)
-				if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1) == MapMatrix::TileStatus::Empty)
+				if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
 				{
 					// Attempt to move the player up and to the left
 					if (MovePlayer(playerPosition, -1, 2, 0.225) == false)
@@ -209,7 +252,7 @@ void Player::Update(double dt, InputManager* inputManager)
 	if (GetIsMoving() == false && jumpPhase == 3)
 	{
 		// First checks if the space directly below is occupied (if it is we're grounded)
-		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second - 1) != MapMatrix::TileStatus::Empty)
+		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second - 1).tileStatus != MapMatrix::TileStatus::Empty)
 		{
 			jumpPhase = 0;
 		}
@@ -223,7 +266,7 @@ void Player::Update(double dt, InputManager* inputManager)
 			if (CheckInput(inputManager, InputManager::Inputs::Right))
 			{
 				// Checks if the space diagonally down is occupied (if it is we'll just treat it as a fall straight down)
-				if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second - 1) == MapMatrix::TileStatus::Empty)
+				if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second - 1).tileStatus == MapMatrix::TileStatus::Empty)
 				{
 					// Attempt to move the player down and to the right
 					if (MovePlayer(playerPosition, 1, -2, 0.225) == false)
@@ -240,7 +283,7 @@ void Player::Update(double dt, InputManager* inputManager)
 			else if (CheckInput(inputManager, InputManager::Inputs::Left))
 			{
 				// Checks if the space diagonally down is occupied (if it is we'll just treat it as a fall straight down)
-				if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1) == MapMatrix::TileStatus::Empty)
+				if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
 				{
 					// Attempt to move the player down and to the left
 					if (MovePlayer(playerPosition, -1, -2, 0.225) == false)
@@ -339,7 +382,7 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 	}
 
 	// Moves the player in logic
-	if (mapMatrix->SetPlayerPosition(playerPosition.first + horizontalMove, playerPosition.second + verticalMove))
+	if (mapMatrix->SetPlayerPosition(playerPosition.first + horizontalMove, playerPosition.second + verticalMove, this))
 	{
 		playerPrevPos = playerPosition;
 		playerPosition.first += horizontalMove;
@@ -371,50 +414,79 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 /*************************************************************************************************/
 void Player::Attack(double dt, std::pair<int, int>& playerPosition)
 {
-	// Checks if the player is open for an attack
-	// Basic attack, hits ahead 2 spaces															UNFINISHED BEHAVIORS
-	if (attackQueued != 0 && GetIsMoving() == false && jumpAttacked == false)
+	// Checks if the player is starting an attack
+	if (attackQueued != 0)
 	{
-		attackTimer = 0.2;
-		attackQueued = 0;
-		MoveTo(GetPosition(), 0.2, false);
-
-		// Checks if the player is jumping
-		if (jumpPhase > 0)
+		// If the player isn't moving, they can start the attack
+		if (GetIsMoving() == false)
 		{
-			jumpAttacked = true;
-		}
-	}
-
-	// Decrements the attack timer
-	if (attackTimer > 0.0)
-	{
-		attackTimer -= dt;
-
-		// Checks if the player is attacking to the right or left
-		if (facingRight)
-		{
-			if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second) == MapMatrix::TileStatus::Enemy)
+			// If it's a basic attack, progresses the basic attack
+			if (attackQueued == 1)
 			{
-
-			}
-			if (mapMatrix->GetTile(playerPosition.first + 1, playerPosition.second) == MapMatrix::TileStatus::Destructible)
-			{
-				mapMatrix->SetTile(playerPosition.first + 1, playerPosition.second, MapMatrix::TileStatus::Empty);
+				ProgressBasicAttack();
 			}
 		}
-		// Otherwise does attacks facing left
+		// If the player is doing a move, they count as moving, so we check if we can cancel the current move into the new move
 		else
 		{
-			if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second) == MapMatrix::TileStatus::Enemy)
-			{
+			auto currentAttack = attackManager.GetCurrentAttackStatus();
 
-			}
-			if (mapMatrix->GetTile(playerPosition.first - 1, playerPosition.second) == MapMatrix::TileStatus::Destructible)
+			// Checks that there is an attack happening
+			if (currentAttack.attackType != AttackManager::AttackTypes::NullAttack)
 			{
-				mapMatrix->SetTile(playerPosition.first - 1, playerPosition.second, MapMatrix::TileStatus::Empty);
-				jumpAttacked = 0;
+				// Checks if the current attack are part of the basic combo
+				if (currentAttack.attackType == AttackManager::AttackTypes::Slash1 || currentAttack.attackType == AttackManager::AttackTypes::Slash2)
+				{
+					// Checks if the current attack is past the startup step
+					if (currentAttack.attackPhase == AttackManager::AttackPhase::Active || currentAttack.attackPhase == AttackManager::AttackPhase::Ending)
+					{
+						// Checks if we are continuing the basic combo
+						if (attackQueued == 1)
+						{
+							ProgressBasicAttack();
+						}
+					}
+				}
 			}
 		}
+
+		// Checks if the player is jumping
+		//if (jumpPhase > 0)
+		//{
+		//	jumpAttacked = true;
+		//}
 	}
+
+	// Updates the attack manager
+	attackManager.UpdateAttacks(mapMatrix, dt);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Starts and manages the three hit basic attack combo
+*/
+/*************************************************************************************************/
+void Player::ProgressBasicAttack()
+{
+	// Checks if we are already in the combo
+	if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash1)
+	{
+		attackManager.StartAttack(AttackManager::AttackTypes::Slash2, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, facingRight);
+		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash2), false);
+	}
+	else if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash2)
+	{
+		attackManager.StartAttack(AttackManager::AttackTypes::Slash3, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, facingRight);
+		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash3), false);
+	}
+	// Otherwise starts the first slash
+	else
+	{
+		attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, facingRight);
+		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash1), false);
+	}
+
+	// Clears the queued attack now that an attack has been started
+	attackQueued = 0;
 }

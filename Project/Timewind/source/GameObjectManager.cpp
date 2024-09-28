@@ -71,9 +71,18 @@ void GameObjectManager::Update(double dt)
 	// Walks through the game object list
 	for (std::multimap<int, GameObject*>::iterator it = gameObjectList.begin(); it != gameObjectList.end();)
 	{
-		(*it).second->Update(dt, inputManager);
-
-		it++;
+		// Destroys the game object if it is marked for destruction
+		if ((*it).second->GetToBeDestroyed())
+		{
+			delete (*it).second;
+			it = gameObjectList.erase(it);
+		}
+		// If the game object is active, update it
+		else if ((*it).second->GetActive())
+		{
+			(*it).second->Update(dt, inputManager);
+			it++;
+		}
 	}
 }
 
@@ -91,7 +100,11 @@ void GameObjectManager::Draw(Window* window)
 	// Walks through the game object list
 	for (std::multimap<int, GameObject*>::iterator it = gameObjectList.begin(); it != gameObjectList.end();)
 	{
-		window->DrawGameObject(*(*it).second);
+		if ((*it).second->GetActive())
+		{
+			window->DrawGameObject((*it).second);
+			(*it).second->DrawChildObjects(window);
+		}
 
 		it++;
 	}

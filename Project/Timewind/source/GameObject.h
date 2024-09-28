@@ -60,19 +60,19 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-	
+
 	/*************************************************************************************************/
 	/*!
 		\brief
@@ -89,9 +89,19 @@ public:
 
 		\param drawPriority_
 			Higher draw priorities are drawn in front of objects with lower priority
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in, defaults to an invalid tile
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, glm::vec4 color_ = { 0.0f, 0.0f, 0.0f, 0.0f }) :
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool inMap_, glm::vec4 color_ = { 0.0f, 0.0f, 0.0f, 0.0f }, std::pair<int, int> mapCoords_ = { -1, -1 }) :
+		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
 		drawPriority(drawPriority_),
 		moving(false),
@@ -101,7 +111,9 @@ public:
 		moveSmooth(false),
 		render(false),
 		texture(NULL),
-		color(color_) {}
+		color(color_),
+		inMap(inMap_),
+		mapCoords(mapCoords_) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -122,9 +134,19 @@ public:
 
 		\param texture_
 			The texture for the game object
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in, defaults to an invalid tile
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, glm::vec4 color_ = { 1.0f, 1.0f, 1.0f, 1.0f }) :
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, bool inMap_, glm::vec4 color_ = { 1.0f, 1.0f, 1.0f, 1.0f }, std::pair<int, int> mapCoords_ = { -1, -1 }) :
+		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
 		drawPriority(drawPriority_),
 		moving(false),
@@ -134,7 +156,9 @@ public:
 		moveSmooth(false),
 		render(true),
 		texture(texture_),
-		color(color_) {}
+		color(color_),
+		inMap(inMap_),
+		mapCoords(mapCoords_) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -157,6 +181,39 @@ public:
 	*/
 	/*************************************************************************************************/
 	virtual void Update(double dt, InputManager* inputManager);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Draws the child game objects
+
+		\param window
+			The game window the objects are being drawn to
+	*/
+	/*************************************************************************************************/
+	virtual void DrawChildObjects(Window* window) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns whether the object is active
+
+		\return
+			True if the object is active, false if not.
+	*/
+	/*************************************************************************************************/
+	bool GetActive() { return active; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns whether the object is to be destroyed
+
+		\return
+			True if the object is to be destroyed, false if not
+	*/
+	/*************************************************************************************************/
+	bool GetToBeDestroyed() { return toBeDestroyed; }
 
 	/*************************************************************************************************/
 	/*!
@@ -260,6 +317,39 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the original position of the current move
+
+		\return
+			The original position of the current move
+	*/
+	/*************************************************************************************************/
+	std::pair<int, int> GetMapCoords() { return mapCoords; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets whether the game object is active
+
+		\param newActive
+			The game object's new render boolean
+	*/
+	/*************************************************************************************************/
+	void SetActive(bool newActive) { active = newActive; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets whether the game object should be destroyed
+
+		\param newToBeDestroyed
+			Whether the game object should be destroyed
+	*/
+	/*************************************************************************************************/
+	void SetToBeDestroyed(bool newToBeDestroyed) { toBeDestroyed = newToBeDestroyed; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets the position of the game object
 
 		\param newPosition
@@ -267,6 +357,28 @@ public:
 	*/
 	/*************************************************************************************************/
 	void SetPosition(glm::vec2 newPosition);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets the rotation of the game object
+
+		\param newRotation
+			The game object's new rotation
+	*/
+	/*************************************************************************************************/
+	void SetRotation(float newRotation);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets the scale of the game object
+
+		\param newScale
+			The game object's new scale
+	*/
+	/*************************************************************************************************/
+	void SetScale(glm::vec2 newScale);
 
 	/*************************************************************************************************/
 	/*!
@@ -330,6 +442,9 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+
+	bool active;								// Is the game object on and being updated
+	bool toBeDestroyed;							// Boolean for the game object manager to delete the object
 	
 	glm::vec2 position;							// The position of the game object
 	float rotation;								// The rotation (in 2d space) of the game object
@@ -346,6 +461,9 @@ private:
 	bool render;								// Says whether this game object should be rendered
 	Texture* texture;							// Pointer to the object's texture (will not be referenced if render is false)
 	glm::vec4 color;							// The color of the game object
+
+	bool inMap;									// Whether the game object is in the map
+	std::pair<int, int> mapCoords;				// The coordinates of the object in the map
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

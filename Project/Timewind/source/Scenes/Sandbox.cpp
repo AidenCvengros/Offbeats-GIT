@@ -26,6 +26,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Includes game object manager and texture manager for creating new game objects in the scene
 #include "../GameObjectManager.h"
 #include "../TextureManager.h"
+#include "../Game_Objects/Enemy.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -81,18 +82,20 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     Texture* tempTexture2 = textureManager->AddTexture("Assets/Sprites/Grass.png");
 
     // Creates essential game objects (player and camera)
-    Player* player = new Player({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 50, tempTexture, mapMatrix);
+    Player* player = new Player({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 50, tempTexture, mapMatrix, { 2, 2 });
     Camera* camera = new Camera(glm::vec2(0.0f, 0.5f), 0.0f, glm::vec2(0.0f, 0.0f), player, gameWindow->GetWindowSize().x / gameWindow->GetWindowSize().y, glm::radians(45.0f));
     objectManager->AddGameObject((GameObject*)camera);
     objectManager->AddGameObject((GameObject*)player);
     gameWindow->SetCamera(camera);
 
     // Creates scene game objects
-    GameObject* object = new GameObject({ 0.0f, 0.0f }, 0.0f, { 10.0f, 10.0f }, 0, tempTexture2);
+    GameObject* object = new GameObject({ 0.0f, 0.0f }, 0.0f, { 10.0f, 10.0f }, 0, tempTexture2, true);
     objectManager->AddGameObject(object);
+    Enemy* enemy = new Enemy({ 16.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 40, tempTexture2, mapMatrix, { 10, 2 });
+    objectManager->AddGameObject(enemy);
 
     // Sets the map for the scene
-    mapMatrix->SetPlayerPosition(2, 2);
+    mapMatrix->SetTile(10, 2, MapMatrix::TileStatus::Enemy, enemy);
     for (int i = 0; i < mapMatrix->GetMaxMapWidth(); i++)
     {
         mapMatrix->SetTile(i, 0, MapMatrix::TileStatus::Wall);
