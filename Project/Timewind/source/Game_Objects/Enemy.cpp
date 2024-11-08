@@ -127,12 +127,12 @@ void Enemy::Update(double dt, InputManager* inputManager)
 void Enemy::DrawChildObjects(Window* window)
 {
 	// Draws the enemy's health bar
-	healthPool->SetPosition({ GetPosition().x * 2, GetPosition().y * 2 - 4.8 });
+	healthPool->SetPosition({ GetPosition().x, GetPosition().y - 1.3 });
 	healthPool->SetScale({ 1.0f, 0.3f });
 	healthPool->SetColor({ 1.0, 1.0, 1.0, 1.0 });
 	window->DrawGameObject(healthPool);
-	healthPool->SetPosition({ (GetPosition().x * 2) - (1 - healthPool->GetPoolRatio()), GetPosition().y * 2 - 4.8 });
-	healthPool->SetScale({ healthPool->GetPoolRatio(), 0.2f });
+	healthPool->SetPosition({ GetPosition().x, GetPosition().y - 1.3 });
+	healthPool->SetScale({ healthPool->GetPoolRatio() * 0.8, 0.2f });
 	healthPool->SetColor({ 1.0, 0.2, 0.2, 1.0 });
 	window->DrawGameObject(healthPool);
 }

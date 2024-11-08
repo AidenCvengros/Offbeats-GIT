@@ -222,7 +222,7 @@ private:
 			Whether the attack hit anything
 	*/
 	/*************************************************************************************************/
-	bool CheckActiveAttack(MapMatrix* mapMatrix, AttackStruct activeAttack);
+	bool CheckActiveAttack(MapMatrix* mapMatrix, AttackStruct& activeAttack);
 
 	/*************************************************************************************************/
 	/*!

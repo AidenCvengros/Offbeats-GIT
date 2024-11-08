@@ -157,7 +157,7 @@ void Engine::Update()
 		lastTime = newTime;
 #ifdef _DEBUG
 		// Prints out the framerate. Debug only
-		std::cout << 1 / dt << std::endl;
+		//std::cout << 1 / dt << std::endl;
 #endif // _DEBUG
 
 		// Updates the window

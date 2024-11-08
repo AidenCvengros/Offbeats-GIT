@@ -483,8 +483,18 @@ void Player::ProgressBasicAttack()
 	// Otherwise starts the first slash
 	else
 	{
-		attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, facingRight);
-		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash1), false);
+		// Only allows a single attack sequence per jump
+		if (jumpPhase == 0 || jumpAttacked == false)
+		{
+			attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, facingRight);
+			MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash1), false);
+
+			// If we are jumping, marks this as the jump attack
+			if (jumpPhase > 0)
+			{
+				jumpAttacked = true;
+			}
+		}
 	}
 
 	// Clears the queued attack now that an attack has been started

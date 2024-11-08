@@ -58,7 +58,7 @@ void InputManager::Init()
 	for (int i = 0; i < (size_t)Inputs::Max; i++)
 	{
 		inputTracker.push_back(InputStatus::Off);
-		timeSincePressed.push_back(600);
+		timeSincePressed.push_back({ 100, false });
 	}
 
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_LEFT));
@@ -88,9 +88,9 @@ void InputManager::Update(double dt)
 	for (int i = 0; i < (size_t)Inputs::Max; i++)
 	{
 		// Increments the buffer tracker and ensures it doesn't overflow
-		if (timeSincePressed[i] < 10.0)
+		if (timeSincePressed[i].first < 10.0)
 		{
-			timeSincePressed[i] += dt;
+			timeSincePressed[i].first += dt;
 		}
 
 		// Updates the input status for this key
@@ -138,10 +138,11 @@ void InputManager::Shutdown()
 InputManager::InputStatus InputManager::CheckInputStatus(Inputs input)
 {
 	// If the buffer check passed
-	if (timeSincePressed[(int)input] < 0.15)
+	if (timeSincePressed[(int)input].first < 0.15 && timeSincePressed[(int)input].second == true)
 	{
 		// Returns that the button was pressed
-		return InputStatus::Pressed;
+		timeSincePressed[(int)input].second = false;
+		inputTracker[(int)input] = InputStatus::Pressed;
 	}
 
 	// Otherwise returns the button status
@@ -186,7 +187,8 @@ void InputManager::UpdateInputStatus(Inputs input)
 		{
 			// Sets the key to pressed
 			inputTracker[(int)input] = InputStatus::Pressed;
-			timeSincePressed[(int)input] = 0.0;
+			timeSincePressed[(int)input].first = 0.0;
+			timeSincePressed[(int)input].second = true;
 		}
 		// Checks if the key was previously pressed
 		else if (inputTracker[(int)input] == InputStatus::Pressed)

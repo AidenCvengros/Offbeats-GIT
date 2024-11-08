@@ -128,6 +128,7 @@ void AttackManager::UpdateAttacks(MapMatrix* mapMatrix, double dt)
 			case AttackPhase::Ending:
 				currentAttack.attackPhase = AttackPhase::NullAttack;
 				currentAttack.phaseTimer = 0.0;
+				EndAttack();
 				break;
 			default:
 				break;
@@ -227,7 +228,7 @@ double AttackManager::GetAttackLength(AttackTypes attackType)
 		Whether the attack hit anything
 */
 /*************************************************************************************************/
-bool AttackManager::CheckActiveAttack(MapMatrix* mapMatrix, AttackManager::AttackStruct activeAttack)
+bool AttackManager::CheckActiveAttack(MapMatrix* mapMatrix, AttackManager::AttackStruct& activeAttack)
 {
 	// Checks hitboxes based on what type of attack it is
 	if (activeAttack.attackType == AttackTypes::Slash1)

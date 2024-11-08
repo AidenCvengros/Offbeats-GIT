@@ -106,6 +106,7 @@ float Pool::AddToPool(float addAmount)
 /*************************************************************************************************/
 float Pool::SubtractFromPool(float subtractAmount)
 {
+	std::cout << "Enemy took " << subtractAmount << " damage." << std::endl;
 	return AddToPool(-subtractAmount);
 }
 
