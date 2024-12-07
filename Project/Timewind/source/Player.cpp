@@ -20,6 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "Player.h"
 
+#include "cppShortcuts.h"
+
 // Includes the enemy class for interacting with them
 #include "Game_Objects/Enemy.h"
 
@@ -52,6 +54,9 @@ Copyright (c) 2023 Aiden Cvengros
 	\brief
 		Constructor for the player game object class
 
+	\param scene
+		The scene that this game object is in
+
 	\param pos
 		The position of the game object
 
@@ -78,7 +83,7 @@ Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Textu
 	GameObject(pos, rot, sca, drawPriority_, texture_, true, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
 	facingRight(true),
 	jumpPhase(0),
-	playerPrevPos({ 2, 2 }),
+	playerPrevPos(mapCoords),
 	timeSinceMove(0.0),
 	attackQueued(0),
 	jumpAttacked(false),
@@ -387,7 +392,7 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 		playerPrevPos = playerPosition;
 		playerPosition.first += horizontalMove;
 		playerPosition.second += verticalMove;
-		MoveTo(glm::vec2(mapMatrix->GetMinMapX() + (2.0f * playerPosition.first), mapMatrix->GetMinMapY() - (2.0f * playerPosition.second)), moveSpeed, false);
+		MoveTo(glm::vec2(ConvertMapCoordToWorldCoord(playerPosition.first), ConvertMapCoordToWorldCoord(playerPosition.second)), moveSpeed, false);
 
 		// Resets time since moving
 		timeSinceMove = 0.0;

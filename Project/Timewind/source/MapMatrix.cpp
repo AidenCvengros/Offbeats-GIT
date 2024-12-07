@@ -21,6 +21,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "MapMatrix.h"
 
+#include "cppShortcuts.h"
+
 // Uses game object for drawing the map
 #include "GameObject.h"
 
@@ -157,7 +159,7 @@ void MapMatrix::Draw(Window* window)
 			// Checks if the square should be drawn
 			if (shouldDraw)
 			{
-				debugSquare.SetPosition({ minX + (2.0f * i), minY - (2.0f * j) });
+				debugSquare.SetPosition({ ConvertMapCoordToWorldCoord(i), ConvertMapCoordToWorldCoord(j) });
 				window->DrawGameObject(&debugSquare);
 			}
 		}

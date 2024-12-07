@@ -76,7 +76,7 @@ void GameObject::Update(double dt, InputManager* inputManager)
 /*************************************************************************************************/
 glm::mat4x4 GameObject::GetTranformationMatrix()
 {
-	return glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f))
+	return glm::translate(glm::mat4(1.0f), glm::vec3(position.x, -position.y, 0.0f))
 		* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(scale, 1.0f));
 }
@@ -134,7 +134,7 @@ int GameObject::GetDrawPriority()
 /*************************************************************************************************/
 void GameObject::SetPosition(glm::vec2 newPosition)
 {
-	position = newPosition;
+	position = { newPosition.x, newPosition.y };
 }
 
 /*************************************************************************************************/

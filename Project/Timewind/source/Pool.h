@@ -73,6 +73,9 @@ public:
 		\brief
 			Constructor for the pool object class
 
+		\param scene
+			The scene that this game object is in
+
 		\param pos
 			The position of the game object
 

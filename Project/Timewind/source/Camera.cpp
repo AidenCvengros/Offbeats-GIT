@@ -69,22 +69,22 @@ void Camera::Update(double dt, InputManager* inputManager)
 	{
 		if (GetPosition().x < centeredObject->GetPosition().x - 5.0f)
 		{
-			SetPosition(glm::vec2((centeredObject->GetPosition().x - 5.0f), centeredObject->GetPosition().y));
+			SetPosition(glm::vec2((centeredObject->GetPosition().x - 5.0f), -centeredObject->GetPosition().y));
 		}
 		else
 		{
-			MoveTo(glm::vec2((centeredObject->GetPosition().x - 5.0f), centeredObject->GetPosition().y), 0.5, false);
+			MoveTo(glm::vec2((centeredObject->GetPosition().x - 5.0f), -centeredObject->GetPosition().y), 0.5, false);
 		}
 	}
 	else
 	{
 		if (GetPosition().x > centeredObject->GetPosition().x + 5.0f)
 		{
-			SetPosition(glm::vec2((centeredObject->GetPosition().x + 5.0f), centeredObject->GetPosition().y));
+			SetPosition(glm::vec2((centeredObject->GetPosition().x + 5.0f), -centeredObject->GetPosition().y));
 		}
 		else
 		{
-			MoveTo(glm::vec2((centeredObject->GetPosition().x + 5.0f), centeredObject->GetPosition().y), 0.5, false);
+			MoveTo(glm::vec2((centeredObject->GetPosition().x + 5.0f), -centeredObject->GetPosition().y), 0.5, false);
 		}
 	}
 }
@@ -104,7 +104,7 @@ glm::mat4 Camera::GetViewMatrix()
 	if (centeredObject)
 	{
 		// Update and return the view matrix
-		viewMat = glm::lookAt(glm::vec3(GetPosition(), -15.0f), glm::vec3(centeredObject->GetPosition(), 0.0f), upVector);
+		viewMat = glm::lookAt(glm::vec3(GetPosition(), -15.0f), glm::vec3(centeredObject->GetPosition().x, -centeredObject->GetPosition().y, 0.0f), upVector);
 	}
 	else
 	{

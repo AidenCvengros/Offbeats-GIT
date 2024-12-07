@@ -73,9 +73,10 @@ public:
 	{
 		window,
 		inputManager,
-		sceneManager,
 		gameObjectManager,
 		textureManager,
+		sceneManager,
+		effectManager,
 		max
 	};
 	

@@ -40,6 +40,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
+class Scene;
+
 //-------------------------------------------------------------------------------------------------
 // Public Constants
 //-------------------------------------------------------------------------------------------------
@@ -130,7 +132,7 @@ public:
 			The scale of the game object
 
 		\param drawPriority_
-			Higher draw priorities are drawn in front of objects with lower priority
+			Higher draw priorities are drawn in front of objects with lower priority (Player is at 50, Background is at 0)
 
 		\param texture_
 			The texture for the game object

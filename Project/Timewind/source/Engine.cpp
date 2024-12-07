@@ -37,6 +37,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "TextureManager.h"
 #include "SceneManager.h"
 #include "MapMatrix.h"
+#include "EffectManager.h"
 
 // Adds the camera class so a starting camera can be set
 #include "Camera.h"
@@ -122,16 +123,19 @@ void Engine::Init()
 	TextureManager* texManager = new TextureManager(gameWindow);
 	SceneManager* sceneManager = new SceneManager(this);
 	MapMatrix* mapMatrix = new MapMatrix(25, 15);
-	
+	EffectManager* effectManager = new EffectManager();
+
 	// Creates and pushes back systems
 	systemList.push_back((System*)inputManager);
 	systemList.push_back((System*)objectManager);
 	systemList.push_back((System*)texManager);
 	systemList.push_back((System*)sceneManager);
 	systemList.push_back((System*)mapMatrix);
+	systemList.push_back((System*)effectManager);
 
 	// Sets up system references to each other
 	sceneManager->SetMapMatrix(mapMatrix);
+	sceneManager->SetEffectManager(effectManager);
 
 	// Loops through, initializing each system
 	for (size_t i = 0; i < systemList.size(); i++)
@@ -275,6 +279,19 @@ System* Engine::GetSystem(SystemTypes systemType)
 				return systemList[i];
 			}
 		}
+	}
+	// Checks for an effect manager
+	else if (systemType == SystemTypes::effectManager)
+	{
+		//for (int i = 0; i < systemList.size(); i++)
+		//{
+		//	if (dynamic_cast<EffectManager*>(systemList[i]) != NULL)
+		//	{
+		//		return systemList[i];
+		//	}
+		//}
+		// Above code refuses to work for some reason so we hard coded this shit
+		return systemList[5];
 	}
 
 	// Otherwise return null

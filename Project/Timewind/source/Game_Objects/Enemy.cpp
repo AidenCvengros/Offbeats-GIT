@@ -20,6 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "Enemy.h"
 
+#include "../cppShortcuts.h"
+
 #include "../Window.h"
 
 //-------------------------------------------------------------------------------------------------
@@ -127,11 +129,11 @@ void Enemy::Update(double dt, InputManager* inputManager)
 void Enemy::DrawChildObjects(Window* window)
 {
 	// Draws the enemy's health bar
-	healthPool->SetPosition({ GetPosition().x, GetPosition().y - 1.3 });
+	healthPool->SetPosition({ GetPosition().x, GetPosition().y + 1.3 });
 	healthPool->SetScale({ 1.0f, 0.3f });
 	healthPool->SetColor({ 1.0, 1.0, 1.0, 1.0 });
 	window->DrawGameObject(healthPool);
-	healthPool->SetPosition({ GetPosition().x, GetPosition().y - 1.3 });
+	healthPool->SetPosition({ GetPosition().x, GetPosition().y + 1.3 });
 	healthPool->SetScale({ healthPool->GetPoolRatio() * 0.8, 0.2f });
 	healthPool->SetColor({ 1.0, 0.2, 0.2, 1.0 });
 	window->DrawGameObject(healthPool);
@@ -175,7 +177,7 @@ bool Enemy::MoveEnemy(std::pair<int, int>& enemyPosition, int horizontalMove, in
 	{
 		enemyPosition.first += horizontalMove;
 		enemyPosition.second += verticalMove;
-		MoveTo(glm::vec2(mapMatrix->GetMinMapX() + (2.0f * enemyPosition.first), mapMatrix->GetMinMapY() - (2.0f * enemyPosition.second)), moveSpeed, false);
+		MoveTo(glm::vec2(ConvertMapCoordToWorldCoord(enemyPosition.first), ConvertMapCoordToWorldCoord(enemyPosition.second)), moveSpeed, false);
 
 		// Since the move was successful, returns true
 		return true;

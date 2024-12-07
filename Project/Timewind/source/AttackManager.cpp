@@ -20,9 +20,14 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "AttackManager.h"
 
+#include "cppShortcuts.h"
+
 // Includes the player and enemy classes to hit them
 #include "Player.h"
 #include "Game_Objects/Enemy.h"
+
+// Includes the Scene Manager so we can make attack effects
+#include "SceneManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -165,6 +170,12 @@ void AttackManager::StartAttack(AttackManager::AttackTypes attack, int attackXCo
 {
 	AttackStruct newAttack = { attack, AttackPhase::Startup, attackXCoordinate, attackYCoordinate, attackFacingRight, attackData[(int)attack].startupTime };
 	currentAttack = newAttack;
+
+	// Starts the slash1 effects
+	if (attack == AttackTypes::Slash1)
+	{
+		_EffectManager->StartEffectAtTile(EffectManager::EffectType::Image, "Assets/Sprites/Slash1.png", attackXCoordinate + 1, attackYCoordinate, attackFacingRight, CalculateTotalAttackTime(attack));
+	}
 }
 
 /*************************************************************************************************/
@@ -336,4 +347,21 @@ std::pair<int, int> AttackManager::CalculateOffsetTile(int xCoord, int yCoord, b
 	{
 		return std::make_pair(xCoord - xOffset, yCoord);
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Returns the total attack length of the given attack
+
+	\param attack
+		The attack to check
+
+	\return
+		The attack length
+*/
+/*************************************************************************************************/
+double AttackManager::CalculateTotalAttackTime(AttackManager::AttackTypes attack)
+{
+	return attackData[(int)attack].startupTime + attackData[(int)attack].activeTime + attackData[(int)attack].endingTime;
 }

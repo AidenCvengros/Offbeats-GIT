@@ -144,6 +144,39 @@ public:
 	*/
 	/*************************************************************************************************/
 	void SetMapMatrix(MapMatrix* mapMatrix_) { mapMatrix = mapMatrix_; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets the effect manager for the scene
+
+		\param effectManager_
+			The effect manager for the scene
+	*/
+	/*************************************************************************************************/
+	void SetEffectManager(EffectManager* effectManager_) { effectManager = effectManager_; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets the current scene being run
+
+		\return
+			The current scene
+	*/
+	/*************************************************************************************************/
+	Scene* GetCurrentScene() { return sceneList[currentSceneIndex]; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets the current scene' map matrix
+
+		\return
+			The map matrix
+	*/
+	/*************************************************************************************************/
+	MapMatrix* GetMapMatrix() { return mapMatrix; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -164,6 +197,7 @@ private:
 	bool changeScene;							// Boolean telling whether the scene should change
 
 	MapMatrix* mapMatrix;						// The map matrix for scenes to change the map
+	EffectManager* effectManager;				// The effect manager for scenes to make effects
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

@@ -246,6 +246,20 @@ private:
 	*/
 	/*************************************************************************************************/
 	std::pair<int, int> CalculateOffsetTile(int xCoord, int yCoord, bool facingRight, int xOffset);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the total attack length of the given attack
+
+		\param attack
+			The attack to check
+
+		\return
+			The attack length
+	*/
+	/*************************************************************************************************/
+	double CalculateTotalAttackTime(AttackManager::AttackTypes attack);
 };
 
 //-------------------------------------------------------------------------------------------------
