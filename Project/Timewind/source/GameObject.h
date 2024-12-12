@@ -102,10 +102,11 @@ public:
 			The map coordinates that the game object is in, defaults to an invalid tile
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool inMap_, glm::vec4 color_ = { 0.0f, 0.0f, 0.0f, 0.0f }, std::pair<int, int> mapCoords_ = { -1, -1 }) :
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_,  bool inMap_, glm::vec4 color_ = { 0.0f, 0.0f, 0.0f, 0.0f }, std::pair<int, int> mapCoords_ = { -1, -1 }) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
 		drawPriority(drawPriority_),
+		facingRight(facingRight_),
 		moving(false),
 		moveOriginalPosition(glm::vec2(0.0f, 0.0f)),
 		moveNewPosition(glm::vec2(0.0f, 0.0f)),
@@ -147,10 +148,11 @@ public:
 			The map coordinates that the game object is in, defaults to an invalid tile
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, bool inMap_, glm::vec4 color_ = { 1.0f, 1.0f, 1.0f, 1.0f }, std::pair<int, int> mapCoords_ = { -1, -1 }) :
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, bool inMap_, glm::vec4 color_ = { 1.0f, 1.0f, 1.0f, 1.0f }, std::pair<int, int> mapCoords_ = { -1, -1 }) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
 		drawPriority(drawPriority_),
+		facingRight(facingRight_),
 		moving(false),
 		moveOriginalPosition(glm::vec2(0.0f, 0.0f)),
 		moveNewPosition(glm::vec2(0.0f, 0.0f)),
@@ -297,6 +299,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns whether the object is facing right or left
+
+		\return
+			True if the object is facing right, false if facing left
+	*/
+	/*************************************************************************************************/
+	bool GetIsFacingRight();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the object's color
 
 		\return
@@ -385,6 +398,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Sets whether the game object is facing right or left
+
+		\param newFacingRight
+			True if the object should now be facing right, false if facing left
+	*/
+	/*************************************************************************************************/
+	void SetIsFacingRight(bool newFacingRight);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets whether the game object should be drawn
 
 		\param newRender
@@ -452,6 +476,7 @@ private:
 	float rotation;								// The rotation (in 2d space) of the game object
 	glm::vec2 scale;							// The scale of the game object
 	int drawPriority;							// How forward the game object is drawn
+	bool facingRight;							// Whether the game object is facing right (true if right, false if left)
 
 	bool moving;								// Whether the move-to action is active
 	glm::vec2 moveOriginalPosition;				// The starting position of the movement

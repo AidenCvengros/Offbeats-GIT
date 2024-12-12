@@ -76,9 +76,21 @@ void GameObject::Update(double dt, InputManager* inputManager)
 /*************************************************************************************************/
 glm::mat4x4 GameObject::GetTranformationMatrix()
 {
+	// Adjusts transformation to flip the sprite if facing left
+	float directionModifier;
+	if (facingRight)
+	{
+		directionModifier = -1;
+	}
+	else
+	{
+		directionModifier = 1;
+	}
+
+	// Calculates and returns the transformation matrix
 	return glm::translate(glm::mat4(1.0f), glm::vec3(position.x, -position.y, 0.0f))
-		* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale(glm::mat4(1.0f), glm::vec3(scale, 1.0f));
+		* glm::rotate(glm::mat4(1.0f), glm::radians(rotation * directionModifier), glm::vec3(0.0f, 0.0f, 1.0f))
+		* glm::scale(glm::mat4(1.0f), glm::vec3(scale.x * directionModifier, scale.y, 1.0f));
 }
 
 /*************************************************************************************************/
@@ -126,6 +138,20 @@ int GameObject::GetDrawPriority()
 /*************************************************************************************************/
 /*!
 	\brief
+		Returns whether the object is facing right or left
+
+	\return
+		True if the object is facing right, false if facing left
+*/
+/*************************************************************************************************/
+bool GameObject::GetIsFacingRight()
+{
+	return facingRight;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Sets the position of the game object
 
 	\param newPosition
@@ -163,6 +189,20 @@ void GameObject::SetRotation(float newRotation)
 void GameObject::SetScale(glm::vec2 newScale)
 {
 	scale = newScale;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets whether the object is facing right or left
+
+	\param newIsFacingRight
+		True if facing right, false if facing left
+*/
+/*************************************************************************************************/
+void GameObject::SetIsFacingRight(bool newIsFacingRight)
+{
+	facingRight = newIsFacingRight;
 }
 
 /*************************************************************************************************/

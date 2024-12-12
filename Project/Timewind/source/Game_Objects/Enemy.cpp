@@ -76,8 +76,7 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 Enemy::Enemy(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_, std::pair<int, int> mapCoords) :
-	GameObject(pos, rot, sca, drawPriority_, texture_, true, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	facingRight(false),
+	GameObject(pos, rot, sca, drawPriority_, false, texture_, true, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
 	attackTimer(0.0),
 	mapMatrix(mapMatrix_)
 {
@@ -165,11 +164,11 @@ bool Enemy::MoveEnemy(std::pair<int, int>& enemyPosition, int horizontalMove, in
 	// Corrects if the enemy is facing right or left
 	if (horizontalMove > 0)
 	{
-		facingRight = true;
+		SetIsFacingRight(true);
 	}
 	else if (horizontalMove < 0)
 	{
-		facingRight = false;
+		SetIsFacingRight(false);
 	}
 
 	// Moves the enemy in logic
@@ -213,35 +212,6 @@ void Enemy::Attack(double dt, std::pair<int, int>& enemyPosition)
 	if (attackTimer > 0.0)
 	{
 		attackTimer -= dt;
-
-		// Checks if the player is attacking to the right or left
-		if (facingRight)
-		{
-			if (mapMatrix->GetTile(enemyPosition.first + 1, enemyPosition.second).tileStatus == MapMatrix::TileStatus::Player)
-			{
-
-			}
-			if (mapMatrix->GetTile(enemyPosition.first + 1, enemyPosition.second).tileStatus == MapMatrix::TileStatus::Enemy)
-			{
-
-			}
-			if (mapMatrix->GetTile(enemyPosition.first + 1, enemyPosition.second).tileStatus == MapMatrix::TileStatus::Destructible)
-			{
-				mapMatrix->SetTile(enemyPosition.first + 1, enemyPosition.second, MapMatrix::TileStatus::Empty);
-			}
-		}
-		// Otherwise does attacks facing left
-		else
-		{
-			if (mapMatrix->GetTile(enemyPosition.first - 1, enemyPosition.second).tileStatus == MapMatrix::TileStatus::Enemy)
-			{
-
-			}
-			if (mapMatrix->GetTile(enemyPosition.first - 1, enemyPosition.second).tileStatus == MapMatrix::TileStatus::Destructible)
-			{
-				mapMatrix->SetTile(enemyPosition.first - 1, enemyPosition.second, MapMatrix::TileStatus::Empty);
-			}
-		}
 	}
 }
 

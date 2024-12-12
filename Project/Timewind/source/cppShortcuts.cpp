@@ -79,9 +79,26 @@ double ConvertMapCoordToWorldCoord(int mapCoordinate)
 		The corresponding location in world coordinates
 */
 /*************************************************************************************************/
-std::pair<double, double> ConvertMapCoordsToWorldCoords(int mapXCoordinate, int mapYCoordinate)
+glm::vec2 ConvertMapCoordsToWorldCoords(int mapXCoordinate, int mapYCoordinate)
 {
-	return std::make_pair(ConvertMapCoordToWorldCoord(mapXCoordinate), ConvertMapCoordToWorldCoord(mapYCoordinate));
+	return { ConvertMapCoordToWorldCoord(mapXCoordinate), ConvertMapCoordToWorldCoord(mapYCoordinate) };
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Converts the given map matrix tile coordinates to world coordinates
+
+	\param mapCoordinates
+		The given map tile coordinates
+
+	\return
+		The corresponding location in world coordinates
+*/
+/*************************************************************************************************/
+glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates)
+{
+	return { ConvertMapCoordToWorldCoord(mapCoordinates.first), ConvertMapCoordToWorldCoord(mapCoordinates.second) };
 }
 
 /*************************************************************************************************/

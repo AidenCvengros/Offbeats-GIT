@@ -1,0 +1,8 @@
+﻿  MapMatrix.cpp
+D:\HDDocuments\Timewind GIT\Offbeats-GIT\Project\Timewind\source\MapMatrix.cpp(387,30): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  Generating code
+  10 of 2566 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    36 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Timewind.vcxproj -> D:\HDDocuments\Timewind GIT\Offbeats-GIT\Project\Timewind\x64\Release\Timewind.exe

@@ -80,8 +80,7 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_, std::pair<int, int> mapCoords) :
-	GameObject(pos, rot, sca, drawPriority_, texture_, true, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	facingRight(true),
+	GameObject(pos, rot, sca, drawPriority_, true, texture_, true, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
 	jumpPhase(0),
 	playerPrevPos(mapCoords),
 	timeSinceMove(0.0),
@@ -379,11 +378,11 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 	// Corrects if the player is facing right or left
 	if (horizontalMove > 0)
 	{
-		facingRight = true;
+		SetIsFacingRight(true);
 	}
 	else if (horizontalMove < 0)
 	{
-		facingRight = false;
+		SetIsFacingRight(false);
 	}
 
 	// Moves the player in logic
@@ -477,12 +476,12 @@ void Player::ProgressBasicAttack()
 	// Checks if we are already in the combo
 	if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash1)
 	{
-		attackManager.StartAttack(AttackManager::AttackTypes::Slash2, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, facingRight);
+		attackManager.StartAttack(AttackManager::AttackTypes::Slash2, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
 		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash2), false);
 	}
 	else if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash2)
 	{
-		attackManager.StartAttack(AttackManager::AttackTypes::Slash3, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, facingRight);
+		attackManager.StartAttack(AttackManager::AttackTypes::Slash3, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
 		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash3), false);
 	}
 	// Otherwise starts the first slash
@@ -491,7 +490,7 @@ void Player::ProgressBasicAttack()
 		// Only allows a single attack sequence per jump
 		if (jumpPhase == 0 || jumpAttacked == false)
 		{
-			attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, facingRight);
+			attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
 			MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash1), false);
 
 			// If we are jumping, marks this as the jump attack

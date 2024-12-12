@@ -80,6 +80,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     // Creates textures
     Texture* tempTexture = textureManager->AddTexture("Assets/Sprites/Ashe_Token.png");
     Texture* tempTexture2 = textureManager->AddTexture("Assets/Sprites/Grass.png");
+    Texture* tempTexture3 = textureManager->AddTexture("Assets/Sprites/Shadow_Enemy.png");
 
     // Creates essential game objects (player and camera)
     Player* player = new Player({ 4.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, tempTexture, mapMatrix, { 2, 2 });
@@ -89,9 +90,9 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     gameWindow->SetCamera(camera);
 
     // Creates scene game objects
-    GameObject* object = new GameObject({ 4.0f, 4.0f }, 0.0f, { 10.0f, 10.0f }, 0, tempTexture2, true);
+    GameObject* object = new GameObject({ 4.0f, 4.0f }, 0.0f, { 10.0f, 10.0f }, 0, true, tempTexture2, true);
     objectManager->AddGameObject(object);
-    Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, tempTexture2, mapMatrix, { 10, 2 });
+    Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, tempTexture3, mapMatrix, { 10, 2 });
     objectManager->AddGameObject(enemy);
 
     // Sets the map for the scene

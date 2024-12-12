@@ -117,9 +117,19 @@ void EffectManager::Update(double dt)
 				ClearEffect(*i);
 				i = activeEffects.erase(i);
 			}
-			// Otherwise moves on to the next effect in the list
+			// Otherwise updates the effect
 			else
 			{
+				// Updates the fade if applicable
+				if (i->effectTotalTime - i->effectTimer > i->fadingStartingTime)
+				{
+					// Calculates interpolation between starting color and fade color
+					float currentFadeTime = (i->effectTotalTime - i->effectTimer) - i->fadingStartingTime;
+					float totalFadeTime = i->effectTotalTime - i->fadingStartingTime;
+					i->object->SetColor(i->startingColor + ((currentFadeTime / totalFadeTime) * (i->fadeColor - i->startingColor)));
+				}
+				
+				// Moves on to the next effect in the list
 				i++;
 			}
 		}
@@ -177,20 +187,29 @@ void EffectManager::ClearEffectList()
 	\param filename
 		The file to play for the effect to start
 
-	\param effectXCoordinate
-		The x world coordinate of the effect
+	\param effectCoordinates
+		The world coordinates of the effect
 
-	\param effectYCoordinate
-		The y world coordinate of the effect
+	\param effectRotation
+		The rotation of the effect
+
+	\param effectScale
+		The scale of the effect
 
 	\param effectFacingRight
 		Boolean for whether the effect is going to the right (true) or the left (false)
 
 	\param effectTime
 		How long the effect lasts
+
+	\param color
+		The color of the effect
+
+	\param fadingStartTime
+		How long in seconds the effect should go until it starts fading (0.0 will start fading immediately, if number is arbitrarily large the effect will never fade)
 */
 /*************************************************************************************************/
-void EffectManager::StartEffect(EffectManager::EffectType effectType, std::string filename, double effectXCoordinate, double effectYCoordinate, bool effectFacingRight, double effectTime)
+void EffectManager::StartEffect(EffectManager::EffectType effectType, std::string filename, glm::vec2 effectCoordinates, float effectRotation, glm::vec2 effectScale, bool effectFacingRight, double effectTime, glm::vec4 color, double fadingStartTime)
 {
 	// Starts a visual effect
 	if (effectType == EffectType::Image)
@@ -198,15 +217,12 @@ void EffectManager::StartEffect(EffectManager::EffectType effectType, std::strin
 		// Makes the texture
 		Texture* newTexture = _TextureManager->AddTexture(filename);
 
-		// Adjusts the effect for facing left or right
-
-
 		// makes the effect game object
-		GameObject* effectObject = new GameObject(glm::vec2(effectXCoordinate, effectYCoordinate), 0.0f, glm::vec2(1.0f, 1.0f), 60, newTexture, false, {0.6f, 0.2f, 0.1f, 0.6f});
+		GameObject* effectObject = new GameObject(effectCoordinates, effectRotation, effectScale, 60, effectFacingRight, newTexture, false, color);
 		_GameObjectManager->AddGameObject(effectObject);
 
 		// Stores the new effect in the active effects list
-		EffectStruct newEffect = { true, effectType, effectObject, effectTime };
+		EffectStruct newEffect = { true, effectType, effectObject, effectTime, effectTime, fadingStartTime, color, { glm::vec3(color), 0.0f } };
 		activeEffects.push_back(newEffect);
 	}
 }
@@ -222,22 +238,25 @@ void EffectManager::StartEffect(EffectManager::EffectType effectType, std::strin
 	\param filename
 		The file to play for the effect to start
 
-	\param effectXTileCoordinate
-		The x tile coordinate of the effect
-
-	\param effectYTileCoordinate
-		The y tile coordinate of the effect
+	\param effectTileCoordinates
+		The tile coordinates of the effect
 
 	\param effectFacingRight
 		Boolean for whether the effect is going to the right (true) or the left (false)
 
 	\param effectTime
 		How long the effect lasts
+
+	\param color
+		The color of the effect
+
+	\param fadingStartTime
+		How long in seconds the effect should go until it starts fading (0.0 will start fading immediately, if number is arbitrarily large the effect will never fade)
 */
 /*************************************************************************************************/
-void EffectManager::StartEffectAtTile(EffectManager::EffectType effectType, std::string filename, int effectXTileCoordinate, int effectYTileCoordinate, bool effectFacingRight, double effectTime)
+void EffectManager::StartEffectInTile(EffectManager::EffectType effectType, std::string filename, std::pair<int, int> effectTileCoordinates, bool effectFacingRight, double effectTime, glm::vec4 color, double fadingStartTime)
 {
-	StartEffect(effectType, filename, ConvertMapCoordToWorldCoord(effectXTileCoordinate), ConvertMapCoordToWorldCoord(effectYTileCoordinate), effectFacingRight, effectTime);
+	StartEffect(effectType, filename, ConvertMapCoordsToWorldCoords(effectTileCoordinates), 0.0f, { 2.0f, 2.0f }, effectFacingRight, effectTime, color, fadingStartTime);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -115,7 +115,7 @@ void MapMatrix::Init()
 void MapMatrix::Draw(Window* window)
 {
 	// Creates a square game object that's gonna be the drawing
-	GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, false, { 0.0f, 0.0f, 0.0f, 0.3f });
+	GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, false, { 0.0f, 0.0f, 0.0f, 0.3f });
 	debugSquare.SetRender(true);
 
 	// Draws the map

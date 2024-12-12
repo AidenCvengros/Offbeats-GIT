@@ -121,17 +121,6 @@ public:
 	*/
 	/*************************************************************************************************/
 	void Update(double dt, InputManager* inputManager);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns whether the player is facing right
-
-		\return
-			Whether the player is facing to the right
-	*/
-	/*************************************************************************************************/
-	bool IsFacingRight() { return facingRight; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -146,7 +135,6 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	bool facingRight;							// Whether the player is facing to the right
 	int jumpPhase;								// Tracks the progress of a jump
 	std::pair<int, int> playerPrevPos;			// The previous player position in map coordinates
 	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)

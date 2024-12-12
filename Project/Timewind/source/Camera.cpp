@@ -65,7 +65,7 @@ void Camera::Update(double dt, InputManager* inputManager)
 	}
 
 	// Calculates placement based on which way the player is facing
-	if (centeredObject->IsFacingRight())
+	if (centeredObject->GetIsFacingRight())
 	{
 		if (GetPosition().x < centeredObject->GetPosition().x - 5.0f)
 		{

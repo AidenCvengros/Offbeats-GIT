@@ -93,7 +93,7 @@ public:
 	*/
 	/*************************************************************************************************/
 	Pool(glm::vec2 pos, float rot, glm::vec2 sca, float maxValue_, bool overflow_, glm::vec4 color_ = { 0.0f, 0.0f, 0.0f, 0.0f }) :
-		GameObject(pos, rot, sca, 60, false, color_),
+		GameObject(pos, rot, sca, 60, true, false, color_),
 		maxValue(maxValue_),
 		currValue(maxValue_),
 		overflow(overflow_) {}

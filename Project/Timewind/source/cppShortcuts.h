@@ -22,6 +22,11 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "Engine.h"
 
+// glm matrix and math functionality
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
@@ -77,7 +82,21 @@ double ConvertMapCoordToWorldCoord(int mapCoordinate);
 		The corresponding location in world coordinates
 */
 /*************************************************************************************************/
-std::pair<double, double> ConvertMapCoordsToWorldCoords(int mapXCoordinate, int mapYCoordinate);
+glm::vec2 ConvertMapCoordsToWorldCoords(int mapXCoordinate, int mapYCoordinate);
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Converts the given map matrix tile coordinates to world coordinates
+
+	\param mapCoordinates
+		The given map tile coordinates
+
+	\return
+		The corresponding location in world coordinates
+*/
+/*************************************************************************************************/
+glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates);
 
 /*************************************************************************************************/
 /*!

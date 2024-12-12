@@ -162,25 +162,31 @@ public:
 		\param filename
 			The file to play for the effect to start
 
-		\param effectXCoordinate
-			The x world coordinate of the effect
+		\param effectCoordinates
+			The world coordinates of the effect
 
-		\param effectYCoordinate
-			The y world coordinate of the effect
+		\param effectRotation
+			The rotation of the effect
+
+		\param effectScale
+			The scale of the effect
 
 		\param effectFacingRight
 			Boolean for whether the effect is going to the right (true) or the left (false)
 
 		\param effectTime
 			How long the effect lasts
+
+		\param fadingStartTime
+			How long in seconds the effect should go until it starts fading (0.0 will start fading immediately, if number is arbitrarily large the effect will never fade)
 	*/
 	/*************************************************************************************************/
-	void StartEffect(EffectType effectType, std::string filename, double effectXCoordinate, double effectYCoordinate, bool effectFacingRight, double effectTime);
+	void StartEffect(EffectType effectType, std::string filename, glm::vec2 effectCoordinates, float effectRotation, glm::vec2 effectScale, bool effectFacingRight, double effectTime, glm::vec4 color, double fadingStartingTime);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Starts the given effect centered at a given map matrix tile
+			Starts the given effect in a given map matrix tile
 
 		\param effectType
 			The type of effect
@@ -188,20 +194,23 @@ public:
 		\param filename
 			The file to play for the effect to start
 
-		\param effectXTileCoordinate
-			The x tile coordinate of the effect
-
-		\param effectYTileCoordinate
-			The y tile coordinate of the effect
+		\param effectTileCoordinates
+			The tile coordinates of the effect
 
 		\param effectFacingRight
 			Boolean for whether the effect is going to the right (true) or the left (false)
 
 		\param effectTime
 			How long the effect lasts
+
+		\param color
+			The color of the effect
+
+		\param fadingStartTime
+			How long in seconds the effect should go until it starts fading (0.0 will start fading immediately, if number is arbitrarily large the effect will never fade)
 	*/
 	/*************************************************************************************************/
-	void StartEffectAtTile(EffectType effectType, std::string filename, int effectXTileCoordinate, int effectYTileCoordinate, bool effectFacingRight, double effectTime);
+	void StartEffectInTile(EffectType effectType, std::string filename, std::pair<int, int> effectTileCoordinates, bool effectFacingRight, double effectTime, glm::vec4 color, double fadingStartingTime);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -217,7 +226,11 @@ private:
 		bool effectActive;						// Denotes whether the effect is active
 		EffectType effectType;					// The type of effect
 		GameObject* object;						// The game object for the effect
+		double effectTotalTime;					// The total length of the effect
 		double effectTimer;						// How much time is left in the current effect
+		double fadingStartingTime;				// How long into the effect it should start fading
+		glm::vec4 startingColor;				// The initial color of the effect
+		glm::vec4 fadeColor;					// The color that the effect fades to
 	}EffectStruct;
 	
 	//---------------------------------------------------------------------------------------------

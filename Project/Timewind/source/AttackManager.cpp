@@ -49,7 +49,7 @@ static const AttackDataStruct attackData[(unsigned long long)AttackManager::Atta
 //  Startup  Active  Ending  Damage  Mana
 	{0.100,  0.066,  0.100,  4.0f,   0.0f},			// Slash 1
 	{0.116,  0.066,  0.116,  6.0f,   0.0f},			// Slash 2
-	{0.150,  0.100,  0.150,  10.0f,  0.0f},			// Slash 3
+	{0.150,  0.100,  0.250,  10.0f,  0.0f},			// Slash 3
 	{0.066,  0.150,  0.100,  12.0f,  10.0f},		// Conducting Strike
 	{0.066,  0.100,  0.200,  16.0f,  4.0f},			// Upwards Slash	
 	{0.150,  1.000,  0.300,  20.0f,  10.0f}			// Electric Slamdown
@@ -174,7 +174,52 @@ void AttackManager::StartAttack(AttackManager::AttackTypes attack, int attackXCo
 	// Starts the slash1 effects
 	if (attack == AttackTypes::Slash1)
 	{
-		_EffectManager->StartEffectAtTile(EffectManager::EffectType::Image, "Assets/Sprites/Slash1.png", attackXCoordinate + 1, attackYCoordinate, attackFacingRight, CalculateTotalAttackTime(attack));
+		// Checks if the attack is facing right or left
+		glm::vec2 effectCoordinates = ConvertMapCoordsToWorldCoords( attackXCoordinate, attackYCoordinate);
+		effectCoordinates.y += 0.2;
+		if (attackFacingRight)
+		{
+			effectCoordinates.x += 1.3;
+		}
+		else
+		{
+			effectCoordinates.x -= 1.3;
+		}
+
+		_EffectManager->StartEffect(EffectManager::EffectType::Image, "Assets/Sprites/Slash1.png", effectCoordinates, 0.0f, { 1.5f, 1.5f }, attackFacingRight, CalculateTotalAttackTime(attack) + 0.25, { 0.9f, 0.3f, 0.1f, 0.85f }, 0.1);
+	}
+	// Starts the slash2 effects
+	if (attack == AttackTypes::Slash2)
+	{
+		// Checks if the attack is facing right or left
+		glm::vec2 effectCoordinates = ConvertMapCoordsToWorldCoords(attackXCoordinate, attackYCoordinate);
+		effectCoordinates.y -= 0.2;
+		if (attackFacingRight)
+		{
+			effectCoordinates.x += 1.35;
+		}
+		else
+		{
+			effectCoordinates.x -= 1.35;
+		}
+
+		_EffectManager->StartEffect(EffectManager::EffectType::Image, "Assets/Sprites/Slash1.png", effectCoordinates, 0.0f, { 1.5f, -1.5f }, attackFacingRight, CalculateTotalAttackTime(attack) + 0.25, { 0.9f, 0.3f, 0.1f, 0.85f }, 0.1);
+	}
+	// Starts the slash3 effects
+	if (attack == AttackTypes::Slash3)
+	{
+		// Checks if the attack is facing right or left
+		glm::vec2 effectCoordinates = ConvertMapCoordsToWorldCoords(attackXCoordinate, attackYCoordinate);
+		if (attackFacingRight)
+		{
+			effectCoordinates.x += 1.4;
+		}
+		else
+		{
+			effectCoordinates.x -= 1.4;
+		}
+
+		_EffectManager->StartEffect(EffectManager::EffectType::Image, "Assets/Sprites/Slash1.png", effectCoordinates, -10.0f, { 2.25f, 1.2f }, attackFacingRight, CalculateTotalAttackTime(attack) + 0.25, { 1.0f, 0.2f, 0.1f, 0.9f }, 0.2);
 	}
 }
 
