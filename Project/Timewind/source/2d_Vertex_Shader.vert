@@ -2,15 +2,17 @@
 
 layout(set = 0, binding = 0) uniform UniformBufferObject
 {
-    mat4 model;
-    mat4 view;
-    mat4 proj;
+  mat4 model;
+  mat4 view;
+  mat4 proj;
+  vec4 lookAt;
+  vec4 camPos;
 } ubo;
 
 layout(push_constant) uniform pushConstant
 {
-    layout(offset = 0) mat4 model;
-    layout(offset = 64) vec4 color;
+  layout(offset = 0) mat4 model;
+  layout(offset = 64) vec4 color;
 } ps;
 
 layout(location = 0) in vec2 inPosition;
@@ -22,7 +24,19 @@ layout(location = 1) out vec2 fragTexCoord;
 
 void main()
 {
-    gl_Position = ubo.proj * ubo.view * ps.model * vec4(inPosition, 0.0, 1.0);
-    fragColor = ps.color;
-    fragTexCoord = inTexCoord;
+  //vec4 vVertex = ubo.view * tempPos;
+  //
+  //float dist = length(vVertex);
+  //vec4 proj = dot(tempPos, normalize(ubo.lookAt)) * normalize(ubo.lookAt);
+  //vec4 c = tempPos - proj;
+  //
+  //float magnitude = 1 - acos(dot(normalize(vVertex), normalize(tempPos)));
+  //
+  //c = length(c) * magnitude * normalize(c);
+  //vec4 dir2 = normalize(c - ubo.lookAt);
+  //dir2 = (dir2 * dist);
+  
+  gl_Position = ubo.proj * ubo.view * ps.model * vec4(inPosition, 0.0, 1.0);
+  fragColor = ps.color;
+  fragTexCoord = inTexCoord;
 }

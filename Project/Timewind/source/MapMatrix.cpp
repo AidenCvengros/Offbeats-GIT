@@ -106,6 +106,24 @@ void MapMatrix::Init()
 /*************************************************************************************************/
 /*!
 	\brief
+		Updates the system. Virtual function that must be overwritten by derived class
+
+	\param
+		The time elapsed since the previous frame.
+*/
+/*************************************************************************************************/
+void MapMatrix::Update(double dt)
+{
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::F1) == InputManager::InputStatus::Pressed)
+	{
+		// Toggles the debug draw
+		debugDraw = !debugDraw;
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Draws the map. Only used for debug purposes
 
 	\param window
@@ -115,52 +133,78 @@ void MapMatrix::Init()
 void MapMatrix::Draw(Window* window)
 {
 	// Creates a square game object that's gonna be the drawing
-	GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, false, { 0.0f, 0.0f, 0.0f, 0.3f });
-	debugSquare.SetRender(true);
+	GameObject wallObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, defaultWallTexture, false, defaultWallColor);
 
 	// Draws the map
 	for (int i = 0; i < mapMatrix.size(); i++)
 	{
 		for (int j = 0; j < mapMatrix[i].size(); j++)
 		{
-			// Boolean to track whether a square should be drawn on this tile
-			bool shouldDraw = false;
-
-			// Checks for the player
-			switch (mapMatrix[i][j].tileStatus)
+			// Checks if the tile has a game object
+			if (mapMatrix[i][j].tileObject)
 			{
-			// Does nothing because the spot is empty
-			case TileStatus::Empty:
-				break;
-			// Uses green for the player
-			case TileStatus::Player:
-				debugSquare.SetColor({ 0.0f, 1.0f, 0.0f, 0.5f });
-				shouldDraw = true;
-				break;
-			// Uses red for enemies
-			case TileStatus::Enemy:
-				debugSquare.SetColor({ 1.0f, 0.0f, 0.0f, 0.5f });
-				shouldDraw = true;
-				break;
-			// Uses light blue for destructibles
-			case TileStatus::Destructible:
-				debugSquare.SetColor({ 0.2f, 0.2f, 1.0f, 0.5f });
-				shouldDraw = true;
-				break;
-			// Uses light grey for walls
-			case TileStatus::Wall:
-				debugSquare.SetColor({ 0.6f, 0.6f, 0.6f, 0.5f });
-				shouldDraw = true;
-				break;
-			default:
-				break;
+				window->DrawGameObject(mapMatrix[i][j].tileObject);
 			}
 
-			// Checks if the square should be drawn
-			if (shouldDraw)
+			// Otherwise checks if the tile is a blank wall
+			if (mapMatrix[i][j].tileStatus == TileStatus::Wall)
 			{
-				debugSquare.SetPosition({ ConvertMapCoordToWorldCoord(i), ConvertMapCoordToWorldCoord(j) });
-				window->DrawGameObject(&debugSquare);
+				wallObject.SetPosition(ConvertMapCoordsToWorldCoords({ i, j }));
+				window->DrawGameObject(&wallObject);
+			}
+		}
+	}
+
+	if (debugDraw)
+	{
+		// Creates a square game object that's gonna be the drawing
+		GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, false, { 0.0f, 0.0f, 0.0f, 0.3f });
+		debugSquare.SetRender(true);
+
+		// Draws the map
+		for (int i = 0; i < mapMatrix.size(); i++)
+		{
+			for (int j = 0; j < mapMatrix[i].size(); j++)
+			{
+				// Boolean to track whether a square should be drawn on this tile
+				bool shouldDraw = false;
+
+				// Checks for the player
+				switch (mapMatrix[i][j].tileStatus)
+				{
+					// Does nothing because the spot is empty
+				case TileStatus::Empty:
+					break;
+					// Uses green for the player
+				case TileStatus::Player:
+					debugSquare.SetColor({ 0.0f, 1.0f, 0.0f, 0.5f });
+					shouldDraw = true;
+					break;
+					// Uses red for enemies
+				case TileStatus::Enemy:
+					debugSquare.SetColor({ 1.0f, 0.0f, 0.0f, 0.5f });
+					shouldDraw = true;
+					break;
+					// Uses light blue for destructibles
+				case TileStatus::Destructible:
+					debugSquare.SetColor({ 0.2f, 0.2f, 1.0f, 0.5f });
+					shouldDraw = true;
+					break;
+					// Uses light grey for walls
+				case TileStatus::Wall:
+					debugSquare.SetColor({ 0.6f, 0.6f, 0.6f, 0.5f });
+					shouldDraw = true;
+					break;
+				default:
+					break;
+				}
+
+				// Checks if the square should be drawn
+				if (shouldDraw)
+				{
+					debugSquare.SetPosition({ ConvertMapCoordToWorldCoord(i), ConvertMapCoordToWorldCoord(j) });
+					window->DrawGameObject(&debugSquare);
+				}
 			}
 		}
 	}
@@ -268,6 +312,24 @@ bool MapMatrix::SetPlayerPosition(int xCoord, int yCoord, GameObject* playerObje
 /*************************************************************************************************/
 /*!
 	\brief
+		Sets the default wall texture that will be used to draw the walls in the current scene
+
+	\param defaultWallTexture_
+		The given wall texture
+
+	\param defaultWallColor_
+		The color that will be applied to that wall texture
+*/
+/*************************************************************************************************/
+void MapMatrix::SetDefaultWallTexture(Texture* defaultWallTexture_, glm::vec4 defaultWallColor_)
+{
+	defaultWallTexture = defaultWallTexture_;
+	defaultWallColor = defaultWallColor_;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Moves an object that's on a tile to a new tile. Returns false if the move would be illegal (oob, wall, etc.)
 
 	\param prevXCoord
@@ -313,6 +375,31 @@ bool MapMatrix::MoveTile(int prevXCoord, int prevYCoord, int newXCoord, int newY
 
 	// Otherwise returns that the player wasn't moved
 	return false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets a given tile to empty and deletes the associated game object
+
+	\param xCoord
+		The x coordinate of the tile to be cleared
+
+	\param yCoord
+		The y coordinate of the tile to be cleared
+*/
+/*************************************************************************************************/
+void MapMatrix::ClearTile(int xCoord, int yCoord)
+{
+	// Checks that the tile has a game object
+	if (mapMatrix[xCoord][yCoord].tileObject)
+	{
+		// Destroys the game object
+		mapMatrix[xCoord][yCoord].tileObject->SetToBeDestroyed(true);
+	}
+	
+	// Sets the tile to empty
+	SetTile(xCoord, yCoord, TileStatus::Empty);
 }
 
 /*************************************************************************************************/

@@ -40,6 +40,7 @@ Copyright (c) 2023 Aiden Cvengros
 #define _EffectManager ((EffectManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::effectManager))										// Gets the effect manager
 #define _TextureManager ((TextureManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::textureManager))									// Gets the texture manager
 #define _GameObjectManager ((GameObjectManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::gameObjectManager))							// Gets the game object manager
+#define _InputManager ((InputManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::inputManager))											// Gets the input manager
 
 //-------------------------------------------------------------------------------------------------
 // Public Classes

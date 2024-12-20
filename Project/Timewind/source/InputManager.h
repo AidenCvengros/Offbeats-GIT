@@ -65,6 +65,9 @@ public:
 		Down,
 		Jump,
 		Attack,
+		F1,
+		F2,
+		F3,
 		Max
 	};
 

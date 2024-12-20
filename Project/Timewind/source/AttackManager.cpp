@@ -302,9 +302,9 @@ bool AttackManager::CheckActiveAttack(MapMatrix* mapMatrix, AttackManager::Attac
 			return true;
 		}
 		// Checks if the attack hit a destructible wall
-		if (hitTile.tileStatus == MapMatrix::TileStatus::Wall)
+		if (hitTile.tileStatus == MapMatrix::TileStatus::Destructible)
 		{
-			mapMatrix->SetTile(hitTileCoords.first, hitTileCoords.second, MapMatrix::TileStatus::Empty);
+			mapMatrix->ClearTile(hitTileCoords.first, hitTileCoords.second);
 			return true;
 		}
 	}
@@ -325,9 +325,9 @@ bool AttackManager::CheckActiveAttack(MapMatrix* mapMatrix, AttackManager::Attac
 			return true;
 		}
 		// Checks if the attack hit a destructible wall
-		if (hitTile.tileStatus == MapMatrix::TileStatus::Wall)
+		if (hitTile.tileStatus == MapMatrix::TileStatus::Destructible)
 		{
-			mapMatrix->SetTile(hitTileCoords.first, hitTileCoords.second, MapMatrix::TileStatus::Empty);
+			mapMatrix->ClearTile(hitTileCoords.first, hitTileCoords.second);
 			return true;
 		}
 	}
@@ -348,9 +348,9 @@ bool AttackManager::CheckActiveAttack(MapMatrix* mapMatrix, AttackManager::Attac
 			return true;
 		}
 		// Checks if the attack hit a destructible wall
-		if (hitTile.tileStatus == MapMatrix::TileStatus::Wall)
+		if (hitTile.tileStatus == MapMatrix::TileStatus::Destructible)
 		{
-			mapMatrix->SetTile(hitTileCoords.first, hitTileCoords.second, MapMatrix::TileStatus::Empty);
+			mapMatrix->ClearTile(hitTileCoords.first, hitTileCoords.second);
 			return true;
 		}
 	}

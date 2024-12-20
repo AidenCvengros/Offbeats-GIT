@@ -160,6 +160,28 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the vector between the camera and the player
+
+		\return
+			The look at vector towards the player
+	*/
+	/*************************************************************************************************/
+	glm::vec4 GetLookAtVector();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the 3-dimensional position of the camera
+
+		\return
+			The position of the camera
+	*/
+	/*************************************************************************************************/
+	glm::vec4 Get3DPosition();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets a game object for the camera to center on
 
 		\param object

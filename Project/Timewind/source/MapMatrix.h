@@ -133,7 +133,7 @@ public:
 			The time elapsed since the previous frame.
 	*/
 	/*************************************************************************************************/
-	void Update(double dt) {}
+	void Update(double dt);
 
 	/*************************************************************************************************/
 	/*!
@@ -239,6 +239,20 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Sets the default wall texture that will be used to draw the walls in the current scene
+
+		\param defaultWallTexture_
+			The given wall texture
+
+		\param defaultWallColor_
+			The color that will be applied to that wall texture
+	*/
+	/*************************************************************************************************/
+	void SetDefaultWallTexture(Texture* defaultWallTexture_, glm::vec4 defaultWallColor_);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Moves an object that's on a tile to a new tile. Returns false if the move would be illegal (oob, wall, etc.)
 
 		\param prevXCoord
@@ -287,6 +301,31 @@ public:
 	*/
 	/*************************************************************************************************/
 	bool MoveTile(std::pair<int, int> prevTile, std::pair<int, int> newTile, TileStatus tileStatus, GameObject* object) { return MoveTile(prevTile.first, prevTile.second, newTile.first, newTile.second, tileStatus, object); }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets a given tile to empty and deletes the associated game object
+
+		\param xCoord
+			The x coordinate of the tile to be cleared
+
+		\param yCoord
+			The y coordinate of the tile to be cleared
+	*/
+	/*************************************************************************************************/
+	void ClearTile(int xCoord, int yCoord);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets a given tile to empty and deletes the associated game object
+
+		\param coordinates
+			The coordinates of the given tile
+	*/
+	/*************************************************************************************************/
+	void ClearTile(std::pair<int, int> coordinates) { ClearTile(coordinates.first, coordinates.second); }
 
 	/*************************************************************************************************/
 	/*!
@@ -395,10 +434,15 @@ private:
 
 	std::vector<std::vector<MapTile>> mapMatrix;	// The map grid
 
-	std::pair<int, int> playerPos;											// The position of the player
+	std::pair<int, int> playerPos;					// The position of the player
 
-	float minX;																// The farthest left you can go
-	float minY;																// The farthest down you can go (y is inverted btw)
+	bool debugDraw;									// Boolean denoting whether the debug view of the map matrix should be drawn
+
+	Texture* defaultWallTexture;					// The texture that will be drawn on walls if the wall doesn't have an associated game object
+	glm::vec4 defaultWallColor;						// The default color applied to the wall texture
+
+	float minX;										// The farthest left you can go
+	float minY;										// The farthest down you can go (y is inverted btw)
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

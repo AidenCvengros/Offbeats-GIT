@@ -52,7 +52,7 @@ Copyright (c) 2023 Aiden Cvengros
 		Manages visual effects
 */
 /*************************************************************************************************/
-class EffectManager : System
+class EffectManager : public System
 {
 public:
 	//---------------------------------------------------------------------------------------------

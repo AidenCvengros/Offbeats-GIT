@@ -20,6 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "Sandbox.h"
 
+#include "../cppShortcuts.h"
+
 // Includes the Engine functionality
 #include "../Engine.h"
 
@@ -64,8 +66,8 @@ Copyright (c) 2023 Aiden Cvengros
 void Sandbox::LoadScene(MapMatrix* mapMatrix)
 {
     // Gets the systems that game objects are loaded with
-    GameObjectManager* objectManager = (GameObjectManager*)engine->GetSystem(Engine::SystemTypes::gameObjectManager);
-    TextureManager* textureManager = (TextureManager*)engine->GetSystem(Engine::SystemTypes::textureManager);
+    GameObjectManager* objectManager = _GameObjectManager;
+    TextureManager* textureManager = _TextureManager;
     Window* gameWindow = (Window*)engine->GetSystem(Engine::SystemTypes::window);
 
     // Checks that the systems were returned properly
@@ -78,21 +80,25 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     // If the systems were found
 
     // Creates textures
-    Texture* tempTexture = textureManager->AddTexture("Assets/Sprites/Ashe_Token.png");
-    Texture* tempTexture2 = textureManager->AddTexture("Assets/Sprites/Grass.png");
-    Texture* tempTexture3 = textureManager->AddTexture("Assets/Sprites/Shadow_Enemy.png");
+    Texture* playerTexture = textureManager->AddTexture("Assets/Sprites/Ashe_Token.png");
+    Texture* wallTexture = textureManager->AddTexture("Assets/Sprites/Wall1.png");
+    Texture* enemyTexture = textureManager->AddTexture("Assets/Sprites/Shadow_Enemy.png");
+    Texture* destructibleWallTexture = textureManager->AddTexture("Assets/Sprites/DestructibleWall.png");
+
+    // Sets the default wall for the scene
+    mapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
 
     // Creates essential game objects (player and camera)
-    Player* player = new Player({ 4.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, tempTexture, mapMatrix, { 2, 2 });
-    Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(0.0f, 0.0f), player, gameWindow->GetWindowSize().x / gameWindow->GetWindowSize().y, glm::radians(45.0f));
+    Player* player = new Player({ 4.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, playerTexture, mapMatrix, { 2, 2 });
+    Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(0.0f, 0.0f), player, gameWindow->GetWindowSize().x / gameWindow->GetWindowSize().y, glm::radians(60.0f));
     objectManager->AddGameObject((GameObject*)camera);
     objectManager->AddGameObject((GameObject*)player);
     gameWindow->SetCamera(camera);
 
     // Creates scene game objects
-    GameObject* object = new GameObject({ 4.0f, 4.0f }, 0.0f, { 10.0f, 10.0f }, 0, true, tempTexture2, true);
-    objectManager->AddGameObject(object);
-    Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, tempTexture3, mapMatrix, { 10, 2 });
+    GameObject* destructibleWall = new GameObject({ 12.0f, 6.0f }, 0.0f, { 2.0f, 2.0f }, 0, true, destructibleWallTexture, true);
+    objectManager->AddGameObject(destructibleWall);
+    Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, enemyTexture, mapMatrix, { 10, 2 });
     objectManager->AddGameObject(enemy);
 
     // Sets the map for the scene
@@ -105,7 +111,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     mapMatrix->SetTile(5, 2, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(7, 3, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(9, 4, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(4, 2, MapMatrix::TileStatus::Destructible);
+    mapMatrix->SetTile(6, 3, MapMatrix::TileStatus::Destructible, destructibleWall);
 }
 
 /*************************************************************************************************/

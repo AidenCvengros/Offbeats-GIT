@@ -88,6 +88,7 @@ Engine* Engine::createEngine()
 	{
 		// Creates the engine
 		engineInstance = new Engine();
+		engineInstance->Init();
 	}
 
 	// Returns the game engine
@@ -246,6 +247,7 @@ System* Engine::GetSystem(SystemTypes systemType)
 				return systemList[i];
 			}
 		}
+		return systemList[0];
 	}
 	// Checks for a scene manager
 	else if (systemType == SystemTypes::sceneManager)
@@ -283,15 +285,13 @@ System* Engine::GetSystem(SystemTypes systemType)
 	// Checks for an effect manager
 	else if (systemType == SystemTypes::effectManager)
 	{
-		//for (int i = 0; i < systemList.size(); i++)
-		//{
-		//	if (dynamic_cast<EffectManager*>(systemList[i]) != NULL)
-		//	{
-		//		return systemList[i];
-		//	}
-		//}
-		// Above code refuses to work for some reason so we hard coded this shit
-		return systemList[5];
+		for (int i = 0; i < systemList.size(); i++)
+		{
+			if (dynamic_cast<EffectManager*>(systemList[i]) != NULL)
+			{
+				return systemList[i];
+			}
+		}
 	}
 
 	// Otherwise return null
@@ -310,5 +310,5 @@ System* Engine::GetSystem(SystemTypes systemType)
 /*********************************************************************************************/
 Engine::Engine()
 {
-	Init();
+	
 }

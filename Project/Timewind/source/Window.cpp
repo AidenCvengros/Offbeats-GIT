@@ -48,7 +48,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Private Constants
 //-------------------------------------------------------------------------------------------------
 
-// The default triangle																				CURRENTLY COMMENTED OUT UNTIL WE NEED IT
+// The default triangle																				!!! CURRENTLY COMMENTED OUT UNTIL WE NEED IT !!!
 //static const std::vector<Vertex> defaultTri =
 //{
 //	{{0.0f, -0.5f}, {1.0f, 0.2f, 0.2f}, {1.0f, 0.0f}},
@@ -128,6 +128,7 @@ void Window::Init()
 	createSwapChain();
 	createImageViews();
 	CreateRenderPass();
+	PrepareOffscreenBuffers();
 	CreateDescriptorSetLayout();
 	createGraphicsPipeline();
 	CreateFramebuffers();
@@ -1965,6 +1966,8 @@ void Window::UpdateUniformBuffers(uint32_t currentImage)
 	ubo.model = camera->GetTranformationMatrix();
 	ubo.view = camera->GetViewMatrix();
 	ubo.proj = camera->GetPerspectiveMatrix();
+	ubo.lookAt = camera->GetLookAtVector();
+	ubo.camPos = camera->Get3DPosition();
 
 	// Copies all the uniform buffer data in
 	void* data;
@@ -2101,4 +2104,27 @@ VkImageView Window::CreateImageView(VkImage image, VkFormat format)
 
 	// returns the newly made image view object
 	return imageView;
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Prepares the offscreen buffers for post-processing effects
+*/
+/*********************************************************************************************/
+void Window::PrepareOffscreenBuffers()
+{
+	// Creates the color attachment for the buffers
+	VkImageCreateInfo image;
+	image.imageType = VK_IMAGE_TYPE_2D;
+	image.format = VK_FORMAT_R8G8B8A8_UNORM;
+	image.extent.width = width;
+	image.extent.height = height;
+	image.extent.depth = 1;
+	image.mipLevels = 1;
+	image.arrayLayers = 1;
+	image.samples = VK_SAMPLE_COUNT_1_BIT;
+	image.tiling = VK_IMAGE_TILING_OPTIMAL;
+	// We will sample directly from the color attachment
+	image.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 }
