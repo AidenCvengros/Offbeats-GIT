@@ -476,6 +476,14 @@ private:
 	Camera* camera;										// The main camera object
 	Texture* blankTexture;								// Default texture used to draw game objects without a texture
 
+	VkRenderPass offscreenRenderPass;					// The render pass for the offscreen buffers
+	VkSampler offscreenSampler;							// The sampler for the offscreen buffers
+	VkImage offscreenImage;								// The image being displayed on the offscreen buffers
+	VkDeviceMemory offscreenBufferMemory;				// The memory location for offscreen buffer data
+	VkImageView offscreenImageView;						// The image view for the offscreen buffer
+	VkFramebuffer offscreenFrameBuffer;					// The offscreen framebuffer
+	VkDescriptorImageInfo offscreenImageDescriptor;		// The image descriptor for the offscreen buffer
+
 	VkBuffer vertexBuffer;								// The vertex buffer
 	VkDeviceMemory vertexBufferMemory;					// The memory pointer for the vertex buffer
 	VkBuffer indexBuffer;								// The indices corresponding to vertices in the vertex buffer
@@ -924,6 +932,14 @@ private:
 	*/
 	/*********************************************************************************************/
 	void PrepareOffscreenBuffers();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Prepares the offscreen buffer descriptor pools
+	*/
+	/*********************************************************************************************/
+	void CreateOffscreenDescriptors();
 };
 
 //-------------------------------------------------------------------------------------------------

@@ -137,6 +137,8 @@ void Window::Init()
 	CreateDescriptorPool();
 	CreateDescriptorSets();
 	CreateSyncObjects();
+	PrepareOffscreenBuffers();
+	CreateOffscreenDescriptors();
 	blankTexture = new Texture(this, "Assets/Sprites/Blank.png");
 }
 
@@ -2114,7 +2116,78 @@ VkImageView Window::CreateImageView(VkImage image, VkFormat format)
 /*********************************************************************************************/
 void Window::PrepareOffscreenBuffers()
 {
-	// Creates the color attachment for the buffers
+	// Creates a color attachment for the offscreen buffer
+	VkAttachmentDescription attachmentDescription;
+	attachmentDescription.format = VK_FORMAT_R8G8B8A8_UNORM;
+	attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+	attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+	// Sets the reference to the color attachment for subpasses to use
+	VkAttachmentReference colorAttachmentRef{};
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	// Sets up the graphics subpass
+	VkSubpassDescription subpass{};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	// Creates the subpass dependencies
+	std::array<VkSubpassDependency, 2> dependencies;
+	dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependencies[0].dstSubpass = 0;
+	dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+	dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+	dependencies[1].srcSubpass = 0;
+	dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+	dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+	dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+	// Cements the render pass
+	VkRenderPassCreateInfo renderPassInfo = {};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &attachmentDescription;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+	renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
+	renderPassInfo.pDependencies = dependencies.data();
+	if (vkCreateRenderPass(logicalDevice, &renderPassInfo, nullptr, &offscreenRenderPass) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create render pass!");
+	}
+
+	// Creates the sampler
+	VkSamplerCreateInfo sampler;
+	sampler.magFilter = VK_FILTER_LINEAR;
+	sampler.minFilter = VK_FILTER_LINEAR;
+	sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+	sampler.addressModeV = sampler.addressModeU;
+	sampler.addressModeW = sampler.addressModeU;
+	sampler.mipLodBias = 0.0f;
+	sampler.maxAnisotropy = 1.0f;
+	sampler.minLod = 0.0f;
+	sampler.maxLod = 1.0f;
+	sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+	if (vkCreateSampler(logicalDevice, &sampler, nullptr, &offscreenSampler) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create sampler");
+	}
+
+	// Creates the color attachment for the offscreen buffer. This doesn't use a texture object because some of the types are different from a normal texture
 	VkImageCreateInfo image;
 	image.imageType = VK_IMAGE_TYPE_2D;
 	image.format = VK_FORMAT_R8G8B8A8_UNORM;
@@ -2125,6 +2198,176 @@ void Window::PrepareOffscreenBuffers()
 	image.arrayLayers = 1;
 	image.samples = VK_SAMPLE_COUNT_1_BIT;
 	image.tiling = VK_IMAGE_TILING_OPTIMAL;
-	// We will sample directly from the color attachment
 	image.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+		
+	// Creates the color image view for the offscreen buffer
+	VkImageViewCreateInfo colorImageView;
+	colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	colorImageView.format = VK_FORMAT_R8G8B8A8_UNORM;
+	colorImageView.flags = 0;
+	colorImageView.subresourceRange = {};
+	colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	colorImageView.subresourceRange.baseMipLevel = 0;
+	colorImageView.subresourceRange.levelCount = 1;
+	colorImageView.subresourceRange.baseArrayLayer = 0;
+	colorImageView.subresourceRange.layerCount = 1;
+
+	// Sets the buffers in memory using the above info structs
+	VkMemoryAllocateInfo memAlloc;
+	VkMemoryRequirements memReqs;
+	if (vkCreateImage(logicalDevice, &image, nullptr, &offscreenImage) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create image!");
+	}
+	vkGetImageMemoryRequirements(logicalDevice, offscreenImage, &memReqs);
+	memAlloc.allocationSize = memReqs.size;
+	memAlloc.memoryTypeIndex = FindMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	if (vkAllocateMemory(logicalDevice, &memAlloc, nullptr, &offscreenBufferMemory) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to allocate memory");
+	}
+	if (vkBindImageMemory(logicalDevice, offscreenImage, offscreenBufferMemory, 0) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to bind image memory");
+	}
+
+	// Sets the image view's texture
+	colorImageView.image = offscreenImage;
+	if (vkCreateImageView(logicalDevice, &colorImageView, nullptr, &offscreenImageView) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create image view");
+	}
+
+	// Creates a spoof image view attachment
+	VkImageView imageViewAttachment = offscreenImageView;
+
+	// Creates the offscreen framebuffer
+	VkFramebufferCreateInfo bufferCreateInfo;
+	bufferCreateInfo.renderPass = offscreenRenderPass;
+	bufferCreateInfo.attachmentCount = 1;
+	bufferCreateInfo.pAttachments = &imageViewAttachment;
+	bufferCreateInfo.width = width;
+	bufferCreateInfo.height = height;
+	bufferCreateInfo.layers = 1;
+	if (vkCreateFramebuffer(logicalDevice, &bufferCreateInfo, nullptr, &offscreenFrameBuffer))
+	{
+		throw std::runtime_error("failed to create framebuffer");
+	}
+
+	// Sets values for the offscreen buffer's image descriptor
+	offscreenImageDescriptor.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	offscreenImageDescriptor.imageView = offscreenImageView;
+	offscreenImageDescriptor.sampler = offscreenSampler;
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Prepares the offscreen buffer descriptor pools
+*/
+/*********************************************************************************************/
+void Window::CreateOffscreenDescriptors()
+{
+	// Defines the number of descriptors in the pools
+	std::array<VkDescriptorPoolSize, 2> poolSizes{};
+	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSizes[0].descriptorCount = 8;
+	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[1].descriptorCount = 6;
+
+	// Sets the pool info based on the pool size
+	VkDescriptorPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	poolInfo.pPoolSizes = poolSizes.data();
+	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT) + 64;
+
+	// Creates the descriptor pool
+	if (vkCreateDescriptorPool(logicalDevice, &poolInfo, NULL, &descriptorPool) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create descriptor pool!");
+	}
+
+	// Sets the layout for the uniform buffer object
+	VkDescriptorSetLayoutBinding uboLayoutBinding{};
+	uboLayoutBinding.binding = 0;
+	uboLayoutBinding.descriptorCount = 1;
+	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	uboLayoutBinding.pImmutableSamplers = NULL;
+	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	// Creates the sampler layout
+	VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+	samplerLayoutBinding.binding = 1;
+	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding.pImmutableSamplers = NULL;
+	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	// Sets the layout for the descriptor set
+	VkDescriptorSetLayoutCreateInfo layoutInfo{};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = 1;
+	layoutInfo.pBindings = &uboLayoutBinding;
+
+	// Makes the descriptor set
+	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create descriptor set layout!");
+	}
+
+	layoutInfo.pBindings = &samplerLayoutBinding;
+
+	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create texture descriptor set layout!");
+	}
+
+	// Sets the layout for the uniform buffer object
+	uboLayoutBinding.binding = 0;
+	uboLayoutBinding.descriptorCount = 1;
+	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	uboLayoutBinding.pImmutableSamplers = NULL;
+	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	// Creates the sampler layout
+	samplerLayoutBinding.binding = 1;
+	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding.pImmutableSamplers = NULL;
+	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	// Creates the sampler layout
+	VkDescriptorSetLayoutBinding samplerLayoutBinding2{};
+	samplerLayoutBinding2.binding = 2;
+	samplerLayoutBinding2.descriptorCount = 1;
+	samplerLayoutBinding2.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	samplerLayoutBinding2.pImmutableSamplers = NULL;
+	samplerLayoutBinding2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	// Sets the layout for the descriptor set
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = 1;
+	layoutInfo.pBindings = &uboLayoutBinding;
+
+	// Makes the descriptor set
+	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create descriptor set layout!");
+	}
+
+	layoutInfo.pBindings = &samplerLayoutBinding;
+
+	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create texture descriptor set layout!");
+	}
+
+	layoutInfo.pBindings = &samplerLayoutBinding;
+
+	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create texture descriptor set layout!");
+	}
 }
