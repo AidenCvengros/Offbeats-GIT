@@ -138,7 +138,9 @@ void Window::Init()
 	CreateDescriptorSets();
 	CreateSyncObjects();
 	PrepareOffscreenBuffers();
+	PrepareOffscreenUniformBuffers();
 	CreateOffscreenDescriptors();
+	PrepareOffscreenPipeline();
 	blankTexture = new Texture(this, "Assets/Sprites/Blank.png");
 }
 
@@ -2199,18 +2201,6 @@ void Window::PrepareOffscreenBuffers()
 	image.samples = VK_SAMPLE_COUNT_1_BIT;
 	image.tiling = VK_IMAGE_TILING_OPTIMAL;
 	image.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-		
-	// Creates the color image view for the offscreen buffer
-	VkImageViewCreateInfo colorImageView;
-	colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	colorImageView.format = VK_FORMAT_R8G8B8A8_UNORM;
-	colorImageView.flags = 0;
-	colorImageView.subresourceRange = {};
-	colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	colorImageView.subresourceRange.baseMipLevel = 0;
-	colorImageView.subresourceRange.levelCount = 1;
-	colorImageView.subresourceRange.baseArrayLayer = 0;
-	colorImageView.subresourceRange.layerCount = 1;
 
 	// Sets the buffers in memory using the above info structs
 	VkMemoryAllocateInfo memAlloc;
@@ -2230,6 +2220,19 @@ void Window::PrepareOffscreenBuffers()
 	{
 		throw std::runtime_error("failed to bind image memory");
 	}
+		
+	// Creates the color image view for the offscreen buffer
+	VkImageViewCreateInfo colorImageView;
+	colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	colorImageView.format = VK_FORMAT_R8G8B8A8_UNORM;
+	colorImageView.flags = 0;
+	colorImageView.subresourceRange = {};
+	colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	colorImageView.subresourceRange.baseMipLevel = 0;
+	colorImageView.subresourceRange.levelCount = 1;
+	colorImageView.subresourceRange.baseArrayLayer = 0;
+	colorImageView.subresourceRange.layerCount = 1;
+	colorImageView.image = offscreenImage;
 
 	// Sets the image view's texture
 	colorImageView.image = offscreenImage;
@@ -2263,111 +2266,199 @@ void Window::PrepareOffscreenBuffers()
 /*********************************************************************************************/
 /*!
 	\brief
+		Prepares the uniform buffers for offscreen shaders
+*/
+/*********************************************************************************************/
+void Window::PrepareOffscreenUniformBuffers()
+{
+	// Sets the size of the buffer
+	VkDeviceSize bufferSize = sizeof(FisheyeUniformBufferObject);
+
+	// Creates the uniform buffer object
+	CreateBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, fisheyeUniformBuffer, fisheyeUniformBufferMemory);
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
 		Prepares the offscreen buffer descriptor pools
 */
 /*********************************************************************************************/
 void Window::CreateOffscreenDescriptors()
 {
-	// Defines the number of descriptors in the pools
-	std::array<VkDescriptorPoolSize, 2> poolSizes{};
-	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSizes[0].descriptorCount = 8;
-	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	poolSizes[1].descriptorCount = 6;
+	//// Defines the number of descriptors in the pools
+	//std::array<VkDescriptorPoolSize, 2> poolSizes{};
+	//poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	//poolSizes[0].descriptorCount = 4;
+	//poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	//poolSizes[1].descriptorCount = 6;
+	//
+	//// Sets the pool info based on the pool size
+	//VkDescriptorPoolCreateInfo poolInfo{};
+	//poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	//poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+	//poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	//poolInfo.pPoolSizes = poolSizes.data();
+	//poolInfo.maxSets = 2;
+	//
+	//// Creates the descriptor pool
+	//if (vkCreateDescriptorPool(logicalDevice, &poolInfo, NULL, &descriptorPool) != VK_SUCCESS)
+	//{
+	//	throw std::runtime_error("failed to create descriptor pool!");
+	//}
+	//
+	//// Sets the layout for the uniform buffer object
+	//VkDescriptorSetLayoutBinding uboLayoutBinding{};
+	//uboLayoutBinding.binding = 0;
+	//uboLayoutBinding.descriptorCount = 1;
+	//uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	//uboLayoutBinding.pImmutableSamplers = NULL;
+	//uboLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	//
+	//// Creates the sampler layout
+	//VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+	//samplerLayoutBinding.binding = 1;
+	//samplerLayoutBinding.descriptorCount = 1;
+	//samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	//samplerLayoutBinding.pImmutableSamplers = NULL;
+	//samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	//
+	//// Sets the layout for the descriptor set
+	//VkDescriptorSetLayoutCreateInfo layoutInfo{};
+	//layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	//layoutInfo.bindingCount = 1;
+	//layoutInfo.pBindings = &uboLayoutBinding;
+	//
+	//// Makes the descriptor set
+	//if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
+	//{
+	//	throw std::runtime_error("failed to create descriptor set layout!");
+	//}
+	//
+	//layoutInfo.pBindings = &samplerLayoutBinding;
+	//
+	//if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
+	//{
+	//	throw std::runtime_error("failed to create texture descriptor set layout!");
+	//}
+	//
+	//VkDescriptorSetLayoutBinding layoutBindings[3];
+	//
+	//// Sets the layout for the uniform buffer object
+	//layoutBindings[0].binding = 0;
+	//layoutBindings[0].descriptorCount = 1;
+	//layoutBindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	//layoutBindings[0].pImmutableSamplers = NULL;
+	//layoutBindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	//
+	//// Creates the sampler layout
+	//layoutBindings[1].binding = 1;
+	//layoutBindings[1].descriptorCount = 1;
+	//layoutBindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	//layoutBindings[1].pImmutableSamplers = NULL;
+	//layoutBindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	//
+	//// Creates the sampler layout
+	//layoutBindings[2].binding = 2;
+	//layoutBindings[2].descriptorCount = 1;
+	//layoutBindings[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	//layoutBindings[2].pImmutableSamplers = NULL;
+	//layoutBindings[2].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	//
+	//// Sets the layout for the descriptor set
+	//layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	//layoutInfo.bindingCount = 3;
+	//layoutInfo.pBindings = layoutBindings;
+	//
+	//// Makes the descriptor set
+	//if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
+	//{
+	//	throw std::runtime_error("failed to create descriptor set layout!");
+	//}
 
-	// Sets the pool info based on the pool size
-	VkDescriptorPoolCreateInfo poolInfo{};
-	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT) + 64;
-
-	// Creates the descriptor pool
-	if (vkCreateDescriptorPool(logicalDevice, &poolInfo, NULL, &descriptorPool) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create descriptor pool!");
-	}
+	VkDescriptorSetLayoutBinding layoutBindings[2];
 
 	// Sets the layout for the uniform buffer object
-	VkDescriptorSetLayoutBinding uboLayoutBinding{};
-	uboLayoutBinding.binding = 0;
-	uboLayoutBinding.descriptorCount = 1;
-	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	uboLayoutBinding.pImmutableSamplers = NULL;
-	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	layoutBindings[0].binding = 0;
+	layoutBindings[0].descriptorCount = 1;
+	layoutBindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	layoutBindings[0].pImmutableSamplers = NULL;
+	layoutBindings[0].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 	// Creates the sampler layout
-	VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-	samplerLayoutBinding.binding = 1;
-	samplerLayoutBinding.descriptorCount = 1;
-	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	samplerLayoutBinding.pImmutableSamplers = NULL;
-	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	layoutBindings[1].binding = 1;
+	layoutBindings[1].descriptorCount = 1;
+	layoutBindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	layoutBindings[1].pImmutableSamplers = NULL;
+	layoutBindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 	// Sets the layout for the descriptor set
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = 1;
-	layoutInfo.pBindings = &uboLayoutBinding;
+	layoutInfo.bindingCount = 3;
+	layoutInfo.pBindings = layoutBindings;
 
 	// Makes the descriptor set
-	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
+	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &fisheyeDescriptorSetLayout) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
 
-	layoutInfo.pBindings = &samplerLayoutBinding;
-
-	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
+	// Allocates the descriptor set
+	VkDescriptorSetAllocateInfo descriptorSetAllocInfo{};
+	descriptorSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	descriptorSetAllocInfo.descriptorPool = descriptorPool;
+	descriptorSetAllocInfo.pSetLayouts = &fisheyeDescriptorSetLayout;
+	descriptorSetAllocInfo.descriptorSetCount = 1;
+	if (vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocInfo, &fisheyeDescriptorSet) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create texture descriptor set layout!");
+		throw std::runtime_error("failed to allocate fisheye descriptor set");
 	}
 
-	// Sets the layout for the uniform buffer object
-	uboLayoutBinding.binding = 0;
-	uboLayoutBinding.descriptorCount = 1;
-	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	uboLayoutBinding.pImmutableSamplers = NULL;
-	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	VkWriteDescriptorSet writeDescriptorSets[2]{};
 
-	// Creates the sampler layout
-	samplerLayoutBinding.binding = 1;
-	samplerLayoutBinding.descriptorCount = 1;
-	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	samplerLayoutBinding.pImmutableSamplers = NULL;
-	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	VkDescriptorBufferInfo bufferInfo{};
+	bufferInfo.buffer = fisheyeUniformBuffer;
+	bufferInfo.offset = 0;
+	bufferInfo.range = sizeof(FisheyeUniformBufferObject);
+	
+	// Binding 0: Vertex shader uniform buffer
+	writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSets[0].dstSet = fisheyeDescriptorSet;
+	writeDescriptorSets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	writeDescriptorSets[0].dstBinding = 0;
+	writeDescriptorSets[0].pBufferInfo = &bufferInfo;
+	writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	
 
-	// Creates the sampler layout
-	VkDescriptorSetLayoutBinding samplerLayoutBinding2{};
-	samplerLayoutBinding2.binding = 2;
-	samplerLayoutBinding2.descriptorCount = 1;
-	samplerLayoutBinding2.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	samplerLayoutBinding2.pImmutableSamplers = NULL;
-	samplerLayoutBinding2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	// Binding 1: Fragment shader texture sampler
+	writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSets[1].dstSet = fisheyeDescriptorSet;
+	writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	writeDescriptorSets[1].dstBinding = 1;
+	writeDescriptorSets[1].pImageInfo = &offscreenImageDescriptor;
+	writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 
-	// Sets the layout for the descriptor set
-	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = 1;
-	layoutInfo.pBindings = &uboLayoutBinding;
+	vkUpdateDescriptorSets(logicalDevice, 2, writeDescriptorSets, 0, nullptr);
+}
 
-	// Makes the descriptor set
-	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
+/*********************************************************************************************/
+/*!
+	\brief
+		Prepares the offscreen render pipeline
+*/
+/*********************************************************************************************/
+void Window::PrepareOffscreenPipeline()
+{
+	// Creates the offscreen pipeline
+	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
+	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	pipelineLayoutCreateInfo.setLayoutCount = 1;
+	pipelineLayoutCreateInfo.pSetLayouts = &fisheyeDescriptorSetLayout;
+	if (vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCreateInfo, nullptr, &pipelineLayouts.scene) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create descriptor set layout!");
+		throw std::runtime_error("failed to create offscreen pipeline");
 	}
 
-	layoutInfo.pBindings = &samplerLayoutBinding;
-
-	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create texture descriptor set layout!");
-	}
-
-	layoutInfo.pBindings = &samplerLayoutBinding;
-
-	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create texture descriptor set layout!");
-	}
+	//
 }

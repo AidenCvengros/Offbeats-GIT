@@ -447,6 +447,11 @@ private:
 		glm::vec4 lookAt;
 		glm::vec4 camPos;
 	};
+
+	struct FisheyeUniformBufferObject
+	{
+		float fisheyeStrength;
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
@@ -483,6 +488,10 @@ private:
 	VkImageView offscreenImageView;						// The image view for the offscreen buffer
 	VkFramebuffer offscreenFrameBuffer;					// The offscreen framebuffer
 	VkDescriptorImageInfo offscreenImageDescriptor;		// The image descriptor for the offscreen buffer
+	VkDescriptorSetLayout fisheyeDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
+	VkDescriptorSet fisheyeDescriptorSet;				// The descriptor set for the fisheye shader
+	VkBuffer fisheyeUniformBuffer;						// The uniform buffer for the fisheye shader
+	VkDeviceMemory fisheyeUniformBufferMemory;			// The memory storing unform buffer data for the fisheye shader
 
 	VkBuffer vertexBuffer;								// The vertex buffer
 	VkDeviceMemory vertexBufferMemory;					// The memory pointer for the vertex buffer
@@ -936,10 +945,26 @@ private:
 	/*********************************************************************************************/
 	/*!
 		\brief
+			Prepares the uniform buffers for offscreen shaders
+	*/
+	/*********************************************************************************************/
+	void PrepareOffscreenUniformBuffers();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
 			Prepares the offscreen buffer descriptor pools
 	*/
 	/*********************************************************************************************/
 	void CreateOffscreenDescriptors();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Prepares the offscreen render pipeline
+	*/
+	/*********************************************************************************************/
+	void PrepareOffscreenPipeline();
 };
 
 //-------------------------------------------------------------------------------------------------
