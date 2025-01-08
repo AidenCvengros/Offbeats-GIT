@@ -480,6 +480,7 @@ private:
 	VkDebugUtilsMessengerEXT debugMessenger;			// The debug messenger
 	Camera* camera;										// The main camera object
 	Texture* blankTexture;								// Default texture used to draw game objects without a texture
+	VkPipelineCache pipelineCache;						// The cache to track different stages of the graphics pipeline
 
 	VkRenderPass offscreenRenderPass;					// The render pass for the offscreen buffers
 	VkSampler offscreenSampler;							// The sampler for the offscreen buffers

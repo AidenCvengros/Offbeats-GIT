@@ -1124,10 +1124,14 @@ void Window::createGraphicsPipeline()
 	// Reads in the shaders
 	auto vertShaderCode = ReadFile("source/2d_vert.spv");
 	auto fragShaderCode = ReadFile("source/2d_frag.spv");
+	auto postProcessVertShaderCode = ReadFile("source/post_process_vert.spv");
+	auto fisheyeFragShaderCode = ReadFile("source/fisheye_frag.spv");
 
 	// Converts the raw data into the shader modules
 	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
 	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+	VkShaderModule postProcessVertShaderModule = createShaderModule(postProcessVertShaderCode);
+	VkShaderModule fisheyeFragShaderModule = createShaderModule(fisheyeFragShaderCode);
 
 	// Creates the vertex shader stage information
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -1143,8 +1147,23 @@ void Window::createGraphicsPipeline()
 	fragShaderStageInfo.module = fragShaderModule;
 	fragShaderStageInfo.pName = "main";
 
+	// Creates the vertex shader stage information
+	VkPipelineShaderStageCreateInfo postProcessVertShaderStageInfo{};
+	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+	vertShaderStageInfo.module = postProcessVertShaderModule;
+	vertShaderStageInfo.pName = "main";
+
+	// Creates the fragment shader stage information
+	VkPipelineShaderStageCreateInfo fisheyeFragShaderStageInfo{};
+	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	fragShaderStageInfo.module = fisheyeFragShaderModule;
+	fragShaderStageInfo.pName = "main";
+
 	// Saves the shader stages in an array
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+	VkPipelineShaderStageCreateInfo offscreenShaderStages[] = { postProcessVertShaderStageInfo, fisheyeFragShaderStageInfo };
 
 	// Tells it to not have static vertex info
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -1153,12 +1172,6 @@ void Window::createGraphicsPipeline()
 	// Gets the vertex description structs
 	auto bindingDescription = Vertex::getBindingDescription();
 	auto attributeDescriptions = Vertex::getAttributeDescriptions();
-
-	// Sets the vertex description structs
-	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	// Tells the graphics pipeline to use a list of individual triangles
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
@@ -1226,25 +1239,39 @@ void Window::createGraphicsPipeline()
 	psRange.size = sizeof(glm::mat4) + sizeof(glm::vec4);
 	psRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	// Initializes the pipeline layout
+	// Creates the fisheye pipeline layout 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &offscreenDescriptorSetLayout;
+	if (vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, NULL, &offscreenPipelineLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create offscreen pipeline layout");
+	}
+
+	// Creates the base pipeline layout
 	pipelineLayoutInfo.setLayoutCount = 2;
 	pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
 	pipelineLayoutInfo.pushConstantRangeCount = 1;
 	pipelineLayoutInfo.pPushConstantRanges = &psRange;
-
-	// Checks that the pipeline layout was set up correctly
 	if (vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create pipeline layout!");
+	}
+
+	// Creates the pipeline cache to track different pipeline stages
+	VkPipelineCacheCreateInfo pipelineCacheCreateInfo{};
+	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+	if (vkCreatePipelineCache(logicalDevice, &pipelineCacheCreateInfo, NULL, &pipelineCache) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create pipeline cache");
 	}
 
 	// Creates the graphics pipeline
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
-	pipelineInfo.pStages = shaderStages;
+	pipelineInfo.pStages = offscreenShaderStages;
 	pipelineInfo.pVertexInputState = &vertexInputInfo;
 	pipelineInfo.pInputAssemblyState = &inputAssembly;
 	pipelineInfo.pViewportState = &viewportState;
@@ -1252,13 +1279,28 @@ void Window::createGraphicsPipeline()
 	pipelineInfo.pMultisampleState = &multisampling;
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = &dynamicState;
-	pipelineInfo.layout = pipelineLayout;
+	pipelineInfo.layout = offscreenPipelineLayout;
 	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
+	if (vkCreateGraphicsPipelines(logicalDevice, pipelineCache, 1, &pipelineInfo, NULL, &offscreenPipeline) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create offscreen graphics pipeline");
+	}
+
+	// Sets the different values for the main graphics pipeline
+	pipelineInfo.pStages = shaderStages;
+	pipelineInfo.layout = pipelineLayout;
+
+	// Sets the vertex description structs
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+
 	// Checks that the graphics pipeline was created correctly
-	if (vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &graphicsPipeline) != VK_SUCCESS)
+	if (vkCreateGraphicsPipelines(logicalDevice, pipelineCache, 1, &pipelineInfo, NULL, &graphicsPipeline) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
@@ -1266,6 +1308,8 @@ void Window::createGraphicsPipeline()
 	// Cleans up the shader modules
 	vkDestroyShaderModule(logicalDevice, fragShaderModule, NULL);
 	vkDestroyShaderModule(logicalDevice, vertShaderModule, NULL);
+	vkDestroyShaderModule(logicalDevice, postProcessVertShaderModule, NULL);
+	vkDestroyShaderModule(logicalDevice, fisheyeFragShaderModule, NULL);
 }
 
 /*********************************************************************************************/
