@@ -493,6 +493,8 @@ private:
 	VkDescriptorSet fisheyeDescriptorSet;				// The descriptor set for the fisheye shader
 	VkBuffer fisheyeUniformBuffer;						// The uniform buffer for the fisheye shader
 	VkDeviceMemory fisheyeUniformBufferMemory;			// The memory storing unform buffer data for the fisheye shader
+	VkPipelineLayout fisheyePipelineLayout;				// The graphics pipeline layout for the fisheye render pass
+	VkPipeline fisheyePipeline;							// The graphics pipeline for the fisheye render pass
 
 	VkBuffer vertexBuffer;								// The vertex buffer
 	VkDeviceMemory vertexBufferMemory;					// The memory pointer for the vertex buffer
@@ -962,10 +964,10 @@ private:
 	/*********************************************************************************************/
 	/*!
 		\brief
-			Prepares the offscreen render pipeline
+			Runs the render pass for the post process shaders
 	*/
 	/*********************************************************************************************/
-	void PrepareOffscreenPipeline();
+	void RunOffscreenRenderPass();
 };
 
 //-------------------------------------------------------------------------------------------------
