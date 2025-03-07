@@ -24,7 +24,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Private Constants
 //-------------------------------------------------------------------------------------------------
 
-const int zDist = -5.0f;						// How far back the camera is in the z axis
+const int zDist = -7.0f;						// How far back the camera is in the z axis
 
 //-------------------------------------------------------------------------------------------------
 // Public Declarations
@@ -93,7 +93,7 @@ void Camera::Update(double dt, InputManager* inputManager)
 		//}
 	}
 
-	MoveTo(glm::vec2((centeredObject->GetPosition().x + (3.0f * directionModifier)), -centeredObject->GetPosition().y), 0.375, false);
+	MoveTo(glm::vec2((centeredObject->GetPosition().x + (4.0f * directionModifier)), -centeredObject->GetPosition().y), 0.375, false);
 }
 
 /*************************************************************************************************/

@@ -129,13 +129,11 @@ void Window::Init()
 	createImageViews();
 	CreateRenderPass();
 	CreateDescriptorSetLayout();
-	CreateOffscreenDescriptors();
 	PrepareOffscreenBuffers();
 	createGraphicsPipeline();
 	CreateFramebuffers();
 	CreateCommandPool();
 	CreateUniformBuffers();
-	PrepareOffscreenUniformBuffers();
 	CreateDescriptorPool();
 	CreateDescriptorSets();
 	CreateSyncObjects();
@@ -197,7 +195,7 @@ void Window::Draw(Window* window_)
 	// Sets the info for the render pass
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = renderPass;
+	renderPassInfo.renderPass = offscreenRenderPass;
 	renderPassInfo.framebuffer = offscreenFrameBuffer;
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = swapChainExtent;
@@ -230,7 +228,7 @@ void Window::Draw(Window* window_)
 	vkCmdSetScissor(commandBuffer[currentFrame], 0, 1, &scissor);
 
 	// Binds the descriptor sets
-	vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, NULL);
+	vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &offscreenDescriptorSet, 0, NULL);
 }
 
 /*********************************************************************************************/
@@ -281,7 +279,7 @@ void Window::CleanupDraw()
 	vkCmdEndRenderPass(commandBuffer[currentFrame]);
 
 	// Runs the post processing shaders
-	RunOffscreenRenderPass();
+	RunFisheyeRenderPass();
 
 	// Checks that everything happened correctly
 	if (vkEndCommandBuffer(commandBuffer[currentFrame]) != VK_SUCCESS)
@@ -356,6 +354,11 @@ void Window::Shutdown()
 	blankTexture->Free(this);
 	delete blankTexture;
 
+	// Cleans up other offscreen members
+	vkDestroySampler(logicalDevice, offscreenSampler, NULL);
+	vkDestroyImageView(logicalDevice, offscreenImageView, NULL);
+	vkDestroyImage(logicalDevice, offscreenImage, NULL);
+
 	// Cleans up the swap chain
 	CleanupSwapChain();
 
@@ -365,19 +368,24 @@ void Window::Shutdown()
 	vkDestroyPipelineLayout(logicalDevice, pipelineLayout, NULL);
 	vkDestroyPipelineLayout(logicalDevice, fisheyePipelineLayout, NULL);
 	vkDestroyRenderPass(logicalDevice, offscreenRenderPass, NULL);
+	vkDestroyRenderPass(logicalDevice, renderPass, NULL);
+	vkDestroyPipelineCache(logicalDevice, pipelineCache, NULL);
 
 	// Cleans up the uniform buffer objects
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		vkDestroyBuffer(logicalDevice, fisheyeUniformBuffer, NULL);
 		vkDestroyBuffer(logicalDevice, uniformBuffers[i], NULL);
 		vkFreeMemory(logicalDevice, uniformBuffersMemory[i], NULL);
 	}
+	vkDestroyBuffer(logicalDevice, offscreenUniformBuffer, NULL);
+	vkFreeMemory(logicalDevice, offscreenUniformBufferMemory, NULL);
+	vkFreeMemory(logicalDevice, offscreenBufferMemory, NULL);
 
 	// Destroys the descriptor sets
 	vkDestroyDescriptorPool(logicalDevice, descriptorPool, NULL);
 	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, NULL);
 	vkDestroyDescriptorSetLayout(logicalDevice, textureDescriptorSetLayout, NULL);
+	vkDestroyDescriptorSetLayout(logicalDevice, fisheyeDescriptorSetLayout, NULL);
 
 	// Destroys the index buffer
 	vkDestroyBuffer(logicalDevice, indexBuffer, NULL);
@@ -663,6 +671,9 @@ void Window::CleanupSwapChain()
 
 	// Destroys the swap chain
 	vkDestroySwapchainKHR(logicalDevice, swapChain, nullptr);
+
+	// Cleans up the offscreen framebuffer as well
+	vkDestroyFramebuffer(logicalDevice, offscreenFrameBuffer, NULL);
 }
 
 /*********************************************************************************************/
@@ -1121,7 +1132,7 @@ void Window::createImageViews()
 	VkImageCreateInfo image{};
 	image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	image.imageType = VK_IMAGE_TYPE_2D;
-	image.format = VK_FORMAT_B8G8R8A8_SRGB;
+	image.format = swapChainImageFormat;
 	image.extent.width = swapChainExtent.width;
 	image.extent.height = swapChainExtent.height;
 	image.extent.depth = 1;
@@ -1205,11 +1216,7 @@ void Window::createGraphicsPipeline()
 
 	// Saves the shader stages in an array
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
-	VkPipelineShaderStageCreateInfo offscreenShaderStages[] = { postProcessVertShaderStageInfo, fisheyeFragShaderStageInfo };
-
-	// Tells it to not have static vertex info
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	VkPipelineShaderStageCreateInfo fisheyeShaderStages[] = { postProcessVertShaderStageInfo, fisheyeFragShaderStageInfo };
 
 	// Gets the vertex description structs
 	auto bindingDescription = Vertex::getBindingDescription();
@@ -1247,7 +1254,7 @@ void Window::createGraphicsPipeline()
 	// Sets the color blend attachment
 	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-	colorBlendAttachment.blendEnable = VK_TRUE;
+	colorBlendAttachment.blendEnable = VK_FALSE;
 	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
@@ -1292,8 +1299,9 @@ void Window::createGraphicsPipeline()
 	}
 
 	// Creates the base pipeline layout
-	pipelineLayoutInfo.setLayoutCount = 2;
-	pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
+	std::array<VkDescriptorSetLayout, 2> sceneDescriptorSetLayouts = { descriptorSetLayout, textureDescriptorSetLayout };
+	pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(sceneDescriptorSetLayouts.size());
+	pipelineLayoutInfo.pSetLayouts = sceneDescriptorSetLayouts.data();
 	pipelineLayoutInfo.pushConstantRangeCount = 1;
 	pipelineLayoutInfo.pPushConstantRanges = &psRange;
 	if (vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS)
@@ -1309,11 +1317,19 @@ void Window::createGraphicsPipeline()
 		throw std::runtime_error("failed to create pipeline cache");
 	}
 
+	// Sets the vertex description structs
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+
 	// Creates the graphics pipeline
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
-	pipelineInfo.pStages = offscreenShaderStages;
+	pipelineInfo.pStages = fisheyeShaderStages;
 	pipelineInfo.pVertexInputState = &vertexInputInfo;
 	pipelineInfo.pInputAssemblyState = &inputAssembly;
 	pipelineInfo.pViewportState = &viewportState;
@@ -1322,15 +1338,9 @@ void Window::createGraphicsPipeline()
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = &dynamicState;
 	pipelineInfo.layout = fisheyePipelineLayout;
-	pipelineInfo.renderPass = offscreenRenderPass;
+	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-
-	// Sets the vertex description structs
-	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	if (vkCreateGraphicsPipelines(logicalDevice, pipelineCache, 1, &pipelineInfo, NULL, &fisheyePipeline) != VK_SUCCESS)
 	{
@@ -1340,7 +1350,8 @@ void Window::createGraphicsPipeline()
 	// Sets the different values for the main graphics pipeline
 	pipelineInfo.pStages = shaderStages;
 	pipelineInfo.layout = pipelineLayout;
-	pipelineInfo.renderPass = renderPass;
+	pipelineInfo.renderPass = offscreenRenderPass;
+	colorBlendAttachment.blendEnable = VK_TRUE;
 
 	// Checks that the graphics pipeline was created correctly
 	if (vkCreateGraphicsPipelines(logicalDevice, pipelineCache, 1, &pipelineInfo, NULL, &graphicsPipeline) != VK_SUCCESS)
@@ -1597,6 +1608,7 @@ VkShaderModule Window::createShaderModule(const std::vector<char>& code)
 /*********************************************************************************************/
 void Window::CreateRenderPass()
 {
+	// Offscreen Render Pass
 	// Sets up a single color buffer for the swap chain
 	VkAttachmentDescription colorAttachment{};
 	colorAttachment.format = swapChainImageFormat;
@@ -1619,22 +1631,14 @@ void Window::CreateRenderPass()
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &colorAttachmentRef;
 
-	// Creates the subpass dependencies
-	std::array<VkSubpassDependency, 2> dependencies{};
-	dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependencies[0].dstSubpass = 0;
-	dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-	dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-	dependencies[1].srcSubpass = 0;
-	dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-	dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-	dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+	// Creates the subpass dependency so we can get our image before we start rendering
+	VkSubpassDependency dependency{};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
 	// Sets up the render pass
 	VkRenderPassCreateInfo renderPassInfo{};
@@ -1643,12 +1647,64 @@ void Window::CreateRenderPass()
 	renderPassInfo.pAttachments = &colorAttachment;
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 2;
-	renderPassInfo.pDependencies = dependencies.data();
+	renderPassInfo.dependencyCount = 1;
+	renderPassInfo.pDependencies = &dependency;
 	//renderPassInfo.flags = VK_;
 
 	// Checks that the render pass was created correctly
 	if (vkCreateRenderPass(logicalDevice, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create render pass!");
+	}
+	
+	// Onscreen Render Pass
+	// Creates a color attachment for the offscreen buffer
+	VkAttachmentDescription attachmentDescription{};
+	attachmentDescription.format = swapChainImageFormat;
+	attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+	attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+	// Creates the subpass dependencies
+	//std::array<VkSubpassDependency, 2> dependencies{};
+	//dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+	//dependencies[0].dstSubpass = 0;
+	//dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	//dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	//dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+	//dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	//dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+	//dependencies[1].srcSubpass = 0;
+	//dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+	//dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	//dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	//dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	//dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+	//dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+	// Sets the reference to the color attachment for subpasses to use
+	//colorAttachmentRef.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+	// Cements the render pass
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &attachmentDescription;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+	renderPassInfo.dependencyCount = 1;
+	renderPassInfo.pDependencies = &dependency;
+
+	if (vkCreateRenderPass(logicalDevice, &renderPassInfo, NULL, &offscreenRenderPass) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create render pass!");
 	}
@@ -2026,7 +2082,7 @@ void Window::CreateDescriptorSetLayout()
 	layoutInfo.bindingCount = 1;
 	layoutInfo.pBindings = &uboLayoutBinding;
 
-	// Makes the descriptor set
+	// Makes the offscreen descriptor sets
 	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create descriptor set layout!");
@@ -2037,6 +2093,34 @@ void Window::CreateDescriptorSetLayout()
 	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create texture descriptor set layout!");
+	}
+
+	VkDescriptorSetLayoutBinding layoutBindings[2];
+
+	// Sets the layout for the uniform buffer object
+	layoutBindings[0].binding = 0;
+	layoutBindings[0].descriptorCount = 1;
+	layoutBindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	layoutBindings[0].pImmutableSamplers = NULL;
+	layoutBindings[0].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	// Creates the sampler layout
+	layoutBindings[1].binding = 1;
+	layoutBindings[1].descriptorCount = 1;
+	layoutBindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	layoutBindings[1].pImmutableSamplers = NULL;
+	layoutBindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	// Sets the layout for the descriptor set
+	//VkDescriptorSetLayoutCreateInfo layoutInfo{};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = 2;
+	layoutInfo.pBindings = layoutBindings;
+
+	// Makes the descriptor set
+	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &fisheyeDescriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create descriptor set layout!");
 	}
 }
 
@@ -2049,7 +2133,7 @@ void Window::CreateDescriptorSetLayout()
 void Window::CreateUniformBuffers()
 {
 	// Sets the size of the buffer
-	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+	VkDeviceSize bufferSize = sizeof(FisheyeUniformBufferObject);
 
 	// Sets there to be a buffer for each framebuffer
 	uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -2062,6 +2146,12 @@ void Window::CreateUniformBuffers()
 
 		//vkMapMemory(logicalDevice, uniformBuffersMemory[i], 0, bufferSize, 0, &uniformBuffersMapped[i]);
 	}
+
+	// Sets the size of the buffer
+	bufferSize = sizeof(UniformBufferObject);
+
+	// Creates the uniform buffer object
+	CreateBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, offscreenUniformBuffer, offscreenUniformBufferMemory);
 }
 
 /*********************************************************************************************/
@@ -2085,9 +2175,9 @@ void Window::UpdateUniformBuffers(uint32_t currentImage)
 
 	// Copies all the uniform buffer data in
 	void* data;
-	vkMapMemory(logicalDevice, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
+	vkMapMemory(logicalDevice, offscreenUniformBufferMemory, 0, sizeof(ubo), 0, &data);
 	memcpy(data, &ubo, sizeof(ubo));
-	vkUnmapMemory(logicalDevice, uniformBuffersMemory[currentImage]);
+	vkUnmapMemory(logicalDevice, offscreenUniformBufferMemory);
 }
 
 /*********************************************************************************************/
@@ -2129,7 +2219,7 @@ void Window::CreateDescriptorPool()
 void Window::CreateDescriptorSets()
 {
 	// Sets the info struct for the descriptor set
-	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, fisheyeDescriptorSetLayout);
 	VkDescriptorSetAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = descriptorPool;
@@ -2150,7 +2240,7 @@ void Window::CreateDescriptorSets()
 		VkDescriptorBufferInfo bufferInfo{};
 		bufferInfo.buffer = uniformBuffers[i];
 		bufferInfo.offset = 0;
-		bufferInfo.range = sizeof(UniformBufferObject);
+		bufferInfo.range = sizeof(FisheyeUniformBufferObject);
 
 		// Creates an array for both descriptor types
 		VkWriteDescriptorSet descriptorWrite{};
@@ -2166,45 +2256,78 @@ void Window::CreateDescriptorSets()
 
 		// Updates the descriptor set
 		vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
+
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = offscreenImageView;
+		imageInfo.sampler = offscreenSampler;
+
+		//VkWriteDescriptorSet descriptorWrite{};
+		descriptorWrite = {};
+		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrite.dstSet = descriptorSets[i];
+		descriptorWrite.dstBinding = 1;
+		descriptorWrite.dstArrayElement = 0;
+		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrite.descriptorCount = 1;
+		descriptorWrite.pImageInfo = &imageInfo;
+
+		vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
 	}
 
 	// Allocates the offscreen descriptor set
 	VkDescriptorSetAllocateInfo descriptorSetAllocInfo{};
 	descriptorSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	descriptorSetAllocInfo.descriptorPool = descriptorPool;
-	descriptorSetAllocInfo.pSetLayouts = &fisheyeDescriptorSetLayout;
+	descriptorSetAllocInfo.pSetLayouts = &descriptorSetLayout;
 	descriptorSetAllocInfo.descriptorSetCount = 1;
-	if (vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocInfo, &fisheyeDescriptorSet) != VK_SUCCESS)
+	if (vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocInfo, &offscreenDescriptorSet) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to allocate fisheye descriptor set");
+		throw std::runtime_error("failed to allocate descriptor set");
 	}
 
-	VkWriteDescriptorSet writeDescriptorSets[2]{};
+	//VkWriteDescriptorSet writeDescriptorSets[2]{};
+	//
+	//VkDescriptorBufferInfo bufferInfo{};
+	//bufferInfo.buffer = offscreenUniformBuffer;
+	//bufferInfo.offset = 0;
+	//bufferInfo.range = sizeof(UniformBufferObject);
+	//
+	//// Binding 0: Vertex shader uniform buffer
+	//writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	//writeDescriptorSets[0].dstSet = offscreenDescriptorSet;
+	//writeDescriptorSets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	//writeDescriptorSets[0].dstBinding = 0;
+	//writeDescriptorSets[0].descriptorCount = 1;
+	//writeDescriptorSets[0].pBufferInfo = &bufferInfo;
+	//writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	//
+	//// Binding 1: Fragment shader texture sampler
+	//writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	//writeDescriptorSets[1].dstSet = offscreenDescriptorSet;
+	//writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	//writeDescriptorSets[1].dstBinding = 1;
+	//writeDescriptorSets[1].descriptorCount = 1;
+	//writeDescriptorSets[1].pImageInfo = &offscreenImageDescriptor;
+	//writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+
+	VkWriteDescriptorSet writeDescriptorSets{};
 
 	VkDescriptorBufferInfo bufferInfo{};
-	bufferInfo.buffer = fisheyeUniformBuffer;
+	bufferInfo.buffer = offscreenUniformBuffer;
 	bufferInfo.offset = 0;
-	bufferInfo.range = sizeof(FisheyeUniformBufferObject);
+	bufferInfo.range = sizeof(UniformBufferObject);
 
 	// Binding 0: Vertex shader uniform buffer
-	writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	writeDescriptorSets[0].dstSet = fisheyeDescriptorSet;
-	writeDescriptorSets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	writeDescriptorSets[0].dstBinding = 0;
-	writeDescriptorSets[0].descriptorCount = 1;
-	writeDescriptorSets[0].pBufferInfo = &bufferInfo;
-	writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSets.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSets.dstSet = offscreenDescriptorSet;
+	writeDescriptorSets.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	writeDescriptorSets.dstBinding = 0;
+	writeDescriptorSets.descriptorCount = 1;
+	writeDescriptorSets.pBufferInfo = &bufferInfo;
+	writeDescriptorSets.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 
-	// Binding 1: Fragment shader texture sampler
-	writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	writeDescriptorSets[1].dstSet = fisheyeDescriptorSet;
-	writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	writeDescriptorSets[1].dstBinding = 1;
-	writeDescriptorSets[1].descriptorCount = 1;
-	writeDescriptorSets[1].pImageInfo = &offscreenImageDescriptor;
-	writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-
-	vkUpdateDescriptorSets(logicalDevice, 2, writeDescriptorSets, 0, NULL);
+	vkUpdateDescriptorSets(logicalDevice, 1, &writeDescriptorSets, 0, NULL);
 }
 
 /*********************************************************************************************/
@@ -2266,52 +2389,6 @@ VkImageView Window::CreateImageView(VkImage image, VkFormat format)
 /*********************************************************************************************/
 void Window::PrepareOffscreenBuffers()
 {
-	// Creates a color attachment for the offscreen buffer
-	VkAttachmentDescription attachmentDescription{};
-	attachmentDescription.format = VK_FORMAT_B8G8R8A8_SRGB;
-	attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
-	attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-	// Sets the reference to the color attachment for subpasses to use
-	VkAttachmentReference colorAttachmentRef{};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	// Sets up the graphics subpass
-	VkSubpassDescription subpass{};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-
-	// Creates the subpass dependency so we can get our image before we start rendering
-	VkSubpassDependency dependency{};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-	// Cements the render pass
-	VkRenderPassCreateInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = 1;
-	renderPassInfo.pAttachments = &attachmentDescription;
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 1;
-	renderPassInfo.pDependencies = &dependency;
-	
-	if (vkCreateRenderPass(logicalDevice, &renderPassInfo, NULL, &offscreenRenderPass) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create render pass!");
-	}
-
 	// Creates the sampler
 	VkSamplerCreateInfo sampler{};
 	sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -2343,187 +2420,15 @@ void Window::PrepareOffscreenBuffers()
 /*********************************************************************************************/
 /*!
 	\brief
-		Prepares the uniform buffers for offscreen shaders
-*/
-/*********************************************************************************************/
-void Window::PrepareOffscreenUniformBuffers()
-{
-	// Sets the size of the buffer
-	VkDeviceSize bufferSize = sizeof(FisheyeUniformBufferObject);
-
-	// Creates the uniform buffer object
-	CreateBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, fisheyeUniformBuffer, fisheyeUniformBufferMemory);
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Prepares the offscreen buffer descriptor pools
-*/
-/*********************************************************************************************/
-void Window::CreateOffscreenDescriptors()
-{
-	VkDescriptorSetLayoutBinding layoutBindings[2];
-
-	// Sets the layout for the uniform buffer object
-	layoutBindings[0].binding = 0;
-	layoutBindings[0].descriptorCount = 1;
-	layoutBindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	layoutBindings[0].pImmutableSamplers = NULL;
-	layoutBindings[0].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-	// Creates the sampler layout
-	layoutBindings[1].binding = 1;
-	layoutBindings[1].descriptorCount = 1;
-	layoutBindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	layoutBindings[1].pImmutableSamplers = NULL;
-	layoutBindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-	// Sets the layout for the descriptor set
-	VkDescriptorSetLayoutCreateInfo layoutInfo{};
-	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = 2;
-	layoutInfo.pBindings = layoutBindings;
-
-	// Makes the descriptor set
-	if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &fisheyeDescriptorSetLayout) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create descriptor set layout!");
-	}
-
-	//// Defines the number of descriptors in the pools
-	//std::array<VkDescriptorPoolSize, 2> poolSizes{};
-	//poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//poolSizes[0].descriptorCount = 4;
-	//poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//poolSizes[1].descriptorCount = 6;
-	//
-	//// Sets the pool info based on the pool size
-	//VkDescriptorPoolCreateInfo poolInfo{};
-	//poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	//poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-	//poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	//poolInfo.pPoolSizes = poolSizes.data();
-	//poolInfo.maxSets = 5;
-	//
-	//// Creates the descriptor pool
-	//if (vkCreateDescriptorPool(logicalDevice, &poolInfo, NULL, &descriptorPool) != VK_SUCCESS)
-	//{
-	//	throw std::runtime_error("failed to create descriptor pool!");
-	//}
-	//
-	//// Sets the layout for the uniform buffer object
-	//VkDescriptorSetLayoutBinding uboLayoutBinding{};
-	//uboLayoutBinding.binding = 0;
-	//uboLayoutBinding.descriptorCount = 1;
-	//uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//uboLayoutBinding.pImmutableSamplers = NULL;
-	//uboLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-	//
-	//// Creates the sampler layout
-	//VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-	//samplerLayoutBinding.binding = 1;
-	//samplerLayoutBinding.descriptorCount = 1;
-	//samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//samplerLayoutBinding.pImmutableSamplers = NULL;
-	//samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-	//
-	//// Sets the layout for the descriptor set
-	//VkDescriptorSetLayoutCreateInfo layoutInfo{};
-	//layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	//layoutInfo.bindingCount = 1;
-	//layoutInfo.pBindings = &uboLayoutBinding;
-	//
-	//// Makes the descriptor set
-	//if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
-	//{
-	//	throw std::runtime_error("failed to create descriptor set layout!");
-	//}
-	//
-	//layoutInfo.pBindings = &samplerLayoutBinding;
-	//
-	//if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &textureDescriptorSetLayout) != VK_SUCCESS)
-	//{
-	//	throw std::runtime_error("failed to create texture descriptor set layout!");
-	//}
-	//
-	//VkDescriptorSetLayoutBinding layoutBindings[3];
-	//
-	//// Sets the layout for the uniform buffer object
-	//layoutBindings[0].binding = 0;
-	//layoutBindings[0].descriptorCount = 1;
-	//layoutBindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//layoutBindings[0].pImmutableSamplers = NULL;
-	//layoutBindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	//
-	//// Creates the sampler layout
-	//layoutBindings[1].binding = 1;
-	//layoutBindings[1].descriptorCount = 1;
-	//layoutBindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//layoutBindings[1].pImmutableSamplers = NULL;
-	//layoutBindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-	//
-	//// Creates the sampler layout
-	//layoutBindings[2].binding = 2;
-	//layoutBindings[2].descriptorCount = 1;
-	//layoutBindings[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//layoutBindings[2].pImmutableSamplers = NULL;
-	//layoutBindings[2].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-	//
-	//// Sets the layout for the descriptor set
-	//layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	//layoutInfo.bindingCount = 3;
-	//layoutInfo.pBindings = layoutBindings;
-	//
-	//// Makes the descriptor set
-	//if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
-	//{
-	//	throw std::runtime_error("failed to create descriptor set layout!");
-	//}
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
 		Runs the render pass for the post process shaders
 */
 /*********************************************************************************************/
-void Window::RunOffscreenRenderPass()
+void Window::RunFisheyeRenderPass()
 {
-	//// Creates an image barrier to transfer between the processing and post-processing
-	//VkImageMemoryBarrier imageBarrier{};
-	//imageBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-	//imageBarrier.pNext = NULL;
-	//imageBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-	//imageBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	//imageBarrier.image = offscreenImage;
-	//imageBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	//imageBarrier.subresourceRange.baseMipLevel = 0;
-	//imageBarrier.subresourceRange.levelCount = 1;
-	//imageBarrier.subresourceRange.layerCount = 1;
-	//VkDependencyInfo dependencyInfo = {
-	//VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
-	//NULL,
-	//VkDependencyFlags                dependencyFlags;
-	//uint32_t                         memoryBarrierCount;
-	//const VkMemoryBarrier2* pMemoryBarriers;
-	//uint32_t                         bufferMemoryBarrierCount;
-	//const VkBufferMemoryBarrier2* pBufferMemoryBarriers;
-	//uint32_t                         imageMemoryBarrierCount;
-	//const VkImageMemoryBarrier2* pImageMemoryBarriers; }
-
-	//VkSubpassDependency subpassDependency;
-	//subpassDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	//subpassDependency.dstSubpass = 0;
-	//subpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	//subpassDependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	//subpassDependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	//subpassDependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
 	// Sets the info for the post-processing render pass
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = offscreenRenderPass;
+	renderPassInfo.renderPass = renderPass;
 	renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = swapChainExtent;
@@ -2535,7 +2440,7 @@ void Window::RunOffscreenRenderPass()
 	vkCmdBeginRenderPass(commandBuffer[currentFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// Sets the fisheye lense pass
-	vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, fisheyePipelineLayout, 0, 1, &fisheyeDescriptorSet, 0, NULL);
+	vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, fisheyePipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, NULL);
 	vkCmdBindPipeline(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, fisheyePipeline);
 	vkCmdDraw(commandBuffer[currentFrame], 3, 1, 0, 0);
 
