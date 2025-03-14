@@ -356,8 +356,8 @@ void Window::Shutdown()
 
 	// Cleans up other offscreen members
 	vkDestroySampler(logicalDevice, offscreenSampler, NULL);
-	vkDestroyImageView(logicalDevice, offscreenImageView, NULL);
-	vkDestroyImage(logicalDevice, offscreenImage, NULL);
+	//vkDestroyImageView(logicalDevice, offscreenImageView, NULL);
+	//vkDestroyImage(logicalDevice, offscreenImage, NULL);
 
 	// Cleans up the swap chain
 	CleanupSwapChain();
@@ -379,7 +379,7 @@ void Window::Shutdown()
 	}
 	vkDestroyBuffer(logicalDevice, offscreenUniformBuffer, NULL);
 	vkFreeMemory(logicalDevice, offscreenUniformBufferMemory, NULL);
-	vkFreeMemory(logicalDevice, offscreenBufferMemory, NULL);
+	//vkFreeMemory(logicalDevice, offscreenBufferMemory, NULL);
 
 	// Destroys the descriptor sets
 	vkDestroyDescriptorPool(logicalDevice, descriptorPool, NULL);
@@ -647,6 +647,7 @@ void Window::RecreateSwapChain()
 	createSwapChain();
 	createImageViews();
 	CreateFramebuffers();
+	UpdateDescriptorSets();
 }
 
 /*********************************************************************************************/
@@ -674,6 +675,9 @@ void Window::CleanupSwapChain()
 
 	// Cleans up the offscreen framebuffer as well
 	vkDestroyFramebuffer(logicalDevice, offscreenFrameBuffer, NULL);
+	vkDestroyImage(logicalDevice, offscreenImage, NULL);
+	vkDestroyImageView(logicalDevice, offscreenImageView, NULL);
+	vkFreeMemory(logicalDevice, offscreenBufferMemory, NULL);
 }
 
 /*********************************************************************************************/
@@ -2233,6 +2237,17 @@ void Window::CreateDescriptorSets()
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
 
+	UpdateDescriptorSets();
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Updates the descriptor sets
+*/
+/*********************************************************************************************/
+void Window::UpdateDescriptorSets()
+{
 	// Initializes the data for each descriptor set
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
@@ -2285,31 +2300,6 @@ void Window::CreateDescriptorSets()
 	{
 		throw std::runtime_error("failed to allocate descriptor set");
 	}
-
-	//VkWriteDescriptorSet writeDescriptorSets[2]{};
-	//
-	//VkDescriptorBufferInfo bufferInfo{};
-	//bufferInfo.buffer = offscreenUniformBuffer;
-	//bufferInfo.offset = 0;
-	//bufferInfo.range = sizeof(UniformBufferObject);
-	//
-	//// Binding 0: Vertex shader uniform buffer
-	//writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	//writeDescriptorSets[0].dstSet = offscreenDescriptorSet;
-	//writeDescriptorSets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//writeDescriptorSets[0].dstBinding = 0;
-	//writeDescriptorSets[0].descriptorCount = 1;
-	//writeDescriptorSets[0].pBufferInfo = &bufferInfo;
-	//writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	//
-	//// Binding 1: Fragment shader texture sampler
-	//writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	//writeDescriptorSets[1].dstSet = offscreenDescriptorSet;
-	//writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//writeDescriptorSets[1].dstBinding = 1;
-	//writeDescriptorSets[1].descriptorCount = 1;
-	//writeDescriptorSets[1].pImageInfo = &offscreenImageDescriptor;
-	//writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 
 	VkWriteDescriptorSet writeDescriptorSets{};
 
@@ -2395,7 +2385,7 @@ void Window::PrepareOffscreenBuffers()
 	sampler.magFilter = VK_FILTER_LINEAR;
 	sampler.minFilter = VK_FILTER_LINEAR;
 	sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-	sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+	sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
 	sampler.addressModeV = sampler.addressModeU;
 	sampler.addressModeW = sampler.addressModeU;
 	sampler.mipLodBias = 0.0f;

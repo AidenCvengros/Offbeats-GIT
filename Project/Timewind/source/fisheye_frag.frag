@@ -15,6 +15,6 @@ layout(location = 0) out vec4 outColor;
 void main()
 {
   float z = sqrt(1.0 - fragTexCoord.x * fragTexCoord.x - fragTexCoord.y * fragTexCoord.y);
-  float a = 1.0 / (z * tan(80 * 0.5));
+  float a = 1.0 / (z * tan(4.58 * 0.5));
   outColor = texture(texSampler, (fragTexCoord - 0.5) * 2.0 * a);
 }
