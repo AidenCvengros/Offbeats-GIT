@@ -141,7 +141,7 @@ void InputManager::Shutdown()
 InputManager::InputStatus InputManager::CheckInputStatus(Inputs input)
 {
 	// If the buffer check passed
-	if (timeSincePressed[(int)input].first < 0.15 && timeSincePressed[(int)input].second == true)
+	if (timeSincePressed[(int)input].first < 0.05 && timeSincePressed[(int)input].second == true)
 	{
 		// Returns that the button was pressed
 		timeSincePressed[(int)input].second = false;

@@ -107,11 +107,15 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     {
         mapMatrix->SetTile(i, 0, MapMatrix::TileStatus::Wall);
         mapMatrix->SetTile(i, 1, MapMatrix::TileStatus::Wall);
-        mapMatrix->SetTile(i, 7, MapMatrix::TileStatus::Wall);
     }
     mapMatrix->SetTile(5, 2, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(7, 3, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(9, 4, MapMatrix::TileStatus::Wall);
+    mapMatrix->SetTile(10, 4, MapMatrix::TileStatus::Wall);
+    mapMatrix->SetTile(12, 5, MapMatrix::TileStatus::Wall);
+    mapMatrix->SetTile(13, 5, MapMatrix::TileStatus::Wall);
+    mapMatrix->SetTile(16, 5, MapMatrix::TileStatus::Wall);
+    mapMatrix->SetTile(17, 5, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(6, 3, MapMatrix::TileStatus::Destructible, destructibleWall);
 }
 

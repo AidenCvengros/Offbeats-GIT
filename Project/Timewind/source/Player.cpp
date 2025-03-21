@@ -84,7 +84,7 @@ Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Textu
 	jumpPhase(0),
 	playerPrevPos(mapCoords),
 	timeSinceMove(0.0),
-	attackQueued(0),
+	actionQueued(PlayerActions::NOATTACK),
 	jumpAttacked(false),
 	mapMatrix(mapMatrix_)
 {
@@ -114,25 +114,36 @@ void Player::Update(double dt, InputManager* inputManager)
 	std::pair playerPosition = mapMatrix->GetPlayerPosition();
 
 	// The buffer zone
+	bool shortHopAttack = false;
 	if (GetIsMoving() == true)
 	{
 		// Jump buffer for having just started a grounded movement
-		if (jumpPhase == 0 && timeSinceMove < 0.125 && inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
+		if (jumpPhase == 0 && timeSinceMove < 0.05 && inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
 		{
 			if (MovePlayer(playerPrevPos, 0, 1, 0.07))
 			{
 				jumpPhase = 1;
 			}
 		}
+
+		// Pressing attack and jump together should let you attack at the lowest part of your jump
+		//if (jumpPhase = 1 && timeSinceMove < 0.05 && inputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
+		//{
+		//	shortHopAttack = true;
+		//}
 	
 		// Updates the time since move tracker
 		timeSinceMove += dt;
 	}
 
-	// Checks for attacks being pressed
+	// Checks for actions being set
 	if (inputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
 	{
-		attackQueued = 1;
+		actionQueued == PlayerActions::BASICATTACK;
+	}
+	if (inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
+	{
+		actionQueued == PlayerActions::JUMP;
 	}
 
 	// Performs attacks if queued
@@ -141,10 +152,6 @@ void Player::Update(double dt, InputManager* inputManager)
 	// Checks that the previous movement finished
 	if (GetIsMoving() == false && jumpPhase == 0)
 	{
-		// Resets the grounded check for jump attacks
-		jumpAttacked = false;
-		attackQueued = 0;
-
 		// Checks if the player isn't grounded
 		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second - 1).tileStatus < MapMatrix::TileStatus::Player)
 		{
@@ -153,7 +160,7 @@ void Player::Update(double dt, InputManager* inputManager)
 		}
 
 		// Checks for a jump (start of jump is quick up one tile
-		else if (CheckInput(inputManager, InputManager::Inputs::Jump))
+		else if (actionQueued == PlayerActions::JUMP || inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Held)
 		{
 			if (MovePlayer(playerPosition, 0, 1, 0.07))
 			{
@@ -171,6 +178,15 @@ void Player::Update(double dt, InputManager* inputManager)
 		{
 			MovePlayer(playerPosition, -1, 0, 0.25);
 		}
+
+		// Resets the grounded check for jump attacks
+		jumpAttacked = false;
+		actionQueued = PlayerActions::NOATTACK;
+	}
+
+	if (shortHopAttack)
+	{
+		actionQueued == PlayerActions::BASICATTACK;
 	}
 
 	// Checks for end of jump phase 1 (float to apex of jump)
@@ -419,13 +435,13 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 void Player::Attack(double dt, std::pair<int, int>& playerPosition)
 {
 	// Checks if the player is starting an attack
-	if (attackQueued != 0)
+	if (actionQueued > PlayerActions::JUMP)
 	{
 		// If the player isn't moving, they can start the attack
 		if (GetIsMoving() == false)
 		{
 			// If it's a basic attack, progresses the basic attack
-			if (attackQueued == 1)
+			if (actionQueued == PlayerActions::BASICATTACK)
 			{
 				ProgressBasicAttack();
 			}
@@ -445,7 +461,7 @@ void Player::Attack(double dt, std::pair<int, int>& playerPosition)
 					if (currentAttack.attackPhase == AttackManager::AttackPhase::Active || currentAttack.attackPhase == AttackManager::AttackPhase::Ending)
 					{
 						// Checks if we are continuing the basic combo
-						if (attackQueued == 1)
+						if (actionQueued == PlayerActions::BASICATTACK)
 						{
 							ProgressBasicAttack();
 						}
@@ -502,5 +518,5 @@ void Player::ProgressBasicAttack()
 	}
 
 	// Clears the queued attack now that an attack has been started
-	attackQueued = 0;
+	actionQueued = PlayerActions::NOATTACK;
 }

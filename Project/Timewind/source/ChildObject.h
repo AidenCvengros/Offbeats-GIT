@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Camera.h
+\file ChildObject.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.9
+\date 2025.3.17
 \brief
-    Camera game object
+    The base class for child game objects
 
     Public Functions:
         + FILL
@@ -17,8 +17,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Camera_H_
-#define Syncopatience_Camera_H_
+#ifndef Syncopatience_ChildObject_H_
+#define Syncopatience_ChildObject_H_
 
 #pragma once
 
@@ -28,22 +28,15 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "stdafx.h"
 
-// Base game object class
 #include "GameObject.h"
 
-// glm matrix and math functionality
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "MapMatrix.h"
 
-// Player class for the camera to be centered on
-#include "Player.h"
+#include "AttackManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
-
-class Scene;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -56,10 +49,10 @@ class Scene;
 /*************************************************************************************************/
 /*!
 	\brief
-		The camera game object class
+		The child game object class
 */
 /*************************************************************************************************/
-class Camera : public GameObject
+class ChildObject : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -81,105 +74,36 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the camera class
+			Constructor for the child game object class
 			
-		\param pos
-			The position of the game object
+		\param parentObject_
+			The parent game object
 
-		\param rot
-			The rotation of the game object
-
-		\param sca
-			The scale of the game object
-
-		\param centeredObject_
-			The game object to center the camera on
-
-		\param windowWidth_
-			The width of the view space
-
-		\param windowHeight_
-			The height of the view space
+		\param flipWithParent_
+			Whether the child should flip direction and sides when the parent flips
 	*/
 	/*************************************************************************************************/
-	Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_, float aspectRatio_, float fieldOfView);
+	ChildObject(GameObject* parentObject_, bool flipWithParent_ = false) : GameObject(parentObject_->GetPosition(), parentObject_->GetRotation(), parentObject_->GetScale(), parentObject_->GetDrawPriority(), parentObject_->GetIsFacingRight(), false),
+		parentObject(parentObject_), flipWithParent(flipWithParent_) {}
 	
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Destructor for the camera class
+			Destructor for FILL class
 	*/
 	/*************************************************************************************************/
-	~Camera() {}
+	~ChildObject() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the game object.
-	
-		\param dt
-			The time elapsed since the previous frame
-	
-		\param inputManager
-			The input manager
-	*/
-	/*************************************************************************************************/
-	void Update(double dt, InputManager* inputManager);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the view matrix of the camera
+			Returns the transformation matrix for the game object
 
 		\return
-			The view matrix
+			The game object's transformation matrix
 	*/
 	/*************************************************************************************************/
-	glm::mat4 GetViewMatrix();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the perspective matrix of the camera
-
-		\return
-			The perspective matrix
-	*/
-	/*************************************************************************************************/
-	glm::mat4 GetPerspectiveMatrix();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the vector between the camera and the player
-
-		\return
-			The look at vector towards the player
-	*/
-	/*************************************************************************************************/
-	glm::vec4 GetLookAtVector();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the 3-dimensional position of the camera
-
-		\return
-			The position of the camera
-	*/
-	/*************************************************************************************************/
-	glm::vec4 Get3DPosition();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets a game object for the camera to center on
-
-		\param object
-			The new centered object
-	*/
-	/*************************************************************************************************/
-	void SetCenteredObject(Player* object);
+	glm::mat4x4 GetTranformationMatrix();
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -194,17 +118,8 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	//bool rotationChanged;						// Boolean for updating camera rotation				THIS VARIABLE NEEDS TO TRACK WHETHER THE TARGET GO HAS CHANGED BEFORE IT WORKS
-	bool perspectiveChanged;					// Boolean for updating camera perspective matrix
-
-	glm::vec3 upVector;							// The up vector for the camera
-	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
-
-	glm::mat4 viewMat;							// The view matrix for the camera
-	glm::mat4 perspMat;							// The perspective matrix for the camera
-
-	float aspectRatio;							// The aspect ratio of the camera view
-	float fov;									// The field of view of the camera view
+	GameObject* parentObject;					// The parent object that this child is attached to
+	bool flipWithParent;						// Flips the child object when the parent object flips direction
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -219,4 +134,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Camera_H_
+#endif // Syncopatience_ChildObject_H_

@@ -102,6 +102,9 @@
     <ClInclude Include="source\cppShortcuts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\ChildObject.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine.cpp">
@@ -166,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="source\cppShortcuts.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ChildObject.cpp">
+      <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

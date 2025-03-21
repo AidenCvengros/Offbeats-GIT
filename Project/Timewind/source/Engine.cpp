@@ -123,7 +123,7 @@ void Engine::Init()
 	GameObjectManager* objectManager = new GameObjectManager(inputManager);
 	TextureManager* texManager = new TextureManager(gameWindow);
 	SceneManager* sceneManager = new SceneManager(this);
-	MapMatrix* mapMatrix = new MapMatrix(25, 15);
+	MapMatrix* mapMatrix = new MapMatrix(100, 50);
 	EffectManager* effectManager = new EffectManager();
 
 	// Creates and pushes back systems

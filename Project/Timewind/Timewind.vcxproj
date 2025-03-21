@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="source\AttackManager.h" />
     <ClInclude Include="source\Camera.h" />
+    <ClInclude Include="source\ChildObject.h" />
     <ClInclude Include="source\cppShortcuts.h" />
     <ClInclude Include="source\EffectManager.h" />
     <ClInclude Include="source\Engine.h" />
@@ -184,6 +185,7 @@
   <ItemGroup>
     <ClCompile Include="source\AttackManager.cpp" />
     <ClCompile Include="source\Camera.cpp" />
+    <ClCompile Include="source\ChildObject.cpp" />
     <ClCompile Include="source\cppShortcuts.cpp" />
     <ClCompile Include="source\EffectManager.cpp" />
     <ClCompile Include="source\Engine.cpp" />

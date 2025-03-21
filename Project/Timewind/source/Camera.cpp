@@ -20,6 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "Camera.h"
 
+#include "cppShortcuts.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -45,6 +47,44 @@ const int zDist = -7.0f;						// How far back the camera is in the z axis
 //-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Constructor for the camera class
+
+	\param pos
+		The position of the game object
+
+	\param rot
+		The rotation of the game object
+
+	\param sca
+		The scale of the game object
+
+	\param centeredObject_
+		The game object to center the camera on
+
+	\param windowWidth_
+		The width of the view space
+
+	\param windowHeight_
+		The height of the view space
+*/
+/*************************************************************************************************/
+Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_, float aspectRatio_, float fieldOfView) :
+	GameObject(pos, rot, sca, 0, true, false),
+	//rotationChanged(true),
+	perspectiveChanged(true),
+	upVector(glm::vec3(0.0f, -1.0f, 0.0f)),
+	centeredObject(centeredObject_),
+	viewMat(glm::mat4(0.0f)),
+	perspMat(glm::mat4(0.0f)),
+	aspectRatio(aspectRatio_),
+	fov(fieldOfView)
+{
+	SetPosition(centeredObject->GetPosition());
+}
 
 /*************************************************************************************************/
 /*!
@@ -93,7 +133,7 @@ void Camera::Update(double dt, InputManager* inputManager)
 		//}
 	}
 
-	MoveTo(glm::vec2((centeredObject->GetPosition().x + (4.0f * directionModifier)), -centeredObject->GetPosition().y), 0.375, false);
+	MoveTo(glm::vec2((centeredObject->GetPosition().x + (4.0f * directionModifier)), -centeredObject->GetPosition().y), 0.5, false);
 }
 
 /*************************************************************************************************/
@@ -122,7 +162,7 @@ glm::mat4 Camera::GetViewMatrix()
 		}
 
 		// Update and return the view matrix
-		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist), glm::vec3(centeredObject->GetPosition().x + (2.0f * directionModifier), -centeredObject->GetPosition().y, 0.0f), upVector);
+		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist), glm::vec3(centeredObject->GetPosition().x, -centeredObject->GetPosition().y, zDist / 4.0f), upVector);
 	}
 	else
 	{
@@ -197,6 +237,7 @@ glm::vec4 Camera::Get3DPosition()
 void Camera::SetCenteredObject(Player* object)
 {
 	centeredObject = object;
+	SetPosition(centeredObject->GetPosition());
 }
 
 //-------------------------------------------------------------------------------------------------
