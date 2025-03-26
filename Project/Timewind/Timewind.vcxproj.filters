@@ -174,4 +174,18 @@
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="source\2d_frag.spv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="source\2d_vert.spv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="source\fisheye_frag.spv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="source\post_process_vert.spv">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

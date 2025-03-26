@@ -17,4 +17,6 @@ void main()
   float z = sqrt(1.0 - fragTexCoord.x * fragTexCoord.x - fragTexCoord.y * fragTexCoord.y);
   float a = 1.0 / (z * tan(4.5625 * 0.5));
   outColor = texture(texSampler, (fragTexCoord - 0.5) * 2.0 * a);
+  
+  //outColor = texture(texSampler, fragTexCoord) * fragColor;
 }

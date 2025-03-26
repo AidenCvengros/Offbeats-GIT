@@ -118,7 +118,7 @@ void Player::Update(double dt, InputManager* inputManager)
 	if (GetIsMoving() == true)
 	{
 		// Jump buffer for having just started a grounded movement
-		if (jumpPhase == 0 && timeSinceMove < 0.05 && inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
+		if (jumpPhase == 0 && timeSinceMove < 0.1 && inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
 		{
 			if (MovePlayer(playerPrevPos, 0, 1, 0.07))
 			{
@@ -139,11 +139,11 @@ void Player::Update(double dt, InputManager* inputManager)
 	// Checks for actions being set
 	if (inputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
 	{
-		actionQueued == PlayerActions::BASICATTACK;
+		actionQueued = PlayerActions::BASICATTACK;
 	}
 	if (inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
 	{
-		actionQueued == PlayerActions::JUMP;
+		actionQueued = PlayerActions::JUMP;
 	}
 
 	// Performs attacks if queued
@@ -186,7 +186,7 @@ void Player::Update(double dt, InputManager* inputManager)
 
 	if (shortHopAttack)
 	{
-		actionQueued == PlayerActions::BASICATTACK;
+		actionQueued = PlayerActions::BASICATTACK;
 	}
 
 	// Checks for end of jump phase 1 (float to apex of jump)
