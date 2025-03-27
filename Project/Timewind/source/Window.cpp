@@ -102,7 +102,7 @@ Window::~Window()
 /*********************************************************************************************/
 /*!
 	\brief
-		Initializes for the window
+		Starts the window and runs all setup functions for starting Vulkan on said window
 */
 /*********************************************************************************************/
 void Window::Init()
@@ -122,7 +122,8 @@ void Window::Init()
 
 	// Initializes the Vulkan instance
 	CreateVulkanInstance();
-	InitSurface();
+	SetupDebugMessenger();
+	InitializeSurface();
 	PickPhysicalDevice();
 	CreateLogicalDevice();
 	createSwapChain();
@@ -573,9 +574,34 @@ void Window::WaitForDrawFinished()
 	vkQueueWaitIdle(graphicsQueue);
 }
 
+/*********************************************************************************************/
+/*!
+	\brief
+		Checks if the given VkResult is VkSuccess. Otherwise throws an error with the given message.
+
+	\param functionResult
+		The result of a vulkan function
+
+	\param errorMessage
+		The error message to print.
+
+	\return
+		Returns the given VkResult
+*/
+/*********************************************************************************************/
+VkResult Window::CheckVulkanSuccess(VkResult functionResult, std::string errorMessage)
+{
+	if (functionResult != VK_SUCCESS)
+	{
+		throw std::runtime_error(errorMessage + " Error code: " + std::to_string(functionResult));
+	}
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+//// Initialization Functions
 
 /*********************************************************************************************/
 /*!
@@ -585,49 +611,372 @@ void Window::WaitForDrawFinished()
 /*********************************************************************************************/
 void Window::CreateVulkanInstance()
 {
-	// Checks if validation layers are on
-	if(enableValidationLayers && !CheckValidationLayerSupport())
+	// Defines the application info
+	VkApplicationInfo applicationInfo{};
+	applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	applicationInfo.pApplicationName = "Syncopatience";												// !!! Needs updated game name !!!
+	applicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);									// !!! Needs accurate game version !!!
+	applicationInfo.pEngineName = "Custom Engine made by Aiden Cvengros";
+	applicationInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);										// !!! Needs accurate engine version !!!
+	applicationInfo.apiVersion = VK_API_VERSION_1_0;
+
+	// Sets the information struct for creating the Vulkan instance
+	VkInstanceCreateInfo vulkanInstanceInfo{};
+	vulkanInstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	vulkanInstanceInfo.pApplicationInfo = &applicationInfo;
+	auto extensions = GetRequiredExtensions();
+	vulkanInstanceInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+	vulkanInstanceInfo.ppEnabledExtensionNames = extensions.data();
+
+	// Checks that validation layers can be turned on if they will need to be
+	if (enableValidationLayers && !CheckValidationLayerSupport())
 	{
 		throw std::runtime_error("validation layers requested, but not available!");
 	}
 
-	VkApplicationInfo appInfo{};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "Syncopatience";
-	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.pEngineName = "Custom Engine made by Aiden Cvengros";
-	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_API_VERSION_1_0;
-
-	VkInstanceCreateInfo createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	createInfo.pApplicationInfo = &appInfo;
-
-	auto extensions = GetRequiredExtensions();
-	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-	createInfo.ppEnabledExtensionNames = extensions.data();
-
-	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+	// Turns validation layers on or off accordingly
 	if (enableValidationLayers)
 	{
-		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-		createInfo.ppEnabledLayerNames = validationLayers.data();
+		// Adds the validation layers to the vulkan instance
+		vulkanInstanceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+		vulkanInstanceInfo.ppEnabledLayerNames = validationLayers.data();
 
-		populateDebugMessengerCreateInfo(debugCreateInfo);
-		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+		// Creates the messaging system for debug output
+		VkDebugUtilsMessengerCreateInfoEXT debugMessengerInfo{};
+		populateDebugMessengerCreateInfo(debugMessengerInfo);
+		vulkanInstanceInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugMessengerInfo;
 	}
 	else
 	{
-		createInfo.enabledLayerCount = 0;
-
-		createInfo.pNext = nullptr;
+		// If validation layers are off, clears the relevant fields for the vulkan instance
+		vulkanInstanceInfo.enabledLayerCount = 0;
+		vulkanInstanceInfo.pNext = NULL;
 	}
 
-	if (vkCreateInstance(&createInfo, nullptr, &vulkanInstance) != VK_SUCCESS)
+	// Creates the vulkan instance
+	CheckVulkanSuccess(vkCreateInstance(&vulkanInstanceInfo, NULL, &vulkanInstance), "Failed to create Vulkan instance!");
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Initializes the debug messenger
+*/
+/*********************************************************************************************/
+void Window::SetupDebugMessenger()
+{
+	// If we aren't doing validation layers, skip this function
+	if (!enableValidationLayers) return;
+
+	// Makes an info stucture for the message
+	VkDebugUtilsMessengerCreateInfoEXT createInfo;
+	populateDebugMessengerCreateInfo(createInfo);
+
+	// Creates the debug messenger
+	CheckVulkanSuccess(CreateDebugUtilsMessengerEXT(vulkanInstance, &createInfo, NULL, &debugMessenger), "Failed to create debug messenger!");
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Initializes the virtual screen surface
+*/
+/*********************************************************************************************/
+void Window::InitializeSurface()
+{
+	CheckVulkanSuccess(glfwCreateWindowSurface(vulkanInstance, window, NULL, &surface), "Failed to initialize virtual screen surface");
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Picks a graphics (or other valid) card for Vulkan to render on
+*/
+/*********************************************************************************************/
+void Window::PickPhysicalDevice()
+{
+	// Queries how many devices are available
+	uint32_t deviceCount = 0;
+	vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, NULL);
+
+	// Fails if no cards were found
+	if (deviceCount == 0)
 	{
-		throw std::runtime_error("failed to create instance!");
+		throw std::runtime_error("No graphics devices were found");
+	}
+
+	// Makes a vector list of all the devices
+	std::vector<VkPhysicalDevice> devices(deviceCount);
+	vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, devices.data());
+
+	// Checks for a suitable device
+	for (const auto& device : devices)
+	{
+		if (IsDeviceSuitable(device))
+		{
+			physicalCard = device;
+			break;
+		}
+	}
+
+	// If there isn't a valid graphics card, throws an error
+	if (physicalCard == VK_NULL_HANDLE)
+	{
+		throw std::runtime_error("Failed to find physical graphics device");
 	}
 }
+
+//// Helper Functions
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Makes the info struct for debug messaging systems
+
+	\param createInfo
+		The output info struct
+*/
+/*********************************************************************************************/
+void Window::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+{
+	// Sets the class members for the debug messenger
+	createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+	createInfo.pfnUserCallback = debugCallback;
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Assigns our messaging system as the debug utility messenger
+
+	\param instance
+		The Vulkan instance
+
+	\param pCreateInfo,
+		The messenger info struct
+
+	\param pAllocator
+		the allocator callback function
+
+	\param pDebugMessenger
+		The messenger
+
+	\result
+		Whether the debug utility messenger exists
+*/
+/*********************************************************************************************/
+VkResult Window::CreateDebugUtilsMessengerEXT(
+	VkInstance instance,
+	const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+	const VkAllocationCallbacks* pAllocator,
+	VkDebugUtilsMessengerEXT* pDebugMessenger)
+{
+	// Gets the function that adds in debug utilities messengers
+	PFN_vkCreateDebugUtilsMessengerEXT func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+	if (func != NULL)
+	{
+		// If we got a function to do so, adds in our debug messenger
+		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+	}
+	else
+	{
+		// Otherwise returns an error
+		return VK_ERROR_EXTENSION_NOT_PRESENT;
+	}
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Determines whether the given graphics card is suitable for running the game
+
+	\param device_
+		The given graphics card
+
+	\return
+		Whether the graphics card is suitable
+*/
+/*********************************************************************************************/
+bool Window::IsDeviceSuitable(VkPhysicalDevice device_)
+{
+	// Destroys each of the frame buffers
+	for (auto framebuffer : swapChainFramebuffers)
+	{
+		vkDestroyFramebuffer(logicalDevice, framebuffer, nullptr);
+	}
+
+	// Finds if there is a valid device queue
+	QueueFamilyIndices indices = FindQueueFamilies(device_);
+
+	// Checks whether the necessary extensions are supported by the device
+	bool extensionsSupported = checkDeviceExtensionSupport(device_);
+
+	// Checks if swap chain is suitable for the game
+	bool swapChainAdequate = false;
+	if (extensionsSupported)
+	{
+		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device_);
+		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+	}
+
+	// Gets the physical device's features
+	VkPhysicalDeviceFeatures supportedFeatures;
+	vkGetPhysicalDeviceFeatures(device_, &supportedFeatures);
+
+	// If all of that is true, returns true
+	return indices.IsComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Finds what types of queues the graphics card supports that we want to use
+
+	\param device_
+		The given graphics card
+
+	\return
+		The types of queue families for our program to use
+*/
+/*********************************************************************************************/
+Window::QueueFamilyIndices Window::FindQueueFamilies(VkPhysicalDevice device)
+{
+	QueueFamilyIndices indices;					// Creates the return struct that tracks the different types of queue families
+
+	// Finds how many queue types the device supports, then finds the full list of those types
+	uint32_t queueFamilyCount = 0;
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, NULL);
+	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+	// Loops through the queue type list to find the queue families we want
+	int queueTypeIndex = 0;
+	for (const VkQueueFamilyProperties& queueFamily : queueFamilies)
+	{
+		// Checks if the current queue type supports graphics
+		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		{
+			indices.graphicsFamily = queueTypeIndex;
+		}
+
+		// Gets whether the device can render a surface
+		VkBool32 presentSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, queueTypeIndex, surface, &presentSupport);
+
+		// If the device can render a surface, save it
+		if (presentSupport)
+		{
+			indices.presentFamily = queueTypeIndex;
+		}
+
+		// Checks if we've found both graphics and presentation queue support
+		if (indices.IsComplete())
+		{
+			break;
+		}
+
+		// Otherwise continues down the list
+		queueTypeIndex++;
+	}
+
+	// Returns the queue family indices struct
+	return indices;
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Determines whether the given graphics card has the extensions that the program needs.
+
+	\param device
+		the given graphics card
+
+	\return
+		Returns true if the device has the necessary extensions
+*/
+/*********************************************************************************************/
+bool Window::checkDeviceExtensionSupport(VkPhysicalDevice device)
+{
+	// Gets the total number of available extensions
+	uint32_t extensionCount;
+	vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, NULL);
+
+	// Gets the extensions
+	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, availableExtensions.data());
+
+	// Gets a list of the different extensions we need
+	std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+	// Checks if all of those extensions are present
+	for (const auto& extension : availableExtensions)
+	{
+		requiredExtensions.erase(extension.extensionName);
+	}
+
+	// If the device has all the extensions, returns true
+	return requiredExtensions.empty();
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Gets the details of the swap chain
+
+	\param device
+		the given graphics card
+
+	\return
+		The swap chain details
+*/
+/*********************************************************************************************/
+Window::SwapChainSupportDetails Window::querySwapChainSupport(VkPhysicalDevice device)
+{
+	SwapChainSupportDetails details;			// Holds the swap chain details
+
+	// Gets the basic surface capabilities
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
+
+	// Gets the list of surface formats
+	uint32_t formatCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+	if (formatCount != 0)
+	{
+		details.formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
+	}
+
+	// Gets the list of presentation modes
+	uint32_t presentModeCount;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+	if (presentModeCount != 0)
+	{
+		details.presentModes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+	}
+
+	// Returns the swap chain details
+	return details;
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Checks that the queue family has a complete set of indices
+
+	\result
+		Whether the struct is complete
+*/
+/*********************************************************************************************/
+bool Window::QueueFamilyIndices::IsComplete()
+{
+	return graphicsFamily.has_value() && presentFamily.has_value();
+}
+
+//// Destruction Functions
 
 /*********************************************************************************************/
 /*!
@@ -683,46 +1032,6 @@ void Window::CleanupSwapChain()
 /*********************************************************************************************/
 /*!
 	\brief
-		Sets up the debug messages
-*/
-/*********************************************************************************************/
-void Window::SetupDebugMessenger()
-{
-	// If we aren't doing validation layers, skip this function
-	if (!enableValidationLayers) return;
-
-	// Makes an info stucture for the message
-	VkDebugUtilsMessengerCreateInfoEXT createInfo;
-	populateDebugMessengerCreateInfo(createInfo);
-
-	// Makes the debug messenger
-	if (CreateDebugUtilsMessengerEXT(vulkanInstance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to set up debug messenger!");
-	}
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Makes the info struct for debug messages
-
-	\param createInfo
-		The output info struct
-*/
-/*********************************************************************************************/
-void Window::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
-{
-	createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-	createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-	createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	createInfo.pfnUserCallback = debugCallback;
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
 		Cleans up the debug messenger
 
 	\param instance
@@ -746,157 +1055,6 @@ void Window::DestroyDebugUtilsMessengerEXT(
 	{
 		func(instance, debugMessenger, pAllocator);
 	}
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Makes sure that the debug utility message system is loaded in
-
-	\param instance
-		The Vulkan instance
-
-	\param pCreateInfo,
-		The messenger info struct
-
-	\param pAllocator
-		the allocator callback function
-
-	\param pDebugMessenger
-		The messenger
-
-	\result
-		Whether the debug utility messenger exists
-*/
-/*********************************************************************************************/
-VkResult Window::CreateDebugUtilsMessengerEXT(
-	VkInstance instance,
-	const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-	const VkAllocationCallbacks* pAllocator,
-	VkDebugUtilsMessengerEXT* pDebugMessenger)
-{
-	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-	if (func != nullptr)
-	{
-		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-	}
-	else
-	{
-		return VK_ERROR_EXTENSION_NOT_PRESENT;
-	}
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Picks a graphics (or other valid) card for Vulkan to render on
-*/
-/*********************************************************************************************/
-void Window::PickPhysicalDevice()
-{
-	// Queries how many devices are available
-	uint32_t deviceCount = 0;
-	vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, NULL);
-
-	// Fails if no cards were found
-	if (deviceCount == 0)
-	{
-		throw std::runtime_error("No graphics devices were found");
-	}
-
-	// Makes a vector list of all the devices
-	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(vulkanInstance, &deviceCount, devices.data());
-
-	// Checks for a suitable device
-	for (const auto& device : devices) {
-		if (IsDeviceSuitable(device)) {
-			physicalCard = device;
-			break;
-		}
-	}
-
-	if (physicalCard == VK_NULL_HANDLE)
-	{
-		throw std::runtime_error("Failed to find physical graphics device");
-	}
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Determines whether the given graphics card is suitable for running the game
-
-	\param device_
-		The given graphics card
-
-	\return
-		Whether the graphics card is suitable
-*/
-/*********************************************************************************************/
-bool Window::IsDeviceSuitable(VkPhysicalDevice device_)
-{
-	// Destroys each of the frame buffers
-	for (auto framebuffer : swapChainFramebuffers)
-	{
-		vkDestroyFramebuffer(logicalDevice, framebuffer, nullptr);
-	}
-
-	// Finds if there is a valid device queue
-	QueueFamilyIndices indices = FindQueueFamilies(device_);
-
-	// Checks whether the necessary extensions are supported by the device
-	bool extensionsSupported = checkDeviceExtensionSupport(device_);
-
-	// Checks if swap chain is suitable for the game
-	bool swapChainAdequate = false;
-	if (extensionsSupported) {
-		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device_);
-		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
-	}
-
-	// Gets the physical device's features
-	VkPhysicalDeviceFeatures supportedFeatures;
-	vkGetPhysicalDeviceFeatures(device_, &supportedFeatures);
-
-	// If all of that is, returns true
-	return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
-}
-
-Window::QueueFamilyIndices Window::FindQueueFamilies(VkPhysicalDevice device)
-{
-	QueueFamilyIndices indices;
-
-	uint32_t queueFamilyCount = 0;
-	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-
-	int i = 0;
-	for (const auto& queueFamily : queueFamilies) {
-		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-			indices.graphicsFamily = i;
-		}
-
-		// Gets whether the device can render a surface
-		VkBool32 presentSupport = false;
-		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
-
-		// If the device can render a surface, save it
-		if (presentSupport)
-		{
-			indices.presentFamily = i;
-		}
-
-		if (indices.isComplete()) {
-			break;
-		}
-
-		i++;
-	}
-
-	return indices;
 }
 
 void Window::CreateLogicalDevice()
@@ -952,20 +1110,6 @@ void Window::CreateLogicalDevice()
 	
 	vkGetDeviceQueue(logicalDevice, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(logicalDevice, indices.presentFamily.value(), 0, &presentQueue);
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Initializes the virtual screen surface
-*/
-/*********************************************************************************************/
-void Window::InitSurface()
-{
-	if (glfwCreateWindowSurface(vulkanInstance, window, NULL, &surface) != VK_SUCCESS)
-	{
-		throw std::runtime_error("Failed to initialize virtual screen surface");
-	}
 }
 
 /*********************************************************************************************/
@@ -1368,81 +1512,6 @@ void Window::createGraphicsPipeline()
 	vkDestroyShaderModule(logicalDevice, vertShaderModule, NULL);
 	vkDestroyShaderModule(logicalDevice, postProcessVertShaderModule, NULL);
 	vkDestroyShaderModule(logicalDevice, fisheyeFragShaderModule, NULL);
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Determines whether the given graphics card has the extensions that the program needs.
-
-	\param device
-		the given graphics card
-
-	\return
-		Returns true if the device has the necessary extensions
-*/
-/*********************************************************************************************/
-bool Window::checkDeviceExtensionSupport(VkPhysicalDevice device)
-{
-	// Gets the total number of available extensions
-	uint32_t extensionCount;
-	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
-	
-	// Gets the extensions
-	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
-
-	// Gets a list of the different extensions we need
-	std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
-
-	// Checks if all of those extensions are present
-	for (const auto& extension : availableExtensions) {
-		requiredExtensions.erase(extension.extensionName);
-	}
-
-	// If the device has all the extensions, returns true
-	return requiredExtensions.empty();
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Gets the details of the swap chain
-
-	\param device
-		the given graphics card
-
-	\return
-		The swap chain details
-*/
-/*********************************************************************************************/
-Window::SwapChainSupportDetails Window::querySwapChainSupport(VkPhysicalDevice device)
-{
-	SwapChainSupportDetails details;			// Holds the swap chain details
-
-	// Gets the basic surface capabilities
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
-
-	// Gets the list of surface formats
-	uint32_t formatCount;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
-	if (formatCount != 0)
-	{
-		details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
-	}
-
-	// Gets the list of presentation modes
-	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
-	if (presentModeCount != 0)
-	{
-		details.presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
-	}
-
-	// Returns the swap chain details
-	return details;
 }
 
 /*********************************************************************************************/

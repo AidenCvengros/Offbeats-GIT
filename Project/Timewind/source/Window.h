@@ -402,17 +402,33 @@ public:
 	*/
 	/*********************************************************************************************/
 	VkImageView CreateImageView(VkImage image, VkFormat format);
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Checks if the given VkResult is VkSuccess. Otherwise throws an error with the given message.
+
+		\param functionResult
+			The result of a vulkan function
+
+		\param errorMessage
+			The error message to print.
+
+		\return
+			Returns the given VkResult
+	*/
+	/*********************************************************************************************/
+	VkResult CheckVulkanSuccess(VkResult functionResult, std::string errorMessage);
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 	
-	const std::vector<const char*> validationLayers =
-	{
-		"VK_LAYER_KHRONOS_validation"
-	};
+	// The list of names for valid validation layers for our program
+	const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 
+	// Turns on validation layers when running in debug, and off otherwise
 #ifdef NDEBUG
 	const bool enableValidationLayers = false;
 #else
@@ -423,17 +439,35 @@ private:
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
 
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Tracks the graphics card's ability to support our graphics queue needs
+	*/
+	/*********************************************************************************************/
 	struct QueueFamilyIndices
 	{
-		std::optional<uint32_t> graphicsFamily;
-		std::optional<uint32_t> presentFamily;
+		std::optional<uint32_t> graphicsFamily;	// The queue type for graphics queues
+		std::optional<uint32_t> presentFamily;	// The queue type for presentation queues
 
-		bool isComplete() {
-			return graphicsFamily.has_value() && presentFamily.has_value();
-		}
+		/*****************************************************************************************/
+		/*!
+			\brief
+				Checks that the queue family has a complete set of indices
+		
+			\result
+				Whether the struct is complete
+		*/
+		/*****************************************************************************************/
+		bool IsComplete();
 	};
 
-	// Handles the swap chain
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Handles variables needed to create the swap chain for this device
+	*/
+	/*********************************************************************************************/
 	struct SwapChainSupportDetails
 	{
 		VkSurfaceCapabilitiesKHR capabilities;		// Holds the capabilities of the screen surface
@@ -441,6 +475,12 @@ private:
 		std::vector<VkPresentModeKHR> presentModes;	// What presentation modes are available
 	};
 
+	/*********************************************************************************************/
+	/*!
+		\brief
+			The uniform buffer object for the first vertex shader
+	*/
+	/*********************************************************************************************/
 	struct UniformBufferObject
 	{
 		glm::mat4 model;
@@ -450,6 +490,12 @@ private:
 		glm::vec4 camPos;
 	};
 
+	/*********************************************************************************************/
+	/*!
+		\brief
+			The uniform buffer object for the post processing shader
+	*/
+	/*********************************************************************************************/
 	struct FisheyeUniformBufferObject
 	{
 		float fisheyeStrength;
@@ -532,6 +578,8 @@ private:
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
 
+	//// Initialization Functions
+
 	/*********************************************************************************************/
 	/*!
 		\brief
@@ -543,26 +591,20 @@ private:
 	/*********************************************************************************************/
 	/*!
 		\brief
-			Remakes the swap chain if it needs changes
-	*/
-	/*********************************************************************************************/
-	void RecreateSwapChain();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Destroys the swap chain
-	*/
-	/*********************************************************************************************/
-	void CleanupSwapChain();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
 			Sets up the debug messages
 	*/
 	/*********************************************************************************************/
 	void SetupDebugMessenger();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Initializes the virtual screen surface
+	*/
+	/*********************************************************************************************/
+	void InitializeSurface();
+
+	//// Helper Functions
 
 	/*********************************************************************************************/
 	/*!
@@ -601,6 +643,24 @@ private:
 		const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
 		const VkAllocationCallbacks* pAllocator,
 		VkDebugUtilsMessengerEXT* pDebugMessenger);
+
+	//// Destruction Functions
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Remakes the swap chain if it needs changes
+	*/
+	/*********************************************************************************************/
+	void RecreateSwapChain();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Destroys the swap chain
+	*/
+	/*********************************************************************************************/
+	void CleanupSwapChain();
 
 	/*********************************************************************************************/
 	/*!
@@ -647,14 +707,6 @@ private:
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
 	void CreateLogicalDevice();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Initializes the virtual screen surface
-	*/
-	/*********************************************************************************************/
-	void InitSurface();
 
 	/*********************************************************************************************/
 	/*!
