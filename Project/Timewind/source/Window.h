@@ -499,7 +499,8 @@ private:
 	struct FisheyeUniformBufferObject
 	{
 		float fisheyeStrength;
-		glm::vec2 resolution;
+		float screenWidth;
+		float screenHeight;
 	};
 	
 	//---------------------------------------------------------------------------------------------

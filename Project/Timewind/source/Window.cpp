@@ -2246,11 +2246,22 @@ void Window::UpdateUniformBuffers(uint32_t currentImage)
 	ubo.lookAt = camera->GetLookAtVector();
 	ubo.camPos = camera->Get3DPosition();
 
+	FisheyeUniformBufferObject fubo{};
+	//static float fisheyeStrength_ = 0.0;
+	//fisheyeStrength_ += 0.001;
+	fubo.fisheyeStrength = 0.23;
+	fubo.screenWidth = swapChainExtent.width;
+	fubo.screenHeight = swapChainExtent.height;
+
 	// Copies all the uniform buffer data in
 	void* data;
 	vkMapMemory(logicalDevice, offscreenUniformBufferMemory, 0, sizeof(ubo), 0, &data);
 	memcpy(data, &ubo, sizeof(ubo));
 	vkUnmapMemory(logicalDevice, offscreenUniformBufferMemory);
+
+	vkMapMemory(logicalDevice, uniformBuffersMemory[currentFrame], 0, sizeof(fubo), 0, &data);
+	memcpy(data, &fubo, sizeof(fubo));
+	vkUnmapMemory(logicalDevice, uniformBuffersMemory[currentFrame]);
 }
 
 /*********************************************************************************************/

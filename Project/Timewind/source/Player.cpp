@@ -411,6 +411,7 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 
 		// Resets time since moving
 		timeSinceMove = 0.0;
+		actionQueued = PlayerActions::NOATTACK;
 
 		// Since the move was successful, returns true
 		return true;

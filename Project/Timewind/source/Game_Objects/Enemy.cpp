@@ -133,8 +133,8 @@ void Enemy::DrawChildObjects(Window* window)
 	healthPool->SetColor({ 1.0, 1.0, 1.0, 1.0 });
 	window->DrawGameObject(healthPool);
 	healthPool->SetPosition({ GetPosition().x, GetPosition().y + 1.3 });
-	healthPool->SetScale({ healthPool->GetPoolRatio() * 0.8, 0.2f });
-	healthPool->SetColor({ 1.0, 0.2, 0.2, 1.0 });
+	healthPool->SetScale({ healthPool->GetPoolRatio(), 0.3f });
+	healthPool->SetColor({ 0.6, 0.1, 0.1, 1.0 });
 	window->DrawGameObject(healthPool);
 }
 

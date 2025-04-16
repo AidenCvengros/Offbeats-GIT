@@ -115,7 +115,7 @@ Engine::~Engine()
 void Engine::Init()
 {
 	// Creates and initializes the game window
-	gameWindow = new Window(800, 600, "Syncopatience");
+	gameWindow = new Window(1200, 900, "Syncopatience");
 	gameWindow->Init();
 
 	// Adds essential game systems to the system list

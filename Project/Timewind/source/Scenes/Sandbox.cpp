@@ -81,9 +81,9 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
 
     // Creates textures
     Texture* playerTexture = textureManager->AddTexture("Assets/Sprites/Ashe_Token.png");
-    Texture* wallTexture = textureManager->AddTexture("Assets/Sprites/Wall1.png");
+    Texture* wallTexture = textureManager->AddTexture("Assets/Sprites/Wall2.png");
     Texture* enemyTexture = textureManager->AddTexture("Assets/Sprites/Shadow_Enemy.png");
-    Texture* destructibleWallTexture = textureManager->AddTexture("Assets/Sprites/DestructibleWall.png");
+    Texture* destructibleWallTexture = textureManager->AddTexture("Assets/Sprites/Box_Wood.png");
 
     // Sets the default wall for the scene
     mapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
