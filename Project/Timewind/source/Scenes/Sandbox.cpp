@@ -80,10 +80,10 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     // If the systems were found
 
     // Creates textures
-    Texture* playerTexture = textureManager->AddTexture("Assets/Sprites/Ashe_Token.png");
+    Texture* playerTexture = textureManager->AddTexture("Assets/Sprites/Alice_Neutral.png");
     Texture* wallTexture = textureManager->AddTexture("Assets/Sprites/Wall2.png");
     Texture* enemyTexture = textureManager->AddTexture("Assets/Sprites/Shadow_Enemy.png");
-    Texture* destructibleWallTexture = textureManager->AddTexture("Assets/Sprites/Box_Wood.png");
+    Texture* destructibleWallTexture = textureManager->AddTexture("Assets/Sprites/Wall_Cracked.png");
 
     // Sets the default wall for the scene
     mapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
@@ -97,6 +97,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
 
     // Creates scene game objects
     GameObject* destructibleWall = new GameObject({ 12.0f, 6.0f }, 0.0f, { 2.0f, 2.0f }, 0, true, destructibleWallTexture, true);
+    destructibleWall->SetColor({ 0.4f, 0.075f, 0.0f, 1.0f });
     objectManager->AddGameObject(destructibleWall);
     Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, enemyTexture, mapMatrix, { 10, 2 });
     objectManager->AddGameObject(enemy);
