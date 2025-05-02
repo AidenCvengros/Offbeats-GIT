@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Gameplay">
       <UniqueIdentifier>{936b266f-a839-4717-b489-11b64ebe1845}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game Objects\Interactibles">
+      <UniqueIdentifier>{8a8a88b0-48ae-4301-ab2f-5c69ed9bcdee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game Objects\Interactibles">
+      <UniqueIdentifier>{f9111b55-b026-47d0-84b7-dd5855ea994b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Engine.h">
@@ -105,6 +111,15 @@
     <ClInclude Include="source\ChildObject.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
+    <ClInclude Include="source\Item.h">
+      <Filter>Header Files\Game Objects\Interactibles</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Game_Objects\Key.h">
+      <Filter>Header Files\Game Objects\Interactibles</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Game_Objects\DestructibleWall.h">
+      <Filter>Header Files\Game Objects\Interactibles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine.cpp">
@@ -172,6 +187,15 @@
     </ClCompile>
     <ClCompile Include="source\ChildObject.cpp">
       <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Item.cpp">
+      <Filter>Source Files\Game Objects\Interactibles</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Game_Objects\Key.cpp">
+      <Filter>Source Files\Game Objects\Interactibles</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Game_Objects\DestructibleWall.cpp">
+      <Filter>Source Files\Game Objects\Interactibles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

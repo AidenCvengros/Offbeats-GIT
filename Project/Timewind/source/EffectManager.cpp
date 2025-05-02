@@ -218,7 +218,7 @@ void EffectManager::StartEffect(EffectManager::EffectType effectType, std::strin
 		Texture* newTexture = _TextureManager->AddTexture(filename);
 
 		// makes the effect game object
-		GameObject* effectObject = new GameObject(effectCoordinates, effectRotation, effectScale, 60, effectFacingRight, newTexture, false, color);
+		GameObject* effectObject = new GameObject(effectCoordinates, effectRotation, effectScale, 60, effectFacingRight, newTexture, color);
 		_GameObjectManager->AddGameObject(effectObject);
 
 		// Stores the new effect in the active effects list

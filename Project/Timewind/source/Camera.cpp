@@ -73,7 +73,7 @@ const int zDist = -10.0f;						// How far back the camera is in the z axis
 */
 /*************************************************************************************************/
 Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_, float aspectRatio_, float fieldOfView) :
-	GameObject(pos, rot, sca, 0, true, false),
+	GameObject(pos, rot, sca),
 	//rotationChanged(true),
 	perspectiveChanged(true),
 	upVector(glm::vec3(0.0f, -1.0f, 0.0f)),

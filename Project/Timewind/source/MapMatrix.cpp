@@ -133,7 +133,7 @@ void MapMatrix::Update(double dt)
 void MapMatrix::Draw(Window* window)
 {
 	// Creates a square game object that's gonna be the drawing
-	GameObject wallObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, defaultWallTexture, false, defaultWallColor);
+	GameObject wallObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, defaultWallTexture, defaultWallColor);
 
 	// Draws the map
 	for (int i = 0; i < mapMatrix.size(); i++)
@@ -158,7 +158,7 @@ void MapMatrix::Draw(Window* window)
 	if (debugDraw)
 	{
 		// Creates a square game object that's gonna be the drawing
-		GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, false, { 0.0f, 0.0f, 0.0f, 0.3f });
+		GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, { 0.0f, 0.0f, 0.0f, 0.3f });
 		debugSquare.SetRender(true);
 
 		// Draws the map

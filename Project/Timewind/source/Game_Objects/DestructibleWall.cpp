@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file ChildObject.cpp
+\file Item.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.16
+\date 2025.4.28
 \brief
-    The base class for child game objects
+    The base class for item game objects
 
     Functions include:
         + FILL
@@ -18,9 +18,13 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "ChildObject.h"
+#include "DestructibleWall.h"
 
-#include "cppShortcuts.h"
+#include "../cppShortcuts.h"
+
+#include "../GameObjectManager.h"
+#include "../SceneManager.h"
+#include "../MapMatrix.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -38,6 +42,24 @@ Copyright (c) 2023 Aiden Cvengros
 // Public Function Declarations
 //-------------------------------------------------------------------------------------------------
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Destructor for FILL class
+*/
+/*************************************************************************************************/
+DestructibleWall::~DestructibleWall()
+{
+    // If there is an object inside the wall, spawn it
+    if (insideObject)
+    {
+        insideObject->SetPosition(GetPosition());
+        insideObject->SetMapCoords(GetMapCoords());
+        _GameObjectManager->AddGameObject(insideObject);
+        _MapMatrix->SetTile(GetMapCoords(), MapMatrix::TileStatus::Key, insideObject);
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Declarations
 //-------------------------------------------------------------------------------------------------
@@ -45,36 +67,6 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Returns the transformation matrix for the game object
-
-	\return
-		The game object's transformation matrix
-*/
-/*************************************************************************************************/
-glm::mat4x4 ChildObject::GetTransformationMatrix()
-{
-	// Adjusts transformation to flip the sprite if facing left
-	float directionModifier;
-	if (flipWithParent && parentObject->GetIsFacingRight() == true)
-	{
-		directionModifier = -1;
-	}
-	else
-	{
-		directionModifier = 1;
-	}
-
-	glm::mat4x4 objectMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(GetPosition(), 0.0f))
-		* glm::rotate(glm::mat4(1.0f), glm::radians(GetRotation() * directionModifier), glm::vec3(0.0f, 0.0f, 1.0f))
-		* glm::scale(glm::mat4(1.0f), glm::vec3(GetScale().x * directionModifier, GetScale().y, 1.0f));
-
-	// Calculates and returns the transformation matrix
-	return objectMatrix * parentObject->GetTranformationMatrix();
-}
 
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions

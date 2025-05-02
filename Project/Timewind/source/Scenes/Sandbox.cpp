@@ -29,6 +29,8 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../GameObjectManager.h"
 #include "../TextureManager.h"
 #include "../Game_Objects/Enemy.h"
+#include "../Game_Objects/DestructibleWall.h"
+#include "../Game_Objects/Key.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -84,6 +86,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     Texture* wallTexture = textureManager->AddTexture("Assets/Sprites/Wall2.png");
     Texture* enemyTexture = textureManager->AddTexture("Assets/Sprites/Shadow_Enemy.png");
     Texture* destructibleWallTexture = textureManager->AddTexture("Assets/Sprites/Wall_Cracked.png");
+    Texture* keyTexture = textureManager->AddTexture("Assets/Sprites/Key.png");
 
     // Sets the default wall for the scene
     mapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
@@ -96,7 +99,9 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     gameWindow->SetCamera(camera);
 
     // Creates scene game objects
-    GameObject* destructibleWall = new GameObject({ 12.0f, 6.0f }, 0.0f, { 2.0f, 2.0f }, 0, true, destructibleWallTexture, true);
+    GameObject* key = new Key(33, { 12.0f, 8.0f }, 0.0f, { 2.0f, 2.0f }, true, keyTexture, { 0.859, 0.255, 0.380, 1.0f }, { 6, 4 });
+    //objectManager->AddGameObject(key);
+    GameObject* destructibleWall = new DestructibleWall(key, { 12.0f, 6.0f }, 0.0f, { 2.0f, 2.0f }, 0, true, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, { 6, 3 });
     destructibleWall->SetColor({ 0.4f, 0.075f, 0.0f, 1.0f });
     objectManager->AddGameObject(destructibleWall);
     Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, enemyTexture, mapMatrix, { 10, 2 });
@@ -118,6 +123,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     mapMatrix->SetTile(16, 5, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(17, 5, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(6, 3, MapMatrix::TileStatus::Destructible, destructibleWall);
+    //mapMatrix->SetTile(6, 4, MapMatrix::TileStatus::Key, key);
 }
 
 /*************************************************************************************************/

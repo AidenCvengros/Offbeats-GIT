@@ -78,7 +78,31 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the game object class (without texture)
+			Constructor for the game object class (no texture (not rendered), not in map)
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+	*/
+	/*************************************************************************************************/
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca) :
+		active(true), toBeDestroyed(false),
+		position(pos), rotation(rot), scale(sca),
+		drawPriority(-100), facingRight(false),
+		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
+		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+		render(false), texture(NULL), color(0.0f),
+		inMap(false), mapCoords({-1, -1}) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the game object class (no texture (solid color), not in map)
 
 		\param pos
 			The position of the game object
@@ -102,26 +126,88 @@ public:
 			The map coordinates that the game object is in, defaults to an invalid tile
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_,  bool inMap_, glm::vec4 color_ = { 0.0f, 0.0f, 0.0f, 0.0f }, std::pair<int, int> mapCoords_ = { -1, -1 }) :
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, glm::vec4 color_) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_),
-		facingRight(facingRight_),
-		moving(false),
-		moveOriginalPosition(glm::vec2(0.0f, 0.0f)),
-		moveNewPosition(glm::vec2(0.0f, 0.0f)),
-		moveTime(0.0), moveTimeLeft(0.0),
-		moveSmooth(false),
-		render(false),
-		texture(NULL),
-		color(color_),
-		inMap(inMap_),
-		mapCoords(mapCoords_) {}
+		drawPriority(drawPriority_), facingRight(facingRight_),
+		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
+		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+		render(false), texture(NULL), color(color_),
+		inMap(false), mapCoords({-1, -1}) {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the game object class (with texture)
+			Constructor for the game object class (no texture (not rendered), in map)
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param mapCoords_
+			The map coordinates that the game object is in, defaults to an invalid tile
+	*/
+	/*************************************************************************************************/
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, std::pair<int, int> mapCoords_) :
+		active(true), toBeDestroyed(false),
+		position(pos), rotation(rot), scale(sca),
+		drawPriority(-100), facingRight(facingRight_),
+		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
+		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+		render(false), texture(NULL), color(0.0f),
+		inMap(true), mapCoords(mapCoords_) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the game object class (no texture (solid color), in map)
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in, defaults to an invalid tile
+	*/
+	/*************************************************************************************************/
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
+		active(true), toBeDestroyed(false),
+		position(pos), rotation(rot), scale(sca),
+		drawPriority(drawPriority_), facingRight(facingRight_),
+		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
+		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+		render(false), texture(NULL), color(color_),
+		inMap(true), mapCoords(mapCoords_) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the game object class (with texture, not in map)
 
 		\param pos
 			The position of the game object
@@ -148,21 +234,53 @@ public:
 			The map coordinates that the game object is in, defaults to an invalid tile
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, bool inMap_, glm::vec4 color_ = { 1.0f, 1.0f, 1.0f, 1.0f }, std::pair<int, int> mapCoords_ = { -1, -1 }) :
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_),
-		facingRight(facingRight_),
-		moving(false),
-		moveOriginalPosition(glm::vec2(0.0f, 0.0f)),
-		moveNewPosition(glm::vec2(0.0f, 0.0f)),
-		moveTime(0.0), moveTimeLeft(0.0),
-		moveSmooth(false),
-		render(true),
-		texture(texture_),
-		color(color_),
-		inMap(inMap_),
-		mapCoords(mapCoords_) {}
+		drawPriority(drawPriority_), facingRight(facingRight_),
+		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
+		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+		render(true), texture(texture_), color(color_),
+		inMap(false), mapCoords({-1, -1}) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the game object class (with texture, in map)
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority (Player is at 50, Background is at 0)
+
+		\param texture_
+			The texture for the game object
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in, defaults to an invalid tile
+	*/
+	/*************************************************************************************************/
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
+		active(true), toBeDestroyed(false),
+		position(pos), rotation(rot), scale(sca),
+		drawPriority(drawPriority_), facingRight(facingRight_),
+		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
+		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+		render(true), texture(texture_), color(color_),
+		inMap(true), mapCoords(mapCoords_) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -170,7 +288,7 @@ public:
 			Destructor for the game object class
 	*/
 	/*************************************************************************************************/
-	~GameObject() {}
+	virtual ~GameObject() {}
 
 	/*************************************************************************************************/
 	/*!
@@ -449,6 +567,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void SetColor(glm::vec4 newColor) { color = newColor; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets the game object's color
+
+		\param newColor
+			The game object's new color
+	*/
+	/*************************************************************************************************/
+	void SetMapCoords(std::pair<int, int> newMapCoords) { mapCoords = newMapCoords; }
 
 	/*************************************************************************************************/
 	/*!

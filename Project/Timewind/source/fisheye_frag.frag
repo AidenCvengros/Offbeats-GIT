@@ -14,7 +14,7 @@ layout(location = 1) in vec2 fragTexCoord;
 
 layout(location = 0) out vec4 outColor;
 
-vec2 res = vec2(200, 150);
+vec2 res = vec2(320, 240);
 const vec3 defaultColor = vec3(0.025, 0.0125, 0.0);
 // Amount of shadow mask.
 float maskDark=0.5;

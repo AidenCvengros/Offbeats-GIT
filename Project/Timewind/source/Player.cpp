@@ -80,7 +80,7 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_, std::pair<int, int> mapCoords) :
-	GameObject(pos, rot, sca, drawPriority_, true, texture_, true, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
+	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
 	jumpPhase(0),
 	playerPrevPos(mapCoords),
 	timeSinceMove(0.0),

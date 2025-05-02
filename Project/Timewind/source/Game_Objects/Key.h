@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file ChildObject.h
+\file Key.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2025.3.17
+\date 2025.5.2
 \brief
-    The base class for child game objects
+    The base class for key game objects
 
     Public Functions:
         + FILL
@@ -17,8 +17,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_ChildObject_H_
-#define Syncopatience_ChildObject_H_
+#ifndef Syncopatience_Key_H_
+#define Syncopatience_Key_H_
 
 #pragma once
 
@@ -26,13 +26,9 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "stdafx.h"
+#include "../stdafx.h"
 
-#include "GameObject.h"
-
-#include "MapMatrix.h"
-
-#include "AttackManager.h"
+#include "../Item.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -49,10 +45,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The child game object class
+		The interactible game object class
 */
 /*************************************************************************************************/
-class ChildObject : public GameObject
+class Key : public Item
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -74,17 +70,28 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the child game object class
-			
-		\param parentObject_
-			The parent game object
+			Constructor for the interactible game object class
 
-		\param flipWithParent_
-			Whether the child should flip direction and sides when the parent flips
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	ChildObject(GameObject* parentObject_, bool flipWithParent_) : GameObject(parentObject_->GetPosition(), parentObject_->GetRotation(), parentObject_->GetScale(), parentObject_->GetDrawPriority(), parentObject_->GetIsFacingRight(), parentObject_->GetColor()),
-		parentObject(parentObject_), flipWithParent(flipWithParent_) {}
+	Key(int keyValue_, glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::Key, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), keyValue(keyValue_) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -92,23 +99,14 @@ public:
 			Destructor for FILL class
 	*/
 	/*************************************************************************************************/
-	~ChildObject() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the transformation matrix for the game object
-
-		\return
-			The game object's transformation matrix
-	*/
-	/*************************************************************************************************/
-	glm::mat4x4 GetTransformationMatrix();
+	virtual ~Key() {}
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	int keyValue;
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -117,9 +115,6 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-	
-	GameObject* parentObject;					// The parent object that this child is attached to
-	bool flipWithParent;						// Flips the child object when the parent object flips direction
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -134,4 +129,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_ChildObject_H_
+#endif // Syncopatience_InteractibleObject_H_
