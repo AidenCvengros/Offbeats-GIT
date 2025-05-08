@@ -1,24 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Key.h
+\file Inventory.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2025.5.2
+\date 2025.5.5
 \brief
-    The base class for key game objects
+    The player's inventory manager
 
-    Public Functions:
-        + FILL
-		
-	Private Functions:
-		+ FILL
+    Functions include:
+        + [FILL]
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Key_H_
-#define Syncopatience_Key_H_
+#ifndef Syncopatience_Inventory_H_
+#define Syncopatience_Inventory_H_
 
 #pragma once
 
@@ -26,9 +23,9 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "../stdafx.h"
+#include "stdafx.h"
 
-#include "../Item.h"
+#include "Game_Objects/Key.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -45,10 +42,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The interactible game object class
+		The inventory manager class
 */
 /*************************************************************************************************/
-class Key : public Item
+class Inventory
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -70,54 +67,33 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the interactible game object class
-
-		\param pos
-			The position of the game object
-
-		\param rot
-			The rotation of the game object
-
-		\param sca
-			The scale of the game object
-
-		\param inMap_
-			Whether this game object is in the map
-
-		\param color_
-			The color of the game object, defaults to clear
-
-		\param mapCoords_
-			The map coordinates that the game object is in
+		  Constructor for the inventory class
 	*/
 	/*************************************************************************************************/
-	Key(int keyValue_, glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::Key, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), keyValue(keyValue_) {}
-	
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Destructor for FILL class
-	*/
-	/*************************************************************************************************/
-	virtual ~Key() {}
+	Inventory() : itemList(NULL) {}
 
 	/*************************************************************************************************/
 	/*!
-		\brief
-			Returns the key's value
-
-		\return
-			The key value for checking against locks
+	  \brief
+		Destructor for inventory class
 	*/
 	/*************************************************************************************************/
-	int GetKeyValue() { return keyValue; }
-	
+	~Inventory() {}
+
+	/*************************************************************************************************/
+	/*!
+	  \brief
+		Adds the given item to the inventory
+	*/
+	/*************************************************************************************************/
+	void AddItem(Item* newItem) { itemList.push_back(newItem); }
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	int keyValue;
+	std::vector<Item*> itemList;
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -126,7 +102,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-
+	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
@@ -140,4 +116,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_InteractibleObject_H_
+#endif // Syncopatience_Inventory_H_
