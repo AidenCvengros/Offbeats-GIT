@@ -31,6 +31,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Enemy.h"
 #include "../Game_Objects/DestructibleWall.h"
 #include "../Game_Objects/Key.h"
+#include "../LockedWall.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -87,6 +88,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     Texture* enemyTexture = textureManager->AddTexture("Assets/Sprites/Shadow_Enemy.png");
     Texture* destructibleWallTexture = textureManager->AddTexture("Assets/Sprites/Wall_Cracked.png");
     Texture* keyTexture = textureManager->AddTexture("Assets/Sprites/Key.png");
+    Texture* lockedWallTexture = textureManager->AddTexture("Assets/Sprites/LockedWall.png");
 
     // Sets the default wall for the scene
     mapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
@@ -106,6 +108,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     objectManager->AddGameObject(destructibleWall);
     Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, enemyTexture, mapMatrix, { 10, 2 });
     objectManager->AddGameObject(enemy);
+    LockedWall* lockedWall = new LockedWall(33, { 30.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, true, lockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, { 15, 2 });
 
     // Sets the map for the scene
     mapMatrix->SetTile(10, 2, MapMatrix::TileStatus::Enemy, enemy);
@@ -123,6 +126,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     mapMatrix->SetTile(16, 5, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(17, 5, MapMatrix::TileStatus::Wall);
     mapMatrix->SetTile(6, 3, MapMatrix::TileStatus::Destructible, destructibleWall);
+    mapMatrix->SetTile(15, 2, MapMatrix::TileStatus::LockedDoor, lockedWall);
     //mapMatrix->SetTile(6, 4, MapMatrix::TileStatus::Key, key);
 }
 

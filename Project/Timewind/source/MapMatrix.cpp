@@ -495,6 +495,41 @@ int MapMatrix::GetMaxMapHeight()
 //
 //}
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Calculates tile coordinates with a left or right offset
+
+	\param xCoord
+		The X coordinate of the center tile
+
+	\param yCoord
+		The Y coordinate of the center tile
+
+	\param facingRight
+		Whether the attack is facing right
+
+	\param xOffset
+		The offset from the center tile. Will be used in conjunction with the facingRight variable to check the correct tile
+
+	\return
+		Returns the tile coordinates
+*/
+/*************************************************************************************************/
+std::pair<int, int> MapMatrix::CalculateOffsetTile(int xCoord, int yCoord, bool facingRight, int xOffset)
+{
+	// Checks if the attack is facing right
+	if (facingRight)
+	{
+		return std::make_pair(xCoord + xOffset, yCoord);
+	}
+	// Otherwise when the attack is facing left
+	else
+	{
+		return std::make_pair(xCoord - xOffset, yCoord);
+	}
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------

@@ -27,6 +27,8 @@ Copyright (c) 2025 Aiden Cvengros
 
 #include "Game_Objects/Key.h"
 
+#include <array>
+
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
@@ -67,33 +69,65 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-		  Constructor for the inventory class
+			Constructor for the inventory class
 	*/
 	/*************************************************************************************************/
-	Inventory() : itemList(NULL) {}
+	Inventory() : keyList() {}
 
 	/*************************************************************************************************/
 	/*!
-	  \brief
-		Destructor for inventory class
+		 \brief
+			Destructor for inventory class
 	*/
 	/*************************************************************************************************/
 	~Inventory() {}
 
 	/*************************************************************************************************/
 	/*!
-	  \brief
-		Adds the given item to the inventory
+		\brief
+			Adds the given item to the inventory
+
+		\param newItem
+			The new item to be added into the inventory
 	*/
 	/*************************************************************************************************/
-	void AddItem(Item* newItem) { itemList.push_back(newItem); }
+	//void AddItem(Item* newItem) { itemList.push_back(newItem); }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Adds the given key to the inventory
+
+		\param newKey
+			The new key to be added into the inventory
+
+		\return
+			Returns true if the key was added. False if not
+	*/
+	/*************************************************************************************************/
+	bool AddKey(Key* newKey);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Checks whether the player has a key of the given index
+
+		\param keyIndex
+			The index of the key being checked
+
+		\return
+			Whether the player has the key
+	*/
+	/*************************************************************************************************/
+	bool HaveKey(int keyIndex) { return keyList[keyIndex] != NULL; }
 
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	std::vector<Item*> itemList;
+	//std::vector<Item*> itemList;				// The list of general items the player has
+	std::array<Key*, 36> keyList;				// The list of keys the player has collected
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

@@ -123,6 +123,9 @@
     <ClInclude Include="source\Inventory.h">
       <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
+    <ClInclude Include="source\LockedWall.h">
+      <Filter>Header Files\Game Objects\Interactibles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine.cpp">
@@ -202,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="source\Inventory.cpp">
       <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="source\LockedWall.cpp">
+      <Filter>Source Files\Game Objects\Interactibles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

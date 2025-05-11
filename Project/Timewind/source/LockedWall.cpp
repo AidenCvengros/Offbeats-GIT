@@ -1,14 +1,14 @@
 /*************************************************************************************************/
 /*!
-\file Inventory.cpp
+\file LockedWall.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2025.5.7
+\date 2025.5.11
 \brief
-    Manages the player's inventory
+    FILL
 
     Functions include:
-        + [FILL]
+        + FILL
 
 Copyright (c) 2025 Aiden Cvengros
 */
@@ -18,7 +18,7 @@ Copyright (c) 2025 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "Inventory.h"
+#include "LockedWall.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -43,30 +43,6 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Adds the given key to the inventory
-
-	\param newKey
-		The new key to be added into the inventory
-
-	\return
-		Returns true if the key was added, false if not
-*/
-/*************************************************************************************************/
-bool Inventory::AddKey(Key* newKey)
-{
-	if (newKey)
-	{
-		keyList[newKey->GetKeyValue()] = newKey;
-		return true;
-	}
-
-	// Otherwise return false
-	return false;
-}
 
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions

@@ -73,6 +73,7 @@ public:
 		Enemy,									// The player cannot walk through spaces on this side vvv
 		Key,
 		Destructible,
+		LockedDoor,
 		Wall,
 		Max
 	};
@@ -344,6 +345,7 @@ public:
 	*/
 	/*************************************************************************************************/
 	MapTile GetTile(int xCoord, int yCoord);
+	MapTile GetTile(std::pair<int, int> coords) { return GetTile(coords.first, coords.second); }
 
 	/*************************************************************************************************/
 	/*!
@@ -419,6 +421,30 @@ public:
 	*/
 	/*************************************************************************************************/
 	//std::pair<int, int> FindTileCoords(GameObject* gameObject);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Calculates tile coordinates with a left or right offset
+
+		\param xCoord
+			The X coordinate of the center tile
+
+		\param yCoord
+			The Y coordinate of the center tile
+
+		\param facingRight
+			Whether the attack is facing right
+
+		\param xOffset
+			The offset from the center tile. Will be used in conjunction with the facingRight variable to check the correct tile
+
+		\return
+			Returns the tile coordinates
+	*/
+	/*************************************************************************************************/
+	std::pair<int, int> CalculateOffsetTile(int xCoord, int yCoord, bool facingRight, int xOffset);
+	std::pair<int, int> CalculateOffsetTile(std::pair<int, int> coords, bool facingRight, int xOffset) { return CalculateOffsetTile(coords.first, coords.second, facingRight, xOffset); }
 
 private:
 	//---------------------------------------------------------------------------------------------

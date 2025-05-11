@@ -1,24 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Player.h
+\file LockedWall.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.16
+\date 2025.5.11
 \brief
-    The game object representing the player
+    The locked wall game object
 
-    Public Functions:
+    Functions include:
         + FILL
-		
-	Private Functions:
-		+ FILL
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Player_H_
-#define Syncopatience_Player_H_
+#ifndef Syncopatience_LockedWall_H_
+#define Syncopatience_LockedWall_H_
 
 #pragma once
 
@@ -29,12 +26,6 @@ Copyright (c) 2023 Aiden Cvengros
 #include "stdafx.h"
 
 #include "GameObject.h"
-
-#include "MapMatrix.h"
-
-#include "AttackManager.h"
-
-#include "Inventory.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -51,24 +42,16 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The player game object
+		The locked wall game object class
 */
 /*************************************************************************************************/
-class Player : public GameObject
+class LockedWall : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 	
-	enum class PlayerActions
-	{
-		NOATTACK,
-		JUMP,
-		INTERACT,
-		MAX,
-	};
-
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
@@ -80,12 +63,18 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-	
-	/*************************************************************************************************/
+  
+	/*********************************************************************************************/
 	/*!
 		\brief
-			Constructor for the player game object class
-			
+			Constructor for the locked wall game object class
+
+		\param keyValue_
+			The value of the key needed to open the lock
+
+		\param insideObject_
+			The object inside the wall that will pop out when destroyed. Set to null if nothing is supposed to pop out.
+
 		\param pos
 			The position of the game object
 
@@ -98,44 +87,57 @@ public:
 		\param drawPriority_
 			Higher draw priorities are drawn in front of objects with lower priority
 
-		\param texture_
-			The texture of the player object
+		\param inMap_
+			Whether this game object is in the map
 
-		\param mapMatrix_
-			The map that the player object is in
+		\param color_
+			The color of the game object, defaults to clear
 
-		\param mapCoords
-			The starting coordinates of the player
+		\param mapCoords_
+			The map coordinates that the game object is in
 	*/
-	/*************************************************************************************************/
-	Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_, std::pair<int, int> mapCoords);
-	
+	/*********************************************************************************************/
+	LockedWall(int keyValue_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), keyValue(keyValue_) {}
+  
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Destructor for locked wall game object class
+	*/
+	/*********************************************************************************************/
+	virtual ~LockedWall() {}
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Destructor for the player class
-	*/
-	/*************************************************************************************************/
-	~Player();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the game object.
+			Updates the game object. Can be overwritten by derived classes
 
 		\param dt
 			The time elapsed since the previous frame
 
 		\param inputManager
-			The input manager
+			Allows the game objects to check inputs
 	*/
 	/*************************************************************************************************/
-	void Update(double dt, InputManager* inputManager);
+	virtual void Update(double dt, InputManager* inputManager) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets the door's key value
+
+		\return
+			The key value
+	*/
+	/*************************************************************************************************/
+	virtual int GetKeyValue() { return keyValue; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	int keyValue;								// The key needed to unlock the door
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -145,82 +147,9 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	int jumpPhase;								// Tracks the progress of a jump
-	std::pair<int, int> playerPrevPos;			// The previous player position in map coordinates
-	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
-
-	PlayerActions actionQueued;					// Denotes whether an attack has been pressed (0 is no attack, it should activate the next time the player is at a tile)
-	bool jumpAttacked;							// Boolean to prevent the player from whiffing multiple times in a jump
-	AttackManager attackManager;				// Keeps track of attacks the player uses
-
-	MapMatrix* mapMatrix;						// The map that the player is in
-	Inventory* inventory;						// The player's inventory
-
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns whether the given input was either pressed or held
-
-		\param inputManager
-			The input manager
-
-		\param input
-			The given input
-
-		\return
-			Whether the input was pressed or held
-	*/
-	/*************************************************************************************************/
-	bool CheckInput(InputManager* inputManager, InputManager::Inputs input);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Helper function to manage moving the player
-
-		\param playerPosition
-			The current position of the player (will be modified if the player moves)
-
-		\param horizontalMove
-			The horizontal movement (positive for right, negative for left)
-
-		\param verticalMove
-			The vertical movement (positive for up, negative for left)
-
-		\param moveSpeed
-			How long the movement takes
-
-		\return
-			Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
-	*/
-	/*************************************************************************************************/
-	bool MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, double moveSpeed);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Helper function to manage moving the player
-
-		\param dt
-			The time elapsed since the previous frame
-
-		\param playerPosition
-			The current position of the player (will be modified if the player moves)
-	*/
-	/*************************************************************************************************/
-	void Interact(double dt, std::pair<int, int>& playerPosition);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Starts and manages the three hit basic attack combo
-	*/
-	/*************************************************************************************************/
-	//void ProgressBasicAttack();
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -231,4 +160,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Player_H_
+#endif // Syncopatience_LockedWall_H_

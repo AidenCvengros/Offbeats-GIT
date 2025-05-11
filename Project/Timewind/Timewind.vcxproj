@@ -173,6 +173,7 @@
     <ClInclude Include="source\Inventory.h" />
     <ClInclude Include="source\Item.h" />
     <ClInclude Include="source\Game_Objects\Key.h" />
+    <ClInclude Include="source\LockedWall.h" />
     <ClInclude Include="source\MapMatrix.h" />
     <ClInclude Include="source\Player.h" />
     <ClInclude Include="source\Pool.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="source\Inventory.cpp" />
     <ClCompile Include="source\Item.cpp" />
     <ClCompile Include="source\Game_Objects\Key.cpp" />
+    <ClCompile Include="source\LockedWall.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\MapMatrix.cpp" />
     <ClCompile Include="source\Player.cpp" />

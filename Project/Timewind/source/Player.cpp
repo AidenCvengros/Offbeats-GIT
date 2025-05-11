@@ -24,6 +24,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Includes the enemy class for interacting with them
 #include "Game_Objects/Enemy.h"
+#include "LockedWall.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -89,6 +90,18 @@ Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Textu
 	mapMatrix(mapMatrix_)
 {
 	mapMatrix->SetPlayerPosition(mapCoords, this);
+	inventory = new Inventory();
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Destructor for the player class
+*/
+/*************************************************************************************************/
+Player::~Player()
+{
+	delete inventory;
 }
 
 /*************************************************************************************************/
@@ -139,7 +152,7 @@ void Player::Update(double dt, InputManager* inputManager)
 	// Checks for actions being set
 	if (inputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
 	{
-		actionQueued = PlayerActions::BASICATTACK;
+		actionQueued = PlayerActions::INTERACT;
 	}
 	if (inputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
 	{
@@ -147,7 +160,7 @@ void Player::Update(double dt, InputManager* inputManager)
 	}
 
 	// Performs attacks if queued
-	Attack(dt, playerPosition);
+	Interact(dt, playerPosition);
 	
 	// Checks that the previous movement finished
 	if (GetIsMoving() == false && jumpPhase == 0)
@@ -186,7 +199,7 @@ void Player::Update(double dt, InputManager* inputManager)
 
 	if (shortHopAttack)
 	{
-		actionQueued = PlayerActions::BASICATTACK;
+		actionQueued = PlayerActions::INTERACT;
 	}
 
 	// Checks for end of jump phase 1 (float to apex of jump)
@@ -408,6 +421,7 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 		playerPosition.first += horizontalMove;
 		playerPosition.second += verticalMove;
 		MoveTo(glm::vec2(ConvertMapCoordToWorldCoord(playerPosition.first), ConvertMapCoordToWorldCoord(playerPosition.second)), moveSpeed, false);
+		SetMapCoords(playerPosition);
 
 		// Resets time since moving
 		timeSinceMove = 0.0;
@@ -433,43 +447,68 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 		The current position of the player (will be modified if the player moves)
 */
 /*************************************************************************************************/
-void Player::Attack(double dt, std::pair<int, int>& playerPosition)
+void Player::Interact(double dt, std::pair<int, int>& playerPosition)
 {
 	// Checks if the player is starting an attack
-	if (actionQueued > PlayerActions::JUMP)
+	if (actionQueued == PlayerActions::INTERACT)
 	{
 		// If the player isn't moving, they can start the attack
 		if (GetIsMoving() == false)
 		{
 			// If it's a basic attack, progresses the basic attack
-			if (actionQueued == PlayerActions::BASICATTACK)
-			{
-				ProgressBasicAttack();
-			}
-		}
-		// If the player is doing a move, they count as moving, so we check if we can cancel the current move into the new move
-		else
-		{
-			auto currentAttack = attackManager.GetCurrentAttackStatus();
+			//if (actionQueued == PlayerActions::INTERACT)
+			//{
+			//	//ProgressBasicAttack();
+			//}
 
-			// Checks that there is an attack happening
-			if (currentAttack.attackType != AttackManager::AttackTypes::NullAttack)
+			std::pair<int, int> interactionCoords = mapMatrix->CalculateOffsetTile(GetMapCoords(), GetIsFacingRight(), 1);
+			MapMatrix::MapTile interactionTile = mapMatrix->GetTile(interactionCoords);
+
+			// Destroys destructible walls
+			if (interactionTile.tileStatus == MapMatrix::TileStatus::Destructible)
 			{
-				// Checks if the current attack are part of the basic combo
-				if (currentAttack.attackType == AttackManager::AttackTypes::Slash1 || currentAttack.attackType == AttackManager::AttackTypes::Slash2)
+				mapMatrix->ClearTile(interactionCoords.first, interactionCoords.second);
+			}
+			// Grabs keys and adds it to inventory
+			if (interactionTile.tileStatus == MapMatrix::TileStatus::Key && interactionTile.tileObject && ((Item*)interactionTile.tileObject)->GetItemType() == Item::ItemType::Key)
+			{
+				if (inventory->AddKey((Key*)interactionTile.tileObject))
 				{
-					// Checks if the current attack is past the startup step
-					if (currentAttack.attackPhase == AttackManager::AttackPhase::Active || currentAttack.attackPhase == AttackManager::AttackPhase::Ending)
-					{
-						// Checks if we are continuing the basic combo
-						if (actionQueued == PlayerActions::BASICATTACK)
-						{
-							ProgressBasicAttack();
-						}
-					}
+					mapMatrix->ClearTile(interactionCoords.first, interactionCoords.second);
+				}
+			}
+			// Opens doors
+			if (interactionTile.tileStatus == MapMatrix::TileStatus::LockedDoor && interactionTile.tileObject)
+			{
+				if (inventory->HaveKey(((LockedWall*)interactionTile.tileObject)->GetKeyValue()))
+				{
+					mapMatrix->ClearTile(interactionCoords.first, interactionCoords.second);
 				}
 			}
 		}
+		// If the player is doing a move, they count as moving, so we check if we can cancel the current move into the new move
+		//else
+		//{
+		//	auto currentAttack = attackManager.GetCurrentAttackStatus();
+		//
+		//	// Checks that there is an attack happening
+		//	if (currentAttack.attackType != AttackManager::AttackTypes::NullAttack)
+		//	{
+		//		// Checks if the current attack are part of the basic combo
+		//		if (currentAttack.attackType == AttackManager::AttackTypes::Slash1 || currentAttack.attackType == AttackManager::AttackTypes::Slash2)
+		//		{
+		//			// Checks if the current attack is past the startup step
+		//			if (currentAttack.attackPhase == AttackManager::AttackPhase::Active || currentAttack.attackPhase == AttackManager::AttackPhase::Ending)
+		//			{
+		//				// Checks if we are continuing the basic combo
+		//				if (actionQueued == PlayerActions::BASICATTACK)
+		//				{
+		//					ProgressBasicAttack();
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
 
 		// Checks if the player is jumping
 		//if (jumpPhase > 0)
@@ -479,7 +518,7 @@ void Player::Attack(double dt, std::pair<int, int>& playerPosition)
 	}
 
 	// Updates the attack manager
-	attackManager.UpdateAttacks(mapMatrix, dt);
+	//attackManager.UpdateAttacks(mapMatrix, dt);
 }
 
 /*************************************************************************************************/
@@ -488,36 +527,36 @@ void Player::Attack(double dt, std::pair<int, int>& playerPosition)
 		Starts and manages the three hit basic attack combo
 */
 /*************************************************************************************************/
-void Player::ProgressBasicAttack()
-{
-	// Checks if we are already in the combo
-	if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash1)
-	{
-		attackManager.StartAttack(AttackManager::AttackTypes::Slash2, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
-		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash2), false);
-	}
-	else if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash2)
-	{
-		attackManager.StartAttack(AttackManager::AttackTypes::Slash3, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
-		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash3), false);
-	}
-	// Otherwise starts the first slash
-	else
-	{
-		// Only allows a single attack sequence per jump
-		if (jumpPhase == 0 || jumpAttacked == false)
-		{
-			attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
-			MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash1), false);
-
-			// If we are jumping, marks this as the jump attack
-			if (jumpPhase > 0)
-			{
-				jumpAttacked = true;
-			}
-		}
-	}
-
-	// Clears the queued attack now that an attack has been started
-	actionQueued = PlayerActions::NOATTACK;
-}
+//void Player::ProgressBasicAttack()
+//{
+//	// Checks if we are already in the combo
+//	if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash1)
+//	{
+//		attackManager.StartAttack(AttackManager::AttackTypes::Slash2, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
+//		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash2), false);
+//	}
+//	else if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash2)
+//	{
+//		attackManager.StartAttack(AttackManager::AttackTypes::Slash3, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
+//		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash3), false);
+//	}
+//	// Otherwise starts the first slash
+//	else
+//	{
+//		// Only allows a single attack sequence per jump
+//		if (jumpPhase == 0 || jumpAttacked == false)
+//		{
+//			attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
+//			MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash1), false);
+//
+//			// If we are jumping, marks this as the jump attack
+//			if (jumpPhase > 0)
+//			{
+//				jumpAttacked = true;
+//			}
+//		}
+//	}
+//
+//	// Clears the queued attack now that an attack has been started
+//	actionQueued = PlayerActions::NOATTACK;
+//}

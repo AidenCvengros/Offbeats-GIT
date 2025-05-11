@@ -79,6 +79,9 @@ public:
 		\brief
 			Constructor for the item game object class
 
+		\param itemType_
+			The type of the item
+
 		\param pos
 			The position of the game object
 
@@ -101,7 +104,7 @@ public:
 			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	Item(ItemType itemType_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_) {}
+	Item(ItemType itemType_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), itemType(itemType_) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -124,6 +127,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	virtual void Update(double dt, InputManager* inputManager) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the type of the item
+
+		\return
+			The item type
+	*/
+	/*************************************************************************************************/
+	ItemType GetItemType() { return itemType; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
