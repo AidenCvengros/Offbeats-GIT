@@ -55,7 +55,7 @@ Copyright (c) 2023 Aiden Cvengros
 		The engine to load the scene into
 */
 /*************************************************************************************************/
-Scene::Scene(Engine* engine_) : engine(engine_)
+Scene::Scene(Engine* engine_) : engine(engine_), inUse(false)
 {
 	
 }

@@ -105,6 +105,7 @@ public:
 	*/
 	/*************************************************************************************************/
 	Item(ItemType itemType_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), itemType(itemType_) {}
+	Item(ItemType itemType_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), itemType(itemType_) {}
 	
 	/*************************************************************************************************/
 	/*!

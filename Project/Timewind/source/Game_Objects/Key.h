@@ -92,6 +92,7 @@ public:
 	*/
 	/*************************************************************************************************/
 	Key(int keyValue_, glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::Key, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), keyValue(keyValue_) {}
+	Key(int keyValue_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::Key, 40, texture_, color_, mapCoords_), keyValue(keyValue_) {}
 	
 	/*************************************************************************************************/
 	/*!

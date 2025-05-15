@@ -29,9 +29,13 @@ Copyright (c) 2023 Aiden Cvengros
 // Includes window class to be drawn to
 #include "Window.h"
 
+#include <fstream>
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
+
+const int bufferSize = 512;					// The default buffer size used for reading files
 
 //-------------------------------------------------------------------------------------------------
 // Public Declarations
@@ -528,6 +532,113 @@ std::pair<int, int> MapMatrix::CalculateOffsetTile(int xCoord, int yCoord, bool 
 	{
 		return std::make_pair(xCoord - xOffset, yCoord);
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Reads in a map from the given file
+
+	\param filename
+		The file to build the map from
+
+	\param specialTileList
+		The list of all nonstandard tiles that need filling
+*/
+/*************************************************************************************************/
+void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< char, std::pair< int, int > > >& specialTileList)
+{
+	// Opens the file
+	std::ifstream fileInput(filename);
+	if (fileInput)
+	{
+		// Reads in the file
+		char bufferInput[bufferSize] = { 0 };
+		int mapWidth;
+		int mapHeight;
+
+		// Reads in the width and height of the map, then moves to the next line
+		fileInput >> mapWidth;
+		fileInput.getline(bufferInput, bufferSize, ',');
+		fileInput >> mapHeight;
+		fileInput.getline(bufferInput, bufferSize);
+
+		// Sets the size of the map matrix
+		mapMatrix.clear();
+		for (size_t i = 0; i < mapWidth; i++)
+		{
+			// Makes the columns height tall
+			std::vector<MapTile> column;
+			column.resize(mapHeight, { TileStatus::Empty, NULL });
+			mapMatrix.push_back(column);
+		}
+
+		// Fills in the map
+		for (int i = mapHeight - 1; i >= 0; i--)
+		{
+			fileInput.getline(bufferInput, bufferSize);
+
+			for (int j = 0; j < mapWidth; j++)
+			{
+				// Checks what the next character is
+				if (bufferInput[j * 2] == 'w')
+				{
+					SetTile(j, i, TileStatus::Wall);
+				}
+				else if (bufferInput[j * 2] == 'p')
+				{
+					SetTile(j, i, TileStatus::Player);
+					playerPos = { j, i };
+				}
+				else if (bufferInput[j * 2] != '0')
+				{
+					// If the space isn't empty or something simple, notes it so the scene can populate these objects
+					specialTileList.push_back({ bufferInput[j * 2], {j, i} });
+				}
+			}
+		}
+	}
+	// If the file didn't read, throw an error
+	else
+	{
+		throw std::runtime_error("Failed to read in scene map");
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Updates the player's position to the map's version.
+
+	\param playerObject
+		The player game object
+*/
+/*************************************************************************************************/
+void MapMatrix::UpdatePlayerPosition(GameObject* playerObject)
+{
+	playerObject->SetMapCoords(playerPos);
+	UpdateObjectPosition(playerPos, playerObject);
+	SetTile(playerPos, TileStatus::Player, playerObject);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Updates an object's visual position based on their map position. Will center the object on the tile.
+
+	\param xCoord
+		The x coordinate of the tile to be changed
+
+	\param yCoord
+		The y coordinate of the tile to be changed
+
+	\param playerObject
+		The player game object
+*/
+/*************************************************************************************************/
+void MapMatrix::UpdateObjectPosition(int xCoord, int yCoord, GameObject* object)
+{
+	object->SetPosition({ xCoord * 2.0f, yCoord * 2.0f });
 }
 
 //-------------------------------------------------------------------------------------------------

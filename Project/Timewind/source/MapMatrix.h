@@ -446,6 +446,49 @@ public:
 	std::pair<int, int> CalculateOffsetTile(int xCoord, int yCoord, bool facingRight, int xOffset);
 	std::pair<int, int> CalculateOffsetTile(std::pair<int, int> coords, bool facingRight, int xOffset) { return CalculateOffsetTile(coords.first, coords.second, facingRight, xOffset); }
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Reads in a map from the given file
+
+		\param filename
+			The file to build the map from
+
+		\param specialTileList
+			The list of all nonstandard tiles that need filling
+	*/
+	/*************************************************************************************************/
+	void ReadMapFromFile(std::string filename, std::vector< std::pair< char, std::pair< int, int > > >& specialTileList);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates the player's position to the map's version.
+
+		\param playerObject
+			The player game object
+	*/
+	/*************************************************************************************************/
+	void UpdatePlayerPosition(GameObject* playerObject);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates an object's visual position based on their map position. Will center the object on the tile.
+
+		\param xCoord
+			The x coordinate of the tile to be changed
+
+		\param yCoord
+			The y coordinate of the tile to be changed
+
+		\param playerObject
+			The player game object
+	*/
+	/*************************************************************************************************/
+	void UpdateObjectPosition(int xCoord, int yCoord, GameObject* object);
+	void UpdateObjectPosition(std::pair<int, int> coords, GameObject* object) { UpdateObjectPosition(coords.first, coords.second, object); }
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts

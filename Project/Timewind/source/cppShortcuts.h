@@ -21,6 +21,7 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 #include "Engine.h"
+#include "SceneManager.h"
 
 // glm matrix and math functionality
 #define GLM_FORCE_RADIANS

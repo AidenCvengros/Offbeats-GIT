@@ -80,8 +80,6 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
         throw std::runtime_error("Engine system was not found for scene initialization.");
     }
 
-    // If the systems were found
-
     // Creates textures
     Texture* playerTexture = textureManager->AddTexture("Assets/Sprites/Alice_Neutral.png");
     Texture* wallTexture = textureManager->AddTexture("Assets/Sprites/Wall2.png");
@@ -100,33 +98,77 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     objectManager->AddGameObject((GameObject*)player);
     gameWindow->SetCamera(camera);
 
-    // Creates scene game objects
-    GameObject* key = new Key(33, { 12.0f, 8.0f }, 0.0f, { 2.0f, 2.0f }, true, keyTexture, { 0.859, 0.255, 0.380, 1.0f }, { 6, 4 });
-    //objectManager->AddGameObject(key);
-    GameObject* destructibleWall = new DestructibleWall(key, { 12.0f, 6.0f }, 0.0f, { 2.0f, 2.0f }, 0, true, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, { 6, 3 });
-    destructibleWall->SetColor({ 0.4f, 0.075f, 0.0f, 1.0f });
-    objectManager->AddGameObject(destructibleWall);
-    Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, enemyTexture, mapMatrix, { 10, 2 });
-    objectManager->AddGameObject(enemy);
-    LockedWall* lockedWall = new LockedWall(33, { 30.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, true, lockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, { 15, 2 });
-
     // Sets the map for the scene
-    mapMatrix->SetTile(10, 2, MapMatrix::TileStatus::Enemy, enemy);
-    for (int i = 0; i < mapMatrix->GetMaxMapWidth(); i++)
+    std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
+    mapMatrix->ReadMapFromFile("Assets/Maps/Level1.csv", specialTileList);
+
+    // Adds in all special tiles
+    for (auto i = specialTileList.begin(); i != specialTileList.end(); i++)
     {
-        mapMatrix->SetTile(i, 0, MapMatrix::TileStatus::Wall);
-        mapMatrix->SetTile(i, 1, MapMatrix::TileStatus::Wall);
+        GameObject* newObject;                  // Game object pointer to store newly made objects
+
+        // Checks what character marked the special tile
+        switch (i->first)
+        {
+        // Case 1 is a key hidden behind a destructible wall
+        case '1':
+            newObject = new Key(33, keyTexture, { 0.859, 0.255, 0.380, 1.0f }, i->second);
+            newObject = new DestructibleWall(newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+            objectManager->AddGameObject(newObject);
+            mapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
+            break;
+        // Case 2 is a free key
+        case '2':
+            newObject = new Key(18, keyTexture, { 0.604f, 0.922f, 0.0f, 1.0f }, i->second);
+            objectManager->AddGameObject(newObject);
+            mapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
+            break;
+        // Case ! is the lock for key 1
+        case '!':
+            newObject = new LockedWall(33, 40, lockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
+            objectManager->AddGameObject(newObject);
+            mapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            break;
+        // Case @ is the lock for key 2
+        case '@':
+            newObject = new LockedWall(18, 40, lockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
+            objectManager->AddGameObject(newObject);
+            mapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            break;
+        default:
+            std::cout << "Extra special tile found. Char: " << i->first << std::endl;
+            break;
+        }
     }
-    mapMatrix->SetTile(5, 2, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(7, 3, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(9, 4, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(10, 4, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(12, 5, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(13, 5, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(16, 5, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(17, 5, MapMatrix::TileStatus::Wall);
-    mapMatrix->SetTile(6, 3, MapMatrix::TileStatus::Destructible, destructibleWall);
-    mapMatrix->SetTile(15, 2, MapMatrix::TileStatus::LockedDoor, lockedWall);
+
+    // Creates scene game objects
+    
+    //objectManager->AddGameObject(key);
+    
+    //destructibleWall->SetColor({ 0.4f, 0.075f, 0.0f, 1.0f });
+    
+    //Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, enemyTexture, mapMatrix, { 10, 2 });
+    //objectManager->AddGameObject(enemy);
+    
+
+    
+    mapMatrix->UpdatePlayerPosition(player);
+    //mapMatrix->SetTile(10, 2, MapMatrix::TileStatus::Enemy, enemy);
+    //for (int i = 0; i < mapMatrix->GetMaxMapWidth(); i++)
+    //{
+    //    mapMatrix->SetTile(i, 0, MapMatrix::TileStatus::Wall);
+    //    mapMatrix->SetTile(i, 1, MapMatrix::TileStatus::Wall);
+    //}
+    //mapMatrix->SetTile(5, 2, MapMatrix::TileStatus::Wall);
+    //mapMatrix->SetTile(7, 3, MapMatrix::TileStatus::Wall);
+    //mapMatrix->SetTile(9, 4, MapMatrix::TileStatus::Wall);
+    //mapMatrix->SetTile(10, 4, MapMatrix::TileStatus::Wall);
+    //mapMatrix->SetTile(12, 5, MapMatrix::TileStatus::Wall);
+    //mapMatrix->SetTile(13, 5, MapMatrix::TileStatus::Wall);
+    //mapMatrix->SetTile(16, 5, MapMatrix::TileStatus::Wall);
+    //mapMatrix->SetTile(17, 5, MapMatrix::TileStatus::Wall);
+    //mapMatrix->SetTile(6, 3, MapMatrix::TileStatus::Destructible, destructibleWall);
+    //mapMatrix->SetTile(15, 2, MapMatrix::TileStatus::LockedDoor, lockedWall);
     //mapMatrix->SetTile(6, 4, MapMatrix::TileStatus::Key, key);
 }
 

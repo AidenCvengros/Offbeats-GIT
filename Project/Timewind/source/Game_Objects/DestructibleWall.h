@@ -98,6 +98,7 @@ public:
 	*/
 	/*************************************************************************************************/
 	DestructibleWall(GameObject* insideObject_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), insideObject(insideObject_) {}
+	DestructibleWall(GameObject* insideObject_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), insideObject(insideObject_) {}
 	
 	/*************************************************************************************************/
 	/*!

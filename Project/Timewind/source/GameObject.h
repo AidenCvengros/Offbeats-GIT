@@ -149,24 +149,29 @@ public:
 		\param sca
 			The scale of the game object
 
-		\param drawPriority_
-			Higher draw priorities are drawn in front of objects with lower priority
+		\param mapCoords_
+			The map coordinates that the game object is in, defaults to an invalid tile
+	*/
+	/*************************************************************************************************/
+	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, std::pair<int, int> mapCoords_) :
+		active(true), toBeDestroyed(false),
+		position(pos), rotation(rot), scale(sca),
+		drawPriority(-100), facingRight(true),
+		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
+		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+		render(false), texture(NULL), color(0.0f),
+		inMap(true), mapCoords(mapCoords_) {}
 
-		\param inMap_
-			Whether this game object is in the map
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the game object class (no texture (not rendered), in map, centered on map tile)
 
 		\param mapCoords_
 			The map coordinates that the game object is in, defaults to an invalid tile
 	*/
 	/*************************************************************************************************/
-	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, std::pair<int, int> mapCoords_) :
-		active(true), toBeDestroyed(false),
-		position(pos), rotation(rot), scale(sca),
-		drawPriority(-100), facingRight(facingRight_),
-		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
-		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-		render(false), texture(NULL), color(0.0f),
-		inMap(true), mapCoords(mapCoords_) {}
+	GameObject(std::pair<int, int> mapCoords_);
 
 	/*************************************************************************************************/
 	/*!
@@ -185,8 +190,8 @@ public:
 		\param drawPriority_
 			Higher draw priorities are drawn in front of objects with lower priority
 
-		\param inMap_
-			Whether this game object is in the map
+		\param facingRight_
+			Whether the game object is facing right (true) or left (false)
 
 		\param color_
 			The color of the game object, defaults to clear
@@ -203,6 +208,23 @@ public:
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(false), texture(NULL), color(color_),
 		inMap(true), mapCoords(mapCoords_) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the game object class (no texture (solid color), in map, centered on map tile)
+
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in, defaults to an invalid tile
+	*/
+	/*************************************************************************************************/
+	GameObject(int drawPriority_, glm::vec4 color_, std::pair<int, int> mapCoords_);
 
 	/*************************************************************************************************/
 	/*!
@@ -260,11 +282,11 @@ public:
 		\param drawPriority_
 			Higher draw priorities are drawn in front of objects with lower priority (Player is at 50, Background is at 0)
 
+		\param facingRight_
+			Whether the game object is facing right (true) or left (false)
+
 		\param texture_
 			The texture for the game object
-
-		\param inMap_
-			Whether this game object is in the map
 
 		\param color_
 			The color of the game object, defaults to clear
@@ -281,6 +303,26 @@ public:
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(true), texture(texture_), color(color_),
 		inMap(true), mapCoords(mapCoords_) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the game object class (with texture, in map, centered on map tile)
+
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority (Player is at 50, Background is at 0)
+
+		\param texture_
+			The texture for the game object
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in, defaults to an invalid tile
+	*/
+	/*************************************************************************************************/
+	GameObject(int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_);
 	
 	/*************************************************************************************************/
 	/*!
