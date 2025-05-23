@@ -22,6 +22,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "cppShortcuts.h"
 
+//#include "InputManager.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -76,7 +78,7 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	GameObject(pos, rot, sca),
 	//rotationChanged(true),
 	perspectiveChanged(true),
-	upVector(glm::vec3(0.0f, -1.0f, 0.0f)),
+	upVector(glm::vec3(0.0f, 1.0f, 0.0f)),
 	centeredObject(centeredObject_),
 	viewMat(glm::mat4(0.0f)),
 	perspMat(glm::mat4(0.0f)),
@@ -133,7 +135,7 @@ void Camera::Update(double dt, InputManager* inputManager)
 		//}
 	}
 
-	MoveTo(glm::vec2((centeredObject->GetPosition().x + (4.0f * directionModifier)), -centeredObject->GetPosition().y), 0.5, false);
+	MoveTo(glm::vec2((centeredObject->GetPosition().x + 8.0f * (max(min(inputManager->CheckMouseCoordinates().first / 1000.0, 1.0f), 0.0f) - 0.5f)), centeredObject->GetPosition().y + -8.0f * (max(min(inputManager->CheckMouseCoordinates().second / 1000.0, 1.0f), 0.0f) - 0.5f)), 0.025, false);
 }
 
 /*************************************************************************************************/
@@ -162,7 +164,8 @@ glm::mat4 Camera::GetViewMatrix()
 		}
 
 		// Update and return the view matrix
-		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist), glm::vec3(centeredObject->GetPosition().x, -centeredObject->GetPosition().y, zDist / 4.0f), upVector);
+		float distanceFromPlayer = glm::distance(centeredObject->GetPosition(), GetPosition());
+		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist + distanceFromPlayer * distanceFromPlayer / 8.0f), glm::vec3(centeredObject->GetPosition().x, centeredObject->GetPosition().y, zDist / 4.0f), upVector);
 	}
 	else
 	{

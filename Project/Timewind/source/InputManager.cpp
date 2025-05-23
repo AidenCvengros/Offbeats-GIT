@@ -61,6 +61,7 @@ void InputManager::Init()
 		timeSincePressed.push_back({ 100, false });
 	}
 
+	keybinds.insert(std::pair(Inputs::Escape, GLFW_KEY_ESCAPE));
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_LEFT));
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_A));
 	keybinds.insert(std::pair(Inputs::Right, GLFW_KEY_RIGHT));
@@ -74,6 +75,8 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::F1, GLFW_KEY_F1));
 	keybinds.insert(std::pair(Inputs::F2, GLFW_KEY_F2));
 	keybinds.insert(std::pair(Inputs::F3, GLFW_KEY_F3));
+
+	glfwSetInputMode(window->GetWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 /*************************************************************************************************/
@@ -98,6 +101,17 @@ void InputManager::Update(double dt)
 
 		// Updates the input status for this key
 		UpdateInputStatus((Inputs)i);
+	}
+
+	glfwGetCursorPos(window->GetWindowPtr(), &mouseCoords.first, &mouseCoords.second);
+	if (CheckInputStatus(Inputs::F3) == InputStatus::Pressed)
+	{
+		std::cout << mouseCoords.first << ", " << mouseCoords.second << std::endl;
+	}
+
+	if (CheckInputStatus(Inputs::Escape) == InputStatus::Pressed)
+	{
+		glfwSetWindowShouldClose(window->GetWindowPtr(), true);
 	}
 }
 

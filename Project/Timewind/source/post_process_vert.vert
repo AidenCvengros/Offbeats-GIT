@@ -9,22 +9,10 @@ layout(location = 1) out vec2 fragTexCoord;
 
 void main()
 {
-  //vec4 vVertex = ubo.view * tempPos;
-  //
-  //float dist = length(vVertex);
-  //vec4 proj = dot(tempPos, normalize(ubo.lookAt)) * normalize(ubo.lookAt);
-  //vec4 c = tempPos - proj;
-  //
-  //float magnitude = 1 - acos(dot(normalize(vVertex), normalize(tempPos)));
-  //
-  //c = length(c) * magnitude * normalize(c);
-  //vec4 dir2 = normalize(c - ubo.lookAt);
-  //dir2 = (dir2 * dist);
-  
   vec2 modPosition = inPosition * 4.0;
   modPosition.x = modPosition.x - 1.0;
   modPosition.y = modPosition.y + 1.0;
-  modPosition.x = modPosition.x * -1;
+  //modPosition.x = modPosition.x * -1;
   
   gl_Position = vec4(modPosition, 0.0, 1.0);
   fragColor = inColor;

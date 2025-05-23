@@ -44,6 +44,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Game Object object to keep track of things to draw to the screen
 #include "GameObject.h"
 
+#include "cppShortcuts.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -2245,6 +2247,7 @@ void Window::UpdateUniformBuffers(uint32_t currentImage)
 	ubo.proj = camera->GetPerspectiveMatrix();
 	ubo.lookAt = camera->GetLookAtVector();
 	ubo.camPos = camera->Get3DPosition();
+	//ubo.playerPos = 
 
 	FisheyeUniformBufferObject fubo{};
 	//static float fisheyeStrength_ = 0.0;

@@ -174,7 +174,7 @@ glm::mat4x4 GameObject::GetTranformationMatrix()
 	}
 
 	// Calculates and returns the transformation matrix
-	return glm::translate(glm::mat4(1.0f), glm::vec3(position.x, -position.y, 0.0f))
+	return glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 0.0f))
 		* glm::rotate(glm::mat4(1.0f), glm::radians(rotation * directionModifier), glm::vec3(0.0f, 0.0f, 1.0f))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(scale.x * directionModifier, scale.y, 1.0f));
 }

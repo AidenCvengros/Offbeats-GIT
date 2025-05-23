@@ -173,6 +173,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the 3-dimensional position of the centered object
+
+		\return
+			The position of the centered object
+	*/
+	/*************************************************************************************************/
+	//glm::vec4 GetCenteredObject3DPosition();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets a game object for the camera to center on
 
 		\param object

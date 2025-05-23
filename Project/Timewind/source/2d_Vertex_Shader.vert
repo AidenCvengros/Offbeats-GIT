@@ -7,6 +7,7 @@ layout(set = 0, binding = 0) uniform UniformBufferObject
   mat4 proj;
   vec4 lookAt;
   vec4 camPos;
+  //vec4 playerPos;
 } ubo;
 
 layout(push_constant) uniform pushConstant
@@ -36,7 +37,18 @@ void main()
   //vec4 dir2 = normalize(c - ubo.lookAt);
   //dir2 = (dir2 * dist);
   
-  gl_Position = ubo.proj * ubo.view * ps.model * vec4(inPosition, 0.0, 1.0);
+  vec4 vertWorldPosition = ps.model * vec4(inPosition, 0.0, 1.0);
+  
+  vec3 screenCenter = vec3(ubo.camPos.x + ubo.lookAt.x, ubo.camPos.y + ubo.lookAt.y, 0.0);
+  vec3 camVec = vertWorldPosition.xyz - screenCenter;
+  float distanceToCamera = sqrt(camVec.x * camVec.x);
+  
+  vertWorldPosition.z += 10.0f - (distanceToCamera * distanceToCamera) / 14.0f;
+  //if (distanceToCamera <= 2.0f)
+  //{
+  //  vertWorldPosition = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+  //  }
+  gl_Position = ubo.proj * ubo.view * vertWorldPosition;
   fragColor = ps.color;
-  fragTexCoord = inTexCoord;
+  fragTexCoord = vec2(inTexCoord.x, 1.0f - inTexCoord.y);
 }
