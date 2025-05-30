@@ -208,6 +208,8 @@ private:
 	//bool rotationChanged;						// Boolean for updating camera rotation				THIS VARIABLE NEEDS TO TRACK WHETHER THE TARGET GO HAS CHANGED BEFORE IT WORKS
 	bool perspectiveChanged;					// Boolean for updating camera perspective matrix
 
+	bool inCutscene;							// Cutscenes hijack the normal gameplay camera
+
 	glm::vec3 upVector;							// The up vector for the camera
 	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
 
@@ -217,9 +219,20 @@ private:
 	float aspectRatio;							// The aspect ratio of the camera view
 	float fov;									// The field of view of the camera view
 
+	double relativePosX;						// Tracks horizontal mouse movement for camera movement
+	double relativePosY;						// Tracks vertical mouse movement for camera movement
+
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates the relative camera position
+	*/
+	/*************************************************************************************************/
+	void UpdateRelativePosition();
 };
 
 //-------------------------------------------------------------------------------------------------

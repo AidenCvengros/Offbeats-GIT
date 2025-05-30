@@ -25,29 +25,13 @@ layout(location = 1) out vec2 fragTexCoord;
 
 void main()
 {
-  //vec4 vVertex = ubo.view * tempPos;
-  //
-  //float dist = length(vVertex);
-  //vec4 proj = dot(tempPos, normalize(ubo.lookAt)) * normalize(ubo.lookAt);
-  //vec4 c = tempPos - proj;
-  //
-  //float magnitude = 1 - acos(dot(normalize(vVertex), normalize(tempPos)));
-  //
-  //c = length(c) * magnitude * normalize(c);
-  //vec4 dir2 = normalize(c - ubo.lookAt);
-  //dir2 = (dir2 * dist);
-  
   vec4 vertWorldPosition = ps.model * vec4(inPosition, 0.0, 1.0);
   
   vec3 screenCenter = vec3(ubo.camPos.x + ubo.lookAt.x, ubo.camPos.y + ubo.lookAt.y, 0.0);
   vec3 camVec = vertWorldPosition.xyz - screenCenter;
-  float distanceToCamera = sqrt(camVec.x * camVec.x);
+  float distanceToCamera = sqrt(camVec.x * camVec.x) / 2.0f;
   
-  vertWorldPosition.z += 10.0f - (distanceToCamera * distanceToCamera) / 14.0f;
-  //if (distanceToCamera <= 2.0f)
-  //{
-  //  vertWorldPosition = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  //  }
+  vertWorldPosition.z += 10.0f - (distanceToCamera * distanceToCamera) / 8.0f;
   gl_Position = ubo.proj * ubo.view * vertWorldPosition;
   fragColor = ps.color;
   fragTexCoord = vec2(inTexCoord.x, 1.0f - inTexCoord.y);

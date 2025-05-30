@@ -176,7 +176,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
         case 'd':
             newObject = new DestructibleWall(NULL, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
             objectManager->AddGameObject(newObject);
-            mapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            mapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
             break;
         // Generic coin
         case 'c':

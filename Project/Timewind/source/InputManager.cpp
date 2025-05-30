@@ -103,7 +103,9 @@ void InputManager::Update(double dt)
 		UpdateInputStatus((Inputs)i);
 	}
 
+	auto oldMouseCoords = mouseCoords;
 	glfwGetCursorPos(window->GetWindowPtr(), &mouseCoords.first, &mouseCoords.second);
+	mouseDelta = { mouseCoords.first - oldMouseCoords.first, mouseCoords.second - oldMouseCoords.second };
 	if (CheckInputStatus(Inputs::F3) == InputStatus::Pressed)
 	{
 		std::cout << mouseCoords.first << ", " << mouseCoords.second << std::endl;

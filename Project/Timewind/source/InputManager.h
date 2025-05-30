@@ -174,6 +174,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	std::pair<double, double> CheckMouseCoordinates() { return mouseCoords; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the coordinates of the mouse
+
+		\return
+			The mouse coordinates
+	*/
+	/*************************************************************************************************/
+	std::pair<double, double> CheckMouseDelta() { return mouseDelta; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -193,6 +204,7 @@ private:
 	std::vector<std::pair<double, bool>> timeSincePressed;		// Functions as a buffer by mapping when this button was most recently pressed (doesn't count held). The boolean limits the buffer to a single pressed input
 	std::multimap<Inputs, int> keybinds;						// Holds the different keys that map to a certain input
 	std::pair<double, double> mouseCoords;						// The position of the mouse
+	std::pair<double, double> mouseDelta;						// How the mouse position has changed since the previous frame
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

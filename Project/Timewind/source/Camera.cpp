@@ -78,12 +78,14 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	GameObject(pos, rot, sca),
 	//rotationChanged(true),
 	perspectiveChanged(true),
+	inCutscene(false),
 	upVector(glm::vec3(0.0f, 1.0f, 0.0f)),
 	centeredObject(centeredObject_),
 	viewMat(glm::mat4(0.0f)),
 	perspMat(glm::mat4(0.0f)),
 	aspectRatio(aspectRatio_),
-	fov(fieldOfView)
+	fov(fieldOfView),
+	relativePosX(0.0), relativePosY(0.0)
 {
 	SetPosition(centeredObject->GetPosition());
 }
@@ -108,34 +110,13 @@ void Camera::Update(double dt, InputManager* inputManager)
 		MoveToUpdate(dt);
 	}
 
-	// Calculates placement based on which way the player is facing
-	float directionModifier;
-	if (centeredObject->GetIsFacingRight())
+	if (inCutscene == false)
 	{
-		directionModifier = -1;
-		//if (GetPosition().x < centeredObject->GetPosition().x - 4.0f)
-		//{
-		//	SetPosition(glm::vec2((centeredObject->GetPosition().x - 4.0f), -centeredObject->GetPosition().y));
-		//}
-		//else
-		//{
-		//	MoveTo(glm::vec2((centeredObject->GetPosition().x - 4.0f), -centeredObject->GetPosition().y), 0.5, false);
-		//}
-	}
-	else
-	{
-		directionModifier = 1;
-		//if (GetPosition().x > centeredObject->GetPosition().x + 4.0f)
-		//{
-		//	SetPosition(glm::vec2((centeredObject->GetPosition().x + 4.0f), -centeredObject->GetPosition().y));
-		//}
-		//else
-		//{
-		//	MoveTo(glm::vec2((centeredObject->GetPosition().x + 4.0f), -centeredObject->GetPosition().y), 0.5, false);
-		//}
-	}
+		// Updates camera view positioning
+		UpdateRelativePosition();
 
-	MoveTo(glm::vec2((centeredObject->GetPosition().x + 8.0f * (max(min(inputManager->CheckMouseCoordinates().first / 1000.0, 1.0f), 0.0f) - 0.5f)), centeredObject->GetPosition().y + -8.0f * (max(min(inputManager->CheckMouseCoordinates().second / 1000.0, 1.0f), 0.0f) - 0.5f)), 0.025, false);
+		MoveTo(glm::vec2(centeredObject->GetPosition().x + 5.0f * relativePosX, centeredObject->GetPosition().y + -3.75f * relativePosY), 0.025, false);
+	}
 }
 
 /*************************************************************************************************/
@@ -246,3 +227,26 @@ void Camera::SetCenteredObject(Player* object)
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Updates the relative camera position
+*/
+/*************************************************************************************************/
+void Camera::UpdateRelativePosition()
+{
+	relativePosX = max(min(relativePosX + (_InputManager->CheckMouseDelta().first / 1000.0), 1.0), -1.0);
+	relativePosY = max(min(relativePosY + (_InputManager->CheckMouseDelta().second / 1000.0), 1.0), -1.0);
+
+	glm::vec2 normalizedRelativePositions = glm::normalize(glm::vec2{ relativePosX, relativePosY });
+
+	if (abs(relativePosX) > abs(normalizedRelativePositions.x))
+	{
+		relativePosX = normalizedRelativePositions.x;
+	}
+	if (abs(relativePosY) > abs(normalizedRelativePositions.y))
+	{
+		relativePosY = normalizedRelativePositions.y;
+	}
+}

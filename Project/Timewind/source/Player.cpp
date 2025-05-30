@@ -206,7 +206,7 @@ void Player::Update(double dt, InputManager* inputManager)
 	if (GetIsMoving() == false && jumpPhase == 1)
 	{
 		// First checks if the space directly above is occupied (if it is we hit a ceiling and start falling)
-		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
+		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus < MapMatrix::TileStatus::Player)
 		{
 			// Boolean to save on rewriting the code for jumping straight up if certain spaces are preventing sideways movement
 			bool jumpUp = true;
@@ -221,7 +221,11 @@ void Player::Update(double dt, InputManager* inputManager)
 					if (MovePlayer(playerPosition, 1, 2, 0.225) == false)
 					{
 						// If the move was unsuccessful, then we move to the open space diagonally up
-						MovePlayer(playerPosition, 1, 1, 0.15);
+						if (MovePlayer(playerPosition, 1, 1, 0.225) == false)
+						{
+							// If the move was unsuccessful, moves into the open space to the side
+							MovePlayer(playerPosition, 1, 0, 0.225);
+						}
 					}
 
 					// Either way we should have moved, so we don't need the jump up routine
@@ -238,7 +242,11 @@ void Player::Update(double dt, InputManager* inputManager)
 					if (MovePlayer(playerPosition, -1, 2, 0.225) == false)
 					{
 						// If the move was unsuccessful, then we move to the open space diagonally up
-						MovePlayer(playerPosition, -1, 1, 0.15);
+						if (MovePlayer(playerPosition, -1, 1, 0.225) == false)
+						{
+							// If the move was unsuccessful, moves into the open space to the side
+							MovePlayer(playerPosition, -1, 0, 0.225);
+						}
 					}
 
 					// Either way we should have moved, so we don't need the jump up routine
@@ -255,6 +263,11 @@ void Player::Update(double dt, InputManager* inputManager)
 					MovePlayer(playerPosition, 0, 1, 0.15);
 				}
 			}
+		}
+		// If the block directly above was filled, checks if it's destructible
+		else if (mapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Destructible)
+		{
+			mapMatrix->ClearTile(playerPosition.first, playerPosition.second + 1);
 		}
 
 		jumpPhase = 2;
@@ -415,11 +428,13 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 	}
 
 	// Moves the player in logic
-	if (mapMatrix->SetPlayerPosition(playerPosition.first + horizontalMove, playerPosition.second + verticalMove, this))
+	int newXCoord = playerPosition.first + horizontalMove;
+	int newYCoord = playerPosition.second + verticalMove;
+	if (mapMatrix->SetPlayerPosition(newXCoord, newYCoord, this))
 	{
 		playerPrevPos = playerPosition;
-		playerPosition.first += horizontalMove;
-		playerPosition.second += verticalMove;
+		playerPosition.first = newXCoord;
+		playerPosition.second = newYCoord;
 		MoveTo(glm::vec2(ConvertMapCoordToWorldCoord(playerPosition.first), ConvertMapCoordToWorldCoord(playerPosition.second)), moveSpeed, false);
 		SetMapCoords(playerPosition);
 
@@ -428,6 +443,24 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 		actionQueued = PlayerActions::NOATTACK;
 
 		// Since the move was successful, returns true
+		return true;
+	}
+
+	// If we are moving upwards and trying to go into a destructible block, destroys that block
+	if (verticalMove > 0 && mapMatrix->GetTile(newXCoord, newYCoord).tileStatus == MapMatrix::TileStatus::Destructible && mapMatrix->SetPlayerPosition(newXCoord, newYCoord - 1, this))
+	{
+		// Moves the player to underneath that block
+		mapMatrix->ClearTile(newXCoord, newYCoord);
+		playerPosition = { newXCoord, newYCoord - 1 };
+		MoveTo(glm::vec2(ConvertMapCoordsToWorldCoords(playerPosition)), moveSpeed, false);
+		SetMapCoords(playerPosition);
+		jumpPhase = 2;
+
+		// Resets time since moving
+		timeSinceMove = 0.0;
+		actionQueued = PlayerActions::NOATTACK;
+
+		// Now that the player has been moved, returns true
 		return true;
 	}
 
