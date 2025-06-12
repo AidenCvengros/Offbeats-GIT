@@ -208,6 +208,8 @@ void Player::Update(double dt, InputManager* inputManager)
 		// First checks if the space directly above is occupied (if it is we hit a ceiling and start falling)
 		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus < MapMatrix::TileStatus::Player)
 		{
+			InteractWithTile(playerPosition.first, playerPosition.second + 1);
+
 			// Boolean to save on rewriting the code for jumping straight up if certain spaces are preventing sideways movement
 			bool jumpUp = true;
 
@@ -264,10 +266,9 @@ void Player::Update(double dt, InputManager* inputManager)
 				}
 			}
 		}
-		// If the block directly above was filled, checks if it's destructible
-		else if (mapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Destructible)
+		else
 		{
-			mapMatrix->ClearTile(playerPosition.first, playerPosition.second + 1);
+			InteractWithTile(playerPosition.first, playerPosition.second + 1);
 		}
 
 		jumpPhase = 2;
@@ -427,9 +428,36 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 		SetIsFacingRight(false);
 	}
 
-	// Moves the player in logic
+	// Get values for the target tile
 	int newXCoord = playerPosition.first + horizontalMove;
 	int newYCoord = playerPosition.second + verticalMove;
+	MapMatrix::MapTile targetTile = mapMatrix->GetTile(newXCoord, newYCoord);
+
+	// If we are moving upwards and trying to go into a destructible block, destroys that block
+	if (verticalMove > 0)
+	{
+		if (targetTile.tileStatus == MapMatrix::TileStatus::Destructible && mapMatrix->SetPlayerPosition(newXCoord, newYCoord - 1, this))
+		{
+			// Moves the player to underneath that block
+			mapMatrix->ClearTile(newXCoord, newYCoord);
+			playerPosition = { newXCoord, newYCoord - 1 };
+			MoveTo(glm::vec2(ConvertMapCoordsToWorldCoords(playerPosition)), moveSpeed, false);
+			SetMapCoords(playerPosition);
+			jumpPhase = 2;
+
+			// Resets time since moving
+			timeSinceMove = 0.0;
+			actionQueued = PlayerActions::NOATTACK;
+
+			// Now that the player has been moved, returns true
+			return true;
+		}
+	}
+
+	// If we are moving into a key or door, interact with it
+	InteractWithTile(newXCoord, newYCoord);
+
+	// Moves the player
 	if (mapMatrix->SetPlayerPosition(newXCoord, newYCoord, this))
 	{
 		playerPrevPos = playerPosition;
@@ -443,24 +471,6 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 		actionQueued = PlayerActions::NOATTACK;
 
 		// Since the move was successful, returns true
-		return true;
-	}
-
-	// If we are moving upwards and trying to go into a destructible block, destroys that block
-	if (verticalMove > 0 && mapMatrix->GetTile(newXCoord, newYCoord).tileStatus == MapMatrix::TileStatus::Destructible && mapMatrix->SetPlayerPosition(newXCoord, newYCoord - 1, this))
-	{
-		// Moves the player to underneath that block
-		mapMatrix->ClearTile(newXCoord, newYCoord);
-		playerPosition = { newXCoord, newYCoord - 1 };
-		MoveTo(glm::vec2(ConvertMapCoordsToWorldCoords(playerPosition)), moveSpeed, false);
-		SetMapCoords(playerPosition);
-		jumpPhase = 2;
-
-		// Resets time since moving
-		timeSinceMove = 0.0;
-		actionQueued = PlayerActions::NOATTACK;
-
-		// Now that the player has been moved, returns true
 		return true;
 	}
 
@@ -495,29 +505,7 @@ void Player::Interact(double dt, std::pair<int, int>& playerPosition)
 			//}
 
 			std::pair<int, int> interactionCoords = mapMatrix->CalculateOffsetTile(GetMapCoords(), GetIsFacingRight(), 1);
-			MapMatrix::MapTile interactionTile = mapMatrix->GetTile(interactionCoords);
-
-			// Destroys destructible walls
-			if (interactionTile.tileStatus == MapMatrix::TileStatus::Destructible)
-			{
-				mapMatrix->ClearTile(interactionCoords.first, interactionCoords.second);
-			}
-			// Grabs keys and adds it to inventory
-			if (interactionTile.tileStatus == MapMatrix::TileStatus::Key && interactionTile.tileObject && ((Item*)interactionTile.tileObject)->GetItemType() == Item::ItemType::Key)
-			{
-				if (inventory->AddKey((Key*)interactionTile.tileObject))
-				{
-					mapMatrix->ClearTile(interactionCoords.first, interactionCoords.second);
-				}
-			}
-			// Opens doors
-			if (interactionTile.tileStatus == MapMatrix::TileStatus::LockedDoor && interactionTile.tileObject)
-			{
-				if (inventory->HaveKey(((LockedWall*)interactionTile.tileObject)->GetKeyValue()))
-				{
-					mapMatrix->ClearTile(interactionCoords.first, interactionCoords.second);
-				}
-			}
+			InteractWithTile(interactionCoords);
 		}
 		// If the player is doing a move, they count as moving, so we check if we can cancel the current move into the new move
 		//else
@@ -593,3 +581,40 @@ void Player::Interact(double dt, std::pair<int, int>& playerPosition)
 //	// Clears the queued attack now that an attack has been started
 //	actionQueued = PlayerActions::NOATTACK;
 //}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to manage moving the player
+
+	\param targetTile
+		The tile being interacted with
+*/
+/*************************************************************************************************/
+void Player::InteractWithTile(std::pair<int, int> targetTileCoords)
+{
+	// Gets the tile
+	MapMatrix::MapTile targetTile = mapMatrix->GetTile(targetTileCoords);
+
+	// Destroys destructible walls
+	if (targetTile.tileStatus == MapMatrix::TileStatus::Destructible)
+	{
+		mapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+	}
+	// Grabs keys and adds it to inventory
+	if (targetTile.tileStatus == MapMatrix::TileStatus::Key && targetTile.tileObject && ((Item*)targetTile.tileObject)->GetItemType() == Item::ItemType::Key)
+	{
+		if (inventory->AddKey((Key*)targetTile.tileObject))
+		{
+			mapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+		}
+	}
+	// Opens doors
+	if (targetTile.tileStatus == MapMatrix::TileStatus::LockedDoor && targetTile.tileObject)
+	{
+		if (inventory->HaveKey(((LockedWall*)targetTile.tileObject)->GetKeyValue()))
+		{
+			mapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+		}
+	}
+}

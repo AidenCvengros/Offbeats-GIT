@@ -217,6 +217,18 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Helper function to manage moving the player
+
+		\param targetTileCoords
+			The tile being interacted with
+	*/
+	/*************************************************************************************************/
+	void InteractWithTile(std::pair<int, int> targetTileCoords);
+	void InteractWithTile(int targetTileXCoord, int targetTileYCoord) { InteractWithTile({ targetTileXCoord, targetTileYCoord }); }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Starts and manages the three hit basic attack combo
 	*/
 	/*************************************************************************************************/

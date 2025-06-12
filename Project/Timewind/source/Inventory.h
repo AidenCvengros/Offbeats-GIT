@@ -127,7 +127,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	//std::vector<Item*> itemList;				// The list of general items the player has
-	std::array<Key*, 36> keyList;				// The list of keys the player has collected
+	std::array<Key*, 56> keyList;				// The list of keys the player has collected
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
