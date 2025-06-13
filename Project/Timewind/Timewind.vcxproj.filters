@@ -126,6 +126,9 @@
     <ClInclude Include="source\LockedWall.h">
       <Filter>Header Files\Game Objects\Interactibles</Filter>
     </ClInclude>
+    <ClInclude Include="source\Game_Objects\Coin.h">
+      <Filter>Header Files\Game Objects\Interactibles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine.cpp">
@@ -207,6 +210,9 @@
       <Filter>Source Files\Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="source\LockedWall.cpp">
+      <Filter>Source Files\Game Objects\Interactibles</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Game_Objects\Coin.cpp">
       <Filter>Source Files\Game Objects\Interactibles</Filter>
     </ClCompile>
   </ItemGroup>

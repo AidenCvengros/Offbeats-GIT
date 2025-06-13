@@ -72,7 +72,7 @@ public:
 			Constructor for the inventory class
 	*/
 	/*************************************************************************************************/
-	Inventory() : keyList() {}
+	Inventory() : keyList(), coinCount(0) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -110,6 +110,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Adds the given key to the inventory
+
+		\return
+			Returns true if coin count hit 100.
+	*/
+	/*************************************************************************************************/
+	bool AddCoin();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Checks whether the player has a key of the given index
 
 		\param keyIndex
@@ -128,6 +139,7 @@ private:
 
 	//std::vector<Item*> itemList;				// The list of general items the player has
 	std::array<Key*, 56> keyList;				// The list of keys the player has collected
+	int coinCount;								// The number of coins the player has collected
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

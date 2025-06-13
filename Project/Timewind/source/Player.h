@@ -217,14 +217,20 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Helper function to manage moving the player
+			Helper function to manage interacting with tiles
 
 		\param targetTileCoords
 			The tile being interacted with
+
+		\param destructibles
+			Whether this interaction should destroy objects
+
+		\param collectibles
+			Whether this interaction should collect objects
 	*/
 	/*************************************************************************************************/
-	void InteractWithTile(std::pair<int, int> targetTileCoords);
-	void InteractWithTile(int targetTileXCoord, int targetTileYCoord) { InteractWithTile({ targetTileXCoord, targetTileYCoord }); }
+	void InteractWithTile(std::pair<int, int> targetTileCoords, bool destructibles, bool collectibles);
+	void InteractWithTile(int targetTileXCoord, int targetTileYCoord, bool destructibles, bool collectibles) { InteractWithTile({ targetTileXCoord, targetTileYCoord }, destructibles, collectibles); }
 
 	/*************************************************************************************************/
 	/*!

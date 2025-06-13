@@ -208,7 +208,7 @@ void Player::Update(double dt, InputManager* inputManager)
 		// First checks if the space directly above is occupied (if it is we hit a ceiling and start falling)
 		if (mapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus < MapMatrix::TileStatus::Player)
 		{
-			InteractWithTile(playerPosition.first, playerPosition.second + 1);
+			InteractWithTile(playerPosition.first, playerPosition.second + 1, true, true);
 
 			// Boolean to save on rewriting the code for jumping straight up if certain spaces are preventing sideways movement
 			bool jumpUp = true;
@@ -268,7 +268,7 @@ void Player::Update(double dt, InputManager* inputManager)
 		}
 		else
 		{
-			InteractWithTile(playerPosition.first, playerPosition.second + 1);
+			InteractWithTile(playerPosition.first, playerPosition.second + 1, true, true);
 		}
 
 		jumpPhase = 2;
@@ -433,6 +433,9 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 	int newYCoord = playerPosition.second + verticalMove;
 	MapMatrix::MapTile targetTile = mapMatrix->GetTile(newXCoord, newYCoord);
 
+	// If we are moving into a key or door, interact with it
+	InteractWithTile(newXCoord, newYCoord, false, true);
+
 	// If we are moving upwards and trying to go into a destructible block, destroys that block
 	if (verticalMove > 0)
 	{
@@ -453,9 +456,6 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 			return true;
 		}
 	}
-
-	// If we are moving into a key or door, interact with it
-	InteractWithTile(newXCoord, newYCoord);
 
 	// Moves the player
 	if (mapMatrix->SetPlayerPosition(newXCoord, newYCoord, this))
@@ -505,7 +505,7 @@ void Player::Interact(double dt, std::pair<int, int>& playerPosition)
 			//}
 
 			std::pair<int, int> interactionCoords = mapMatrix->CalculateOffsetTile(GetMapCoords(), GetIsFacingRight(), 1);
-			InteractWithTile(interactionCoords);
+			InteractWithTile(interactionCoords, true, true);
 		}
 		// If the player is doing a move, they count as moving, so we check if we can cancel the current move into the new move
 		//else
@@ -585,30 +585,51 @@ void Player::Interact(double dt, std::pair<int, int>& playerPosition)
 /*************************************************************************************************/
 /*!
 	\brief
-		Helper function to manage moving the player
+		Helper function to manage interacting with tiles
 
-	\param targetTile
+	\param targetTileCoords
 		The tile being interacted with
+
+	\param destructibles
+		Whether this interaction should destroy objects
+
+	\param collectibles
+		Whether this interaction should collect objects
 */
 /*************************************************************************************************/
-void Player::InteractWithTile(std::pair<int, int> targetTileCoords)
+void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destructibles, bool collectibles)
 {
 	// Gets the tile
 	MapMatrix::MapTile targetTile = mapMatrix->GetTile(targetTileCoords);
 
 	// Destroys destructible walls
-	if (targetTile.tileStatus == MapMatrix::TileStatus::Destructible)
+	if (destructibles)
 	{
-		mapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
-	}
-	// Grabs keys and adds it to inventory
-	if (targetTile.tileStatus == MapMatrix::TileStatus::Key && targetTile.tileObject && ((Item*)targetTile.tileObject)->GetItemType() == Item::ItemType::Key)
-	{
-		if (inventory->AddKey((Key*)targetTile.tileObject))
+		if (targetTile.tileStatus == MapMatrix::TileStatus::Destructible)
 		{
 			mapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
 		}
 	}
+
+	// Grabs collectibles and adds it to inventory
+	if (collectibles)
+	{
+		// Checks for key
+		if (targetTile.tileStatus == MapMatrix::TileStatus::Key && targetTile.tileObject && ((Item*)targetTile.tileObject)->GetItemType() == Item::ItemType::Key)
+		{
+			if (inventory->AddKey((Key*)targetTile.tileObject))
+			{
+				mapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+			}
+		}
+		// Checks for coin
+		if (targetTile.tileStatus == MapMatrix::TileStatus::Coin)
+		{
+			inventory->AddCoin();
+			mapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+		}
+	}
+
 	// Opens doors
 	if (targetTile.tileStatus == MapMatrix::TileStatus::LockedDoor && targetTile.tileObject)
 	{

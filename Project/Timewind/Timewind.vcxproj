@@ -167,6 +167,7 @@
     <ClInclude Include="source\Engine.h" />
     <ClInclude Include="source\GameObject.h" />
     <ClInclude Include="source\GameObjectManager.h" />
+    <ClInclude Include="source\Game_Objects\Coin.h" />
     <ClInclude Include="source\Game_Objects\DestructibleWall.h" />
     <ClInclude Include="source\Game_Objects\Enemy.h" />
     <ClInclude Include="source\InputManager.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="source\Engine.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\GameObjectManager.cpp" />
+    <ClCompile Include="source\Game_Objects\Coin.cpp" />
     <ClCompile Include="source\Game_Objects\DestructibleWall.cpp" />
     <ClCompile Include="source\Game_Objects\Enemy.cpp" />
     <ClCompile Include="source\InputManager.cpp" />

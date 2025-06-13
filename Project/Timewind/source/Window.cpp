@@ -128,12 +128,12 @@ void Window::Init()
 	InitializeSurface();
 	PickPhysicalDevice();
 	CreateLogicalDevice();
-	createSwapChain();
-	createImageViews();
+	CreateSwapChain();
+	CreateImageViews();
 	CreateRenderPass();
 	CreateDescriptorSetLayout();
 	PrepareOffscreenBuffers();
-	createGraphicsPipeline();
+	CreateGraphicsPipeline();
 	CreateFramebuffers();
 	CreateCommandPool();
 	CreateUniformBuffers();
@@ -814,13 +814,13 @@ bool Window::IsDeviceSuitable(VkPhysicalDevice device_)
 	QueueFamilyIndices indices = FindQueueFamilies(device_);
 
 	// Checks whether the necessary extensions are supported by the device
-	bool extensionsSupported = checkDeviceExtensionSupport(device_);
+	bool extensionsSupported = CheckDeviceExtensionSupport(device_);
 
 	// Checks if swap chain is suitable for the game
 	bool swapChainAdequate = false;
 	if (extensionsSupported)
 	{
-		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device_);
+		SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device_);
 		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 
@@ -900,7 +900,7 @@ Window::QueueFamilyIndices Window::FindQueueFamilies(VkPhysicalDevice device)
 		Returns true if the device has the necessary extensions
 */
 /*********************************************************************************************/
-bool Window::checkDeviceExtensionSupport(VkPhysicalDevice device)
+bool Window::CheckDeviceExtensionSupport(VkPhysicalDevice device)
 {
 	// Gets the total number of available extensions
 	uint32_t extensionCount;
@@ -935,7 +935,7 @@ bool Window::checkDeviceExtensionSupport(VkPhysicalDevice device)
 		The swap chain details
 */
 /*********************************************************************************************/
-Window::SwapChainSupportDetails Window::querySwapChainSupport(VkPhysicalDevice device)
+Window::SwapChainSupportDetails Window::QuerySwapChainSupport(VkPhysicalDevice device)
 {
 	SwapChainSupportDetails details;			// Holds the swap chain details
 
@@ -995,8 +995,8 @@ void Window::RecreateSwapChain()
 	CleanupSwapChain();
 
 	// Remakes the swap chain, image views, and frame buffers
-	createSwapChain();
-	createImageViews();
+	CreateSwapChain();
+	CreateImageViews();
 	CreateFramebuffers();
 	UpdateDescriptorSets();
 }
@@ -1189,15 +1189,15 @@ std::vector<const char*> Window::GetRequiredExtensions()
 		Creates the swap chain
 */
 /*********************************************************************************************/
-void Window::createSwapChain()
+void Window::CreateSwapChain()
 {
 	// Gets the swap chain support details
-	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalCard);
+	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalCard);
 
 	// Uses those details to find the format, presentation mode, and dimensions of the swap chain
-	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
-	VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
+	VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
+	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
+	VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
 	
 	// Sets the number of images that will be available in the swap chain queue to one over the card's minimum
 	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
@@ -1267,7 +1267,7 @@ void Window::createSwapChain()
 		Defines how to view the images for the screen to read them properly
 */
 /*********************************************************************************************/
-void Window::createImageViews()
+void Window::CreateImageViews()
 {
 	// Sets the size of the image views vector
 	imageViews.resize(swapChainImages.size());
@@ -1322,7 +1322,7 @@ void Window::createImageViews()
 		Defines the graphics pipeline
 */
 /*********************************************************************************************/
-void Window::createGraphicsPipeline()
+void Window::CreateGraphicsPipeline()
 {
 	// Reads in the shaders
 	auto vertShaderCode = ReadFile("source/2d_vert.spv");
@@ -1331,10 +1331,10 @@ void Window::createGraphicsPipeline()
 	auto fisheyeFragShaderCode = ReadFile("source/fisheye_frag.spv");
 
 	// Converts the raw data into the shader modules
-	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
-	VkShaderModule postProcessVertShaderModule = createShaderModule(postProcessVertShaderCode);
-	VkShaderModule fisheyeFragShaderModule = createShaderModule(fisheyeFragShaderCode);
+	VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
+	VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
+	VkShaderModule postProcessVertShaderModule = CreateShaderModule(postProcessVertShaderCode);
+	VkShaderModule fisheyeFragShaderModule = CreateShaderModule(fisheyeFragShaderCode);
 
 	// Creates the vertex shader stage information
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -1528,7 +1528,7 @@ void Window::createGraphicsPipeline()
 		The format we want
 */
 /*********************************************************************************************/
-VkSurfaceFormatKHR Window::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+VkSurfaceFormatKHR Window::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
 	// Checks each of the available formats
 	for (const auto& availableFormat : availableFormats)
@@ -1556,7 +1556,7 @@ VkSurfaceFormatKHR Window::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFo
 		The format we want
 */
 /*********************************************************************************************/
-VkPresentModeKHR Window::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
+VkPresentModeKHR Window::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
 {
 	// Goes through each available mode
 	for (const auto& availablePresentMode : availablePresentModes)
@@ -1583,7 +1583,7 @@ VkPresentModeKHR Window::chooseSwapPresentMode(const std::vector<VkPresentModeKH
 		The struct containing the width and height of the swap chain we are drawing to
 */
 /*********************************************************************************************/
-VkExtent2D Window::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
+VkExtent2D Window::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {
 	// If the window is the max size, then we don't need to do anything
 	if (capabilities.currentExtent.width != (std::numeric_limits<uint32_t>::max)())
@@ -1654,7 +1654,7 @@ std::vector<char> Window::ReadFile(const std::string& filename)
 		The resultant shader module
 */
 /*********************************************************************************************/
-VkShaderModule Window::createShaderModule(const std::vector<char>& code)
+VkShaderModule Window::CreateShaderModule(const std::vector<char>& code)
 {
 	// Converts the raw read in data into a the shader module info struct
 	VkShaderModuleCreateInfo createInfo{};

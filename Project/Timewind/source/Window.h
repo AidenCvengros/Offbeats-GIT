@@ -738,7 +738,7 @@ private:
 			Creates the swap chain
 	*/
 	/*********************************************************************************************/
-	void createSwapChain();
+	void CreateSwapChain();
 
 	/*********************************************************************************************/
 	/*!
@@ -746,7 +746,7 @@ private:
 			Defines how to view the images for the screen to read them properly
 	*/
 	/*********************************************************************************************/
-	void createImageViews();
+	void CreateImageViews();
 
 	/*********************************************************************************************/
 	/*!
@@ -754,7 +754,7 @@ private:
 			Defines the graphics pipeline
 	*/
 	/*********************************************************************************************/
-	void createGraphicsPipeline();
+	void CreateGraphicsPipeline();
 
 	/*********************************************************************************************/
 	/*!
@@ -768,7 +768,7 @@ private:
 			Returns true if the device has the necessary extensions
 	*/
 	/*********************************************************************************************/
-	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+	bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
 
 	/*********************************************************************************************/
 	/*!
@@ -782,7 +782,7 @@ private:
 			The swap chain details
 	*/
 	/*********************************************************************************************/
-	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+	SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
 	/*********************************************************************************************/
 	/*!
@@ -796,7 +796,7 @@ private:
 			The format we want
 	*/
 	/*********************************************************************************************/
-	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+	VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 
 	/*********************************************************************************************/
 	/*!
@@ -810,7 +810,7 @@ private:
 			The format we want
 	*/
 	/*********************************************************************************************/
-	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+	VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 
 	/*********************************************************************************************/
 	/*!
@@ -824,7 +824,7 @@ private:
 			The struct containing the width and height of the swap chain we are drawing to
 	*/
 	/*********************************************************************************************/
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 	/*********************************************************************************************/
 	/*!
@@ -852,7 +852,7 @@ private:
 			The resultant shader module
 	*/
 	/*********************************************************************************************/
-	VkShaderModule createShaderModule(const std::vector<char>& code);
+	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 	/*********************************************************************************************/
 	/*!

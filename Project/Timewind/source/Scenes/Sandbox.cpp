@@ -32,6 +32,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/DestructibleWall.h"
 #include "../Game_Objects/Key.h"
 #include "../LockedWall.h"
+#include "../Game_Objects/Coin.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -87,6 +88,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
     Texture* destructibleWallTexture = textureManager->AddTexture("Assets/Sprites/Wall_Cracked.png");
     Texture* keyTexture = textureManager->AddTexture("Assets/Sprites/Key.png");
     Texture* lockedWallTexture = textureManager->AddTexture("Assets/Sprites/LockedWall.png");
+    Texture* coinTexture = textureManager->AddTexture("Assets/Sprites/Coin.png");
 
     // Sets the default wall for the scene
     mapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
@@ -180,6 +182,9 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
             break;
         // Generic coin
         case 'c':
+            newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+            objectManager->AddGameObject(newObject);
+            mapMatrix->SetTile(i->second, MapMatrix::TileStatus::Coin, newObject);
             break;
         default:
             std::cout << "Extra special tile found. Char: " << i->first << std::endl;
