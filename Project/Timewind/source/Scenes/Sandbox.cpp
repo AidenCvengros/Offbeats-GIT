@@ -183,6 +183,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
         // Generic coin
         case 'c':
             newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+            newObject->SetScale(glm::vec2(1.25, 1.25));
             objectManager->AddGameObject(newObject);
             mapMatrix->SetTile(i->second, MapMatrix::TileStatus::Coin, newObject);
             break;
@@ -192,35 +193,8 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
         }
     }
 
-    // Creates scene game objects
-    
-    //objectManager->AddGameObject(key);
-    
-    //destructibleWall->SetColor({ 0.4f, 0.075f, 0.0f, 1.0f });
-    
-    //Enemy* enemy = new Enemy({ 20.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 40, enemyTexture, mapMatrix, { 10, 2 });
-    //objectManager->AddGameObject(enemy);
-    
-
-    
+    // Updates the player position for the map
     mapMatrix->UpdatePlayerPosition(player);
-    //mapMatrix->SetTile(10, 2, MapMatrix::TileStatus::Enemy, enemy);
-    //for (int i = 0; i < mapMatrix->GetMaxMapWidth(); i++)
-    //{
-    //    mapMatrix->SetTile(i, 0, MapMatrix::TileStatus::Wall);
-    //    mapMatrix->SetTile(i, 1, MapMatrix::TileStatus::Wall);
-    //}
-    //mapMatrix->SetTile(5, 2, MapMatrix::TileStatus::Wall);
-    //mapMatrix->SetTile(7, 3, MapMatrix::TileStatus::Wall);
-    //mapMatrix->SetTile(9, 4, MapMatrix::TileStatus::Wall);
-    //mapMatrix->SetTile(10, 4, MapMatrix::TileStatus::Wall);
-    //mapMatrix->SetTile(12, 5, MapMatrix::TileStatus::Wall);
-    //mapMatrix->SetTile(13, 5, MapMatrix::TileStatus::Wall);
-    //mapMatrix->SetTile(16, 5, MapMatrix::TileStatus::Wall);
-    //mapMatrix->SetTile(17, 5, MapMatrix::TileStatus::Wall);
-    //mapMatrix->SetTile(6, 3, MapMatrix::TileStatus::Destructible, destructibleWall);
-    //mapMatrix->SetTile(15, 2, MapMatrix::TileStatus::LockedDoor, lockedWall);
-    //mapMatrix->SetTile(6, 4, MapMatrix::TileStatus::Key, key);
 }
 
 /*************************************************************************************************/

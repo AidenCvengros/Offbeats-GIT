@@ -85,6 +85,7 @@ Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Textu
 	jumpPhase(0),
 	playerPrevPos(mapCoords),
 	timeSinceMove(0.0),
+	fallingDelay(0),
 	actionQueued(PlayerActions::NOATTACK),
 	jumpAttacked(false),
 	mapMatrix(mapMatrix_)
@@ -362,10 +363,43 @@ void Player::Update(double dt, InputManager* inputManager)
 	if (GetIsMoving() == false && jumpPhase == 4)
 	{
 		// Attempts to move down
-		if (MovePlayer(playerPosition, 0, -1, 0.07) == false)
+		if (fallingDelay >= 2)
+		{
+			if (CheckInput(inputManager, InputManager::Inputs::Right))
+			{
+				if (MovePlayer(playerPosition, 1, -1, 0.07) == false)
+				{
+					jumpPhase = 0;
+				}
+			}
+			else if (CheckInput(inputManager, InputManager::Inputs::Left))
+			{
+				if (MovePlayer(playerPosition, -1, -1, 0.07) == false)
+				{
+					jumpPhase = 0;
+				}
+			}
+			else
+			{
+				if (MovePlayer(playerPosition, 0, -1, 0.07) == false)
+				{
+					// If there is ground below, becomes grounded
+					jumpPhase = 0;
+				}
+			}
+			
+			// Resets the falling delay
+			fallingDelay = 0;
+		}
+		else if (MovePlayer(playerPosition, 0, -1, 0.07) == false)
 		{
 			// If there is ground below, becomes grounded
 			jumpPhase = 0;
+			fallingDelay = 0;
+		}
+		else
+		{
+			fallingDelay++;
 		}
 	}
 }

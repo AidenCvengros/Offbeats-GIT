@@ -148,6 +148,7 @@ private:
 	int jumpPhase;								// Tracks the progress of a jump
 	std::pair<int, int> playerPrevPos;			// The previous player position in map coordinates
 	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
+	int fallingDelay;							// Lets the player move while falling once per three tiles
 
 	PlayerActions actionQueued;					// Denotes whether an attack has been pressed (0 is no attack, it should activate the next time the player is at a tile)
 	bool jumpAttacked;							// Boolean to prevent the player from whiffing multiple times in a jump
