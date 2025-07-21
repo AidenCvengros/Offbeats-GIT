@@ -199,6 +199,10 @@ void Engine::Draw(Window* window_)
 		systemList[i]->Draw(window_);
 	}
 
+	// Starts the mask render pass draw
+	gameWindow->DrawMaskRenderPass(window_);
+	((GameObjectManager*)GetSystem(SystemTypes::gameObjectManager))->DrawGlitches(window_);
+
 	// Finishes the drawing commands for this frame
 	gameWindow->CleanupDraw();
 }

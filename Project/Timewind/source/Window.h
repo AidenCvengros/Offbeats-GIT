@@ -166,6 +166,17 @@ public:
 	/*********************************************************************************************/
 	/*!
 		\brief
+			Begins the mask render pass drawing sequence
+
+		\param
+			The window being drawn to
+	*/
+	/*************************************************************************************************/
+	void DrawMaskRenderPass(Window* window);
+
+	/*********************************************************************************************/
+	/*!
+		\brief
 			Draws the given game object
 
 		\param gameObject
@@ -539,13 +550,27 @@ private:
 	VkDeviceMemory offscreenBufferMemory;				// The memory location for offscreen buffer data
 	VkImageView offscreenImageView;						// The image view for the offscreen buffer
 	VkFramebuffer offscreenFrameBuffer;					// The offscreen framebuffer
-	VkDescriptorImageInfo offscreenImageDescriptor;		// The image descriptor for the offscreen buffer
+	//VkDescriptorImageInfo offscreenImageDescriptor;		// The image descriptor for the offscreen buffer
 	VkDescriptorSetLayout fisheyeDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
 	VkDescriptorSet offscreenDescriptorSet;				// The descriptor set for the fisheye shader
 	VkBuffer offscreenUniformBuffer;					// The uniform buffer for the fisheye shader
 	VkDeviceMemory offscreenUniformBufferMemory;		// The memory storing unform buffer data for the fisheye shader
 	VkPipelineLayout fisheyePipelineLayout;				// The graphics pipeline layout for the fisheye render pass
 	VkPipeline fisheyePipeline;							// The graphics pipeline for the fisheye render pass
+
+	VkRenderPass maskRenderPass;					// The render pass for the offscreen buffers
+	VkSampler maskSampler;							// The sampler for the offscreen buffers
+	VkImage maskImage;								// The image being displayed on the offscreen buffers
+	VkDeviceMemory maskBufferMemory;				// The memory location for offscreen buffer data
+	VkImageView maskImageView;						// The image view for the offscreen buffer
+	VkFramebuffer maskFrameBuffer;					// The offscreen framebuffer
+	//VkDescriptorImageInfo maskImageDescriptor;		// The image descriptor for the offscreen buffer
+	VkDescriptorSetLayout maskDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
+	VkDescriptorSet maskDescriptorSet;				// The descriptor set for the fisheye shader
+	VkBuffer maskUniformBuffer;					// The uniform buffer for the fisheye shader
+	VkDeviceMemory maskUniformBufferMemory;		// The memory storing unform buffer data for the fisheye shader
+	//VkPipelineLayout maskPipelineLayout;				// The graphics pipeline layout for the fisheye render pass
+	VkPipeline maskPipeline;							// The graphics pipeline for the fisheye render pass
 
 	VkBuffer vertexBuffer;								// The vertex buffer
 	VkDeviceMemory vertexBufferMemory;					// The memory pointer for the vertex buffer

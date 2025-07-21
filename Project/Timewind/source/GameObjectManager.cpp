@@ -100,10 +100,13 @@ void GameObjectManager::Draw(Window* window)
 	// Walks through the game object list
 	for (std::multimap<int, GameObject*>::iterator it = gameObjectList.begin(); it != gameObjectList.end();)
 	{
-		if ((*it).second->GetActive())
+		if (it->first < 100)
 		{
-			window->DrawGameObject((*it).second);
-			(*it).second->DrawChildObjects(window);
+			if ((*it).second->GetActive())
+			{
+				window->DrawGameObject((*it).second);
+				(*it).second->DrawChildObjects(window);
+			}
 		}
 
 		it++;
@@ -128,6 +131,33 @@ void GameObjectManager::Shutdown()
 
 	// Clears the game object list
 	gameObjectList.clear();
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Draws the glitched game objects in the manager to the screen.
+
+	\param window
+		The window being drawn to
+*/
+/*************************************************************************************************/
+void GameObjectManager::DrawGlitches(Window* window)
+{
+	// Walks through the game object list
+	for (std::multimap<int, GameObject*>::iterator it = gameObjectList.begin(); it != gameObjectList.end();)
+	{
+		if (it->first >= 100)
+		{
+			if ((*it).second->GetActive())
+			{
+				window->DrawGameObject((*it).second);
+				(*it).second->DrawChildObjects(window);
+			}
+		}
+
+		it++;
+	}
 }
 
 /*************************************************************************************************/

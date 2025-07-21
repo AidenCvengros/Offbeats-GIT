@@ -7,7 +7,8 @@ layout(set = 0, binding = 0) uniform FisheyeUniformBufferObject
   float screenHeight;
 } fubo;
 
-layout(set= 0, binding = 1) uniform sampler2D texSampler;
+layout(set = 0, binding = 1) uniform sampler2D texSampler;
+layout(set = 0, binding = 2) uniform sampler2D glitchMask;
 
 layout(location = 0) in vec4 fragColor;
 layout(location = 1) in vec2 fragTexCoord;
@@ -139,7 +140,17 @@ void main()
   }
   else
   {
-    vec3 newColor = Tri(newTexCoords)*Mask(newTexCoords * res * 6.0);
-    outColor = vec4(newColor, 1.0);
+    float maskValue = texture(glitchMask, newTexCoords).r;
+    
+    if (maskValue < 0.5)
+    {
+      outColor = texture(texSampler, newTexCoords);
+    }
+    else
+    {
+      vec3 newColor= Tri(newTexCoords)*Mask(newTexCoords * res * 6.0);
+      outColor = vec4(newColor, 1.0);
+    }
+    //outColor = texture(texSampler, fragTexCoord);
   }
 }

@@ -132,7 +132,7 @@ public:
 		drawPriority(drawPriority_), facingRight(facingRight_),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-		render(false), texture(NULL), color(color_),
+		render(true), texture(NULL), color(color_),
 		inMap(false), mapCoords({-1, -1}) {}
 
 	/*************************************************************************************************/
