@@ -140,17 +140,9 @@ void main()
   }
   else
   {
-    float maskValue = texture(glitchMask, newTexCoords).r;
+    vec4 maskValue = texture(glitchMask, newTexCoords);
     
-    if (maskValue < 0.5)
-    {
-      outColor = texture(texSampler, newTexCoords);
-    }
-    else
-    {
-      vec3 newColor= Tri(newTexCoords)*Mask(newTexCoords * res * 6.0);
-      outColor = vec4(newColor, 1.0);
-    }
-    //outColor = texture(texSampler, fragTexCoord);
+    vec3 newColor= (Tri(newTexCoords)*Mask(newTexCoords * res * 6.0) * (1.0 - maskValue.a)) + (texture(texSampler, newTexCoords).rgb * maskValue.rgb * maskValue.a);
+    outColor = vec4(newColor, 1.0);
   }
 }

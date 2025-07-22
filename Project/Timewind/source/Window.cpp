@@ -257,7 +257,7 @@ void Window::DrawMaskRenderPass(Window* window)
 	renderPassInfo.renderArea.extent = swapChainExtent;
 
 	// Sets the render size
-	VkClearValue clearColor = { {1.0f, 0.0f, 1.0f, 1.0f} };
+	VkClearValue clearColor = { {1.0f, 1.0f, 1.0f, 0.0f} };
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
 

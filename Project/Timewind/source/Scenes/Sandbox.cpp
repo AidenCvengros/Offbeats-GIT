@@ -33,6 +33,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Key.h"
 #include "../LockedWall.h"
 #include "../Game_Objects/Coin.h"
+#include "../Game_Objects/ScreenCrack.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -193,7 +194,7 @@ void Sandbox::LoadScene(MapMatrix* mapMatrix)
         }
     }
 
-    GameObject* glitchBox = new GameObject(glm::vec2(11.0f, 10.5f), 40.0f, glm::vec2(5.0f, 5.0f), 150, true, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    ScreenCrack* glitchBox = new ScreenCrack(glm::vec2(11.0f, 10.5f), 40.0f, glm::vec2(3.0f, 3.0f), 150, true, glm::vec4(1.0f, 0.3f, 0.0f, 0.9f), 12.0f);
     objectManager->AddGameObject(glitchBox);
 
     // Updates the player position for the map

@@ -170,6 +170,7 @@
     <ClInclude Include="source\Game_Objects\Coin.h" />
     <ClInclude Include="source\Game_Objects\DestructibleWall.h" />
     <ClInclude Include="source\Game_Objects\Enemy.h" />
+    <ClInclude Include="source\Game_Objects\ScreenCrack.h" />
     <ClInclude Include="source\InputManager.h" />
     <ClInclude Include="source\Inventory.h" />
     <ClInclude Include="source\Item.h" />
@@ -200,6 +201,7 @@
     <ClCompile Include="source\Game_Objects\Coin.cpp" />
     <ClCompile Include="source\Game_Objects\DestructibleWall.cpp" />
     <ClCompile Include="source\Game_Objects\Enemy.cpp" />
+    <ClCompile Include="source\Game_Objects\ScreenCrack.cpp" />
     <ClCompile Include="source\InputManager.cpp" />
     <ClCompile Include="source\Inventory.cpp" />
     <ClCompile Include="source\Item.cpp" />
