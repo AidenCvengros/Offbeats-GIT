@@ -1,29 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Engine.h
+\file File.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2023.9.7
+\date 2025.9.10
 \brief
-    Creates and manages the game engine
+    Class to open a file for input and/or output
 
-    Public Functions:
-        + Engine::createEngine
-		+ Engine::~Engine
-		+ Engine::Init
-		+ Engine::Update
-		+ Engine::Draw
-		+ Engine::Shutdown
+    Functions include:
+        + FILL
 
-	Private Functions:
-		+ Engine::Engine
-
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Engine_H_
-#define Syncopatience_Engine_H_
+#ifndef Syncopatience_File_H_
+#define Syncopatience_File_H_
 
 #pragma once
 
@@ -33,12 +25,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "stdafx.h"
 
-// Includes to make system vector
-#include "System.h"
 #include <vector>
-
-// Include to communicate with window
-#include "Window.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -55,30 +42,19 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		Singleton class that defines and manages the game engine.
+		The class that manages file i/o
 */
 /*************************************************************************************************/
-class Engine
+class File
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-
+	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
-
-	enum SystemTypes
-	{
-		window,
-		inputManager,
-		gameObjectManager,
-		textureManager,
-		sceneManager,
-		effectManager,
-		max
-	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -87,88 +63,68 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-
+	
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Static function that creates the singleton game engine. Also will return the game engine
-			reference
+			Constructor for the File class
+
+		\param _filename
+			The name of the file to be opened
+
+		\param read
+			Whether we're reading the file
+
+		\param write
+			Whether we're writing the file
+	*/
+	/*************************************************************************************************/
+	File(const std::string& _filename, bool read, bool write);
+	
+	/*************************************************************************************************/
+	/*!
+	  \brief
+	    Destructor for File class
+	*/
+	/*************************************************************************************************/
+	~File();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Reads in the given file
+
+		\param filename
+			The given file
 
 		\return
-			Returns the game engine.
+			A string of the file
 	*/
-	/*************************************************************************************************/
-	static Engine* createEngine();
+	/*********************************************************************************************/
+	std::vector<char> ReadFile(const std::string& filename);
 
 	/*********************************************************************************************/
 	/*!
 		\brief
-			Engine destructor.
+			Returns the results of the file read in
+
+		\return
+			A vector containing all the read in data
 	*/
 	/*********************************************************************************************/
-	~Engine();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Initializes the engine
-	*/
-	/*********************************************************************************************/
-	void Init();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Updates the game engine. Also defines an in-engine frame
-	*/
-	/*********************************************************************************************/
-	void Update();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Draws the engine updates to the screen.
-
-		\param window_
-			The window being drawn to
-	*/
-	/*************************************************************************************************/
-	void Draw(Window* window_);
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Shuts down the game engine
-	*/
-	/*********************************************************************************************/
-	void Shutdown();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Gets a system from the system list of the given type
-
-		\param systemType
-			The given system type
-	*/
-	/*********************************************************************************************/
-	System* GetSystem(SystemTypes systemType);
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Gets a system from the system list of the given type
-
-		\param systemType
-			The given system type
-	*/
-	/*********************************************************************************************/
-	Window* GetWindow() { return gameWindow; }
+	const std::vector<char>& GetReadData() { return fileData; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	std::string filename;						// The name of the file being operated on
+
+	bool readingFile;							// Whether the file was read in
+	std::vector<char> fileData;					// The read in data from the file
+
+	bool writingFile;							// Whether the file is being written to
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -178,25 +134,9 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	static Engine* engineInstance;			// Points to the singleton engine instance
-
-	std::vector<System *> systemList;		// Holds a list of all systems that need to be managed
-	Window* gameWindow;						// Points to the window so the engine can communicate directly with the window
-
-	double lastTime;						// Tracks the last recorded time for calculating dt
-	double dt;								// The time (in seconds) since the previous frame
-
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Engine class initializer.
-	*/
-	/*********************************************************************************************/
-	Engine();
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -207,4 +147,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_[FILL]_H_
+#endif // Syncopatience_File_H_

@@ -36,6 +36,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Public Constants
 //-------------------------------------------------------------------------------------------------
 
+#define _Window Engine::createEngine()->GetWindow()
 #define _CurrentScene ((SceneManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::sceneManager))->GetCurrentScene()                      // Gets the current scene
 #define _MapMatrix ((SceneManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::sceneManager))->GetMapMatrix()                            // Gets the active map matrix
 #define _EffectManager ((EffectManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::effectManager))										// Gets the effect manager

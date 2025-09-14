@@ -1,17 +1,16 @@
 /*************************************************************************************************/
 /*!
-\file TextureManager.cpp
+\file File.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.7
+\date 2025.9.10
 \brief
-    Manages textures and ensures that multiple textures of the same file don't get created
+    Class to read and write files
 
     Functions include:
-        + System::System
-		+ Systme::~System
+        + FILL
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
@@ -19,7 +18,9 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "TextureManager.h"
+#include "File.h"
+
+#include <fstream>
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -48,104 +49,85 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		Constructor for the texture manager class
+		Constructor for the File class
 
-	\param window
-		Pointer to the game window
+	\param _filename
+		The name of the file to be opened
+
+	\param read
+		Whether we're reading the file
+
+	\param write
+		Whether we're writing the file
 */
 /*************************************************************************************************/
-TextureManager::TextureManager(Window* window_)
+File::File(const std::string& _filename, bool read, bool write)
 {
-	window = window_;
-}
+	// Saves the filename
+	filename = _filename;
 
-/*************************************************************************************************/
-/*!
-	\brief
-		Destructor for the texture manager class
-*/
-/*************************************************************************************************/
-TextureManager::~TextureManager()
-{
+	// Sets the internal booleans
+	readingFile = read;
+	writingFile = write;
 
-}
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Initializes the texture manager
-*/
-/*************************************************************************************************/
-void TextureManager::Init()
-{
-
-}
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Shuts down the texture manager and all the textures in it.
-*/
-/*************************************************************************************************/
-void TextureManager::Shutdown()
-{
-	// Walks through the texture list
-	for (std::list<Texture*>::iterator it = textureList.begin(); it != textureList.end();)
+	// Checks if we are both reading and writing the file
+	if (read && write)
 	{
-		// Frees the texture
-		delete* it;
-		it++;
+		
 	}
-
-	// Clears the texture list
-	textureList.clear();
+	// Otherwise reads in the file
+	if (read)
+	{
+		fileData = ReadFile(filename);
+	}
 }
 
 /*************************************************************************************************/
 /*!
 	\brief
-		Adds a texture to the manager's list.
+		Destructor for File class
+*/
+/*************************************************************************************************/
+File::~File()
+{
 
-	\param filename_
-		The name of the texture file
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Reads in the given file
+
+	\param filename
+		The given file
 
 	\return
-		Pointer to the new texture
+		A string of the file
 */
-/*************************************************************************************************/
-Texture* TextureManager::AddTexture(std::string filename_)
+/*********************************************************************************************/
+std::vector<char> File::ReadFile(const std::string& filename)
 {
-	// Loops through the texture list to see if this file has already been loaded
-	//auto it = std::find(textureList.begin(), textureList.end(), filename_);
-	auto it = textureList.begin();
-	for (; it != textureList.end(); it++)
-	{
-		if (**it == filename_)
-		{
-			break;
-		}
-	}
-	
-	// If this file has been loaded
-	if (it != textureList.end())
-	//if (textureList.size() && *(textureList.front()) == filename_)
-	{
-		// Return that texture
-		return *it;
-		//return textureList.front();
-	}
-	// If the file has not been loaded yet
-	else
-	{
-		// Creates the new texture
-		Texture* newTexture = new Texture(window, filename_);
+	// Opens the file
+	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-		// Puts the new texture on the list
-		textureList.push_back(newTexture);
-
-		// Returns the new texture
-		return newTexture;
+	// If the file opened correctly
+	if (!file.is_open())
+	{
+		throw std::runtime_error("failed to open file!");
 	}
+
+	// Gets the file size
+	size_t fileSize = (size_t)file.tellg();
+	std::vector<char> buffer(fileSize);
+
+	// Reads the file from the start
+	file.seekg(0);
+	file.read(buffer.data(), fileSize);
+
+	// Closes the file
+	file.close();
+
+	return buffer;
 }
 
 //-------------------------------------------------------------------------------------------------

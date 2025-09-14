@@ -165,6 +165,7 @@
     <ClInclude Include="source\cppShortcuts.h" />
     <ClInclude Include="source\EffectManager.h" />
     <ClInclude Include="source\Engine.h" />
+    <ClInclude Include="source\File.h" />
     <ClInclude Include="source\GameObject.h" />
     <ClInclude Include="source\GameObjectManager.h" />
     <ClInclude Include="source\Game_Objects\Coin.h" />
@@ -179,6 +180,7 @@
     <ClInclude Include="source\MapMatrix.h" />
     <ClInclude Include="source\Player.h" />
     <ClInclude Include="source\Pool.h" />
+    <ClInclude Include="source\RenderPass.h" />
     <ClInclude Include="source\Scene.h" />
     <ClInclude Include="source\SceneManager.h" />
     <ClInclude Include="source\Scenes\Sandbox.h" />
@@ -196,6 +198,7 @@
     <ClCompile Include="source\cppShortcuts.cpp" />
     <ClCompile Include="source\EffectManager.cpp" />
     <ClCompile Include="source\Engine.cpp" />
+    <ClCompile Include="source\File.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\GameObjectManager.cpp" />
     <ClCompile Include="source\Game_Objects\Coin.cpp" />
@@ -211,6 +214,7 @@
     <ClCompile Include="source\MapMatrix.cpp" />
     <ClCompile Include="source\Player.cpp" />
     <ClCompile Include="source\Pool.cpp" />
+    <ClCompile Include="source\RenderPass.cpp" />
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\SceneManager.cpp" />
     <ClCompile Include="source\Scenes\Sandbox.cpp" />

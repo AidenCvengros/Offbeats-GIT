@@ -204,6 +204,31 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Helper function that moves the player to the given map position
+
+		\param newPosition
+			The new map position for the player
+
+		\param moveSpeed
+			How long the movement takes
+
+		\return
+			Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+	*/
+	/*************************************************************************************************/
+	bool MovePlayer(std::pair<int, int>& newPosition, double moveSpeed);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Helper function to update the coordinates of what square the player is in
+	*/
+	/*************************************************************************************************/
+	void UpdatePlayerCoords();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Helper function to manage moving the player
 
 		\param dt

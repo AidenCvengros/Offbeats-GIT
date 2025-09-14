@@ -515,6 +515,50 @@ bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove,
 /*************************************************************************************************/
 /*!
 	\brief
+		Helper function that moves the player to the given map position
+
+	\param newPosition
+		The new map position for the player
+
+	\param moveSpeed
+		How long the movement takes
+
+	\return
+		Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+*/
+/*************************************************************************************************/
+bool Player::MovePlayer(std::pair<int, int>& newPosition, double moveSpeed)
+{
+	// Gets the player's current position
+	std::pair<int, int> currentPosition = mapMatrix->GetPlayerPosition();
+
+	// Calculates the offsets
+	int xOffset = newPosition.first - currentPosition.first;
+	int yOffset = newPosition.second - currentPosition.second;
+
+	// Moves the player
+	return MovePlayer(currentPosition, xOffset, yOffset, moveSpeed);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to update the coordinates of what square the player is in
+*/
+/*************************************************************************************************/
+void Player::UpdatePlayerCoords()
+{
+	std::pair<int, int> playerCoords = ConvertWorldCoordsToMapCoords(GetPosition().x, GetPosition().y);
+
+	if (playerCoords != mapMatrix->GetPlayerPosition())
+	{
+		MovePlayer(playerCoords, 0.0f);
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Helper function to manage moving the player
 
 	\param dt

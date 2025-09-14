@@ -78,7 +78,7 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the camera class
+			Constructor for the texturee class
 
 		param window
 			The pointer to the game window
@@ -92,6 +92,26 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Constructor for the texture class
+
+		\param window
+			The pointer to the game window
+
+		\param textureWidth
+			The width of the new texture
+
+		\param textureHeight
+			The height of the new texture
+
+		\param imageFormat
+			The format for the new texture
+	*/
+	/*************************************************************************************************/
+	Texture(Window* window, int textureWidth, int textureHeight, VkFormat imageFormat);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Destructor for the camera class
 	*/
 	/*************************************************************************************************/
@@ -101,12 +121,9 @@ public:
 	/*!
 		\brief
 			Frees the texture from memory
-
-		param window
-			The pointer to the game window
 	*/
 	/*************************************************************************************************/
-	void Free(Window* window);
+	void Free();
 
 	/*************************************************************************************************/
 	/*!
@@ -118,6 +135,28 @@ public:
 	*/
 	/*************************************************************************************************/
 	VkDescriptorSet* GetDescriptorSet() { return &descriptorSet; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the texture's image view object
+
+		\return
+			The texture's image view object
+	*/
+	/*************************************************************************************************/
+	VkImageView& GetImageView() { return textureImageView; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the texture's sampler object
+
+		\return
+			The texture's sampler object
+	*/
+	/*************************************************************************************************/
+	VkSampler& GetSampler() { return textureSampler; }
 
 	/*************************************************************************************************/
 	/*!
@@ -155,6 +194,8 @@ private:
 	VkSampler textureSampler;					// The texture image sampler
 	
 	VkDescriptorSet descriptorSet;				// The base descriptor set memory
+
+	bool freed;									// Ticks true if the texture has been freed
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

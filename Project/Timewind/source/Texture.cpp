@@ -20,6 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "Texture.h"
 
+#include "cppShortcuts.h"
+
 // Texture headers
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -114,39 +116,91 @@ Texture::Texture(Window* window, std::string filename_)
 
 /*************************************************************************************************/
 /*!
+		\brief
+			Constructor for the texture class
+
+		\param window
+			The pointer to the game window
+
+		\param textureWidth
+			The width of the new texture
+
+		\param textureHeight
+			The height of the new texture
+
+		\param imageFormat
+			The format for the new texture
+*/
+/*************************************************************************************************/
+Texture::Texture(Window* window, int textureWidth, int textureHeight, VkFormat imageFormat)
+{
+	// Creates a buffer in memory for the texture buffer
+	window->CreateBuffer(textureWidth * textureHeight * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, textureBuffer, textureBufferMemory);
+
+	// Creates the image object
+	CreateImage(window, textureWidth, textureHeight, imageFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+
+	// Transitions the texture buffer data to the image
+	TransitionImageLayout(window, textureImage, imageFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(window, textureBuffer, textureImage, static_cast<uint32_t>(textureWidth), static_cast<uint32_t>(textureHeight));
+	TransitionImageLayout(window, textureImage, imageFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	// Cleans up the texture buffer
+	vkDestroyBuffer(window->GetLogicalDevice(), textureBuffer, NULL);
+	vkFreeMemory(window->GetLogicalDevice(), textureBufferMemory, NULL);
+
+	// Constructs the image view object
+	textureImageView = window->CreateImageView(textureImage, imageFormat);
+
+	// Creates the texture sampler
+	CreateTextureSampler(window);
+
+	// Creates descriptor sets for the texture
+	CreateTextureDescriptorSet(window);
+
+	// Now that the texture has been created, turns off the freed flag
+	freed = false;
+}
+
+/*************************************************************************************************/
+/*!
 	\brief
 		Destructor for the camera class
 */
 /*************************************************************************************************/
 Texture::~Texture()
 {
-	
+	Free();
 }
 
 /*************************************************************************************************/
 /*!
 	\brief
 		Frees the texture from memory
-
-	param window
-		The pointer to the game window
 */
 /*************************************************************************************************/
-void Texture::Free(Window* window)
+void Texture::Free()
 {
-	// Ends the render pass
-	window->WaitForDrawFinished();
+	// Checks that the texture hasn't already been freed
+	if (freed == false)
+	{
+		// Ends the render pass
+		_Window->WaitForDrawFinished();
 
-	// Cleans up the descriptor sets
-	vkFreeDescriptorSets(window->GetLogicalDevice(), window->GetDescriptorPool(), 1, &descriptorSet);
+		// Cleans up the descriptor sets
+		vkFreeDescriptorSets(_Window->GetLogicalDevice(), _Window->GetDescriptorPool(), 1, &descriptorSet);
 
-	// Cleans up the texture image view objects
-	vkDestroySampler(window->GetLogicalDevice(), textureSampler, NULL);
-	vkDestroyImageView(window->GetLogicalDevice(), textureImageView, NULL);
+		// Cleans up the texture image view objects
+		vkDestroySampler(_Window->GetLogicalDevice(), textureSampler, NULL);
+		vkDestroyImageView(_Window->GetLogicalDevice(), textureImageView, NULL);
 
-	// Cleans up the texture objects
-	vkDestroyImage(window->GetLogicalDevice(), textureImage, NULL);
-	vkFreeMemory(window->GetLogicalDevice(), textureImageMemory, NULL);
+		// Cleans up the texture objects
+		vkDestroyImage(_Window->GetLogicalDevice(), textureImage, NULL);
+		vkFreeMemory(_Window->GetLogicalDevice(), textureImageMemory, NULL);
+
+		// Sets the freed flag
+		freed = true;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -54,6 +54,9 @@ Copyright (c) 2023 Aiden Cvengros
 // The texture class for the default texture
 #include "Texture.h"
 
+// The render pass class
+#include "RenderPass.h"
+
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
@@ -121,9 +124,7 @@ public:
 		blankTexture(NULL),
 		width(initWidth),
 		height(initHeight),
-		name(initWindowName),
-		offscreenImage(NULL),
-		offscreenFrameBuffer(NULL) {}
+		name(initWindowName) {}
 
 	/*********************************************************************************************/
 	/*!
@@ -298,7 +299,7 @@ public:
 			The vulkan device
 	*/
 	/*********************************************************************************************/
-	VkDevice GetLogicalDevice() { return logicalDevice; }
+	VkDevice& GetLogicalDevice() { return logicalDevice; }
 
 	/*********************************************************************************************/
 	/*!
@@ -529,13 +530,13 @@ private:
 	std::vector<VkImage> swapChainImages;				// The frame buffers being drawn to
 	VkFormat swapChainImageFormat;						// The image format (should be srgb)
 	VkExtent2D swapChainExtent;							// Holds the dimensions of the frame buffers
-	std::vector<VkImageView> imageViews;				// Holds how to view the images
+	//std::vector<VkImageView> imageViews;				// Holds how to view the images
 	uint32_t imageIndex;								// Keeps track of which image the swap chain is on
-	VkRenderPass renderPass;							// The variable to manage render passes
-	VkDescriptorSetLayout descriptorSetLayout;			// Specifies the layout for shader descriptors
+	//VkRenderPass renderPass;							// The variable to manage render passes
+	//VkDescriptorSetLayout descriptorSetLayout;			// Specifies the layout for shader descriptors
 	VkDescriptorSetLayout textureDescriptorSetLayout;	// Specifies the layout for texture descriptors.
-	VkPipelineLayout pipelineLayout;					// Holds the layout of the graphics pipeline so it can be adjusted
-	VkPipeline graphicsPipeline;						// The graphics pipeline
+	//VkPipelineLayout pipelineLayout;					// Holds the layout of the graphics pipeline so it can be adjusted
+	//VkPipeline graphicsPipeline;						// The graphics pipeline
 	std::vector<VkFramebuffer> swapChainFramebuffers;	// The framebuffers for the swap chain
 	VkCommandPool commandPool;							// Holds the list of commands for the graphics system
 	std::vector<VkCommandBuffer> commandBuffer;			// Gets the commands
@@ -544,42 +545,46 @@ private:
 	Texture* blankTexture;								// Default texture used to draw game objects without a texture
 	VkPipelineCache pipelineCache;						// The cache to track different stages of the graphics pipeline
 
-	VkRenderPass offscreenRenderPass;					// The render pass for the offscreen buffers
-	VkSampler offscreenSampler;							// The sampler for the offscreen buffers
-	VkImage offscreenImage;								// The image being displayed on the offscreen buffers
-	VkDeviceMemory offscreenBufferMemory;				// The memory location for offscreen buffer data
-	VkImageView offscreenImageView;						// The image view for the offscreen buffer
-	VkFramebuffer offscreenFrameBuffer;					// The offscreen framebuffer
-	//VkDescriptorImageInfo offscreenImageDescriptor;		// The image descriptor for the offscreen buffer
-	VkDescriptorSetLayout fisheyeDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
-	VkDescriptorSet offscreenDescriptorSet;				// The descriptor set for the fisheye shader
-	VkBuffer offscreenUniformBuffer;					// The uniform buffer for the fisheye shader
-	VkDeviceMemory offscreenUniformBufferMemory;		// The memory storing unform buffer data for the fisheye shader
-	VkPipelineLayout fisheyePipelineLayout;				// The graphics pipeline layout for the fisheye render pass
-	VkPipeline fisheyePipeline;							// The graphics pipeline for the fisheye render pass
+	RenderPass baseScenePass;							// The render pass for drawing the base scene
+	RenderPass glitchMaskPass;							// The render pass that creates the mask for where to render glitch effects
+	RenderPass postProcessPass;							// The post-processing render pass
 
-	VkRenderPass maskRenderPass;					// The render pass for the offscreen buffers
-	VkSampler maskSampler;							// The sampler for the offscreen buffers
-	VkImage maskImage;								// The image being displayed on the offscreen buffers
-	VkDeviceMemory maskBufferMemory;				// The memory location for offscreen buffer data
-	VkImageView maskImageView;						// The image view for the offscreen buffer
-	VkFramebuffer maskFrameBuffer;					// The offscreen framebuffer
-	//VkDescriptorImageInfo maskImageDescriptor;		// The image descriptor for the offscreen buffer
-	VkDescriptorSetLayout maskDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
-	VkDescriptorSet maskDescriptorSet;				// The descriptor set for the fisheye shader
-	VkBuffer maskUniformBuffer;					// The uniform buffer for the fisheye shader
-	VkDeviceMemory maskUniformBufferMemory;		// The memory storing unform buffer data for the fisheye shader
-	//VkPipelineLayout maskPipelineLayout;				// The graphics pipeline layout for the fisheye render pass
-	VkPipeline maskPipeline;							// The graphics pipeline for the fisheye render pass
+	//VkRenderPass offscreenRenderPass;					// The render pass for the offscreen buffers
+	//VkSampler offscreenSampler;							// The sampler for the offscreen buffers
+	//VkImage offscreenImage;								// The image being displayed on the offscreen buffers
+	//VkDeviceMemory offscreenBufferMemory;				// The memory location for offscreen buffer data
+	//VkImageView offscreenImageView;						// The image view for the offscreen buffer
+	//VkFramebuffer offscreenFrameBuffer;					// The offscreen framebuffer
+	////VkDescriptorImageInfo offscreenImageDescriptor;		// The image descriptor for the offscreen buffer
+	//VkDescriptorSetLayout fisheyeDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
+	//VkDescriptorSet offscreenDescriptorSet;				// The descriptor set for the fisheye shader
+	//VkBuffer offscreenUniformBuffer;					// The uniform buffer for the fisheye shader
+	//VkDeviceMemory offscreenUniformBufferMemory;		// The memory storing unform buffer data for the fisheye shader
+	//VkPipelineLayout fisheyePipelineLayout;				// The graphics pipeline layout for the fisheye render pass
+	//VkPipeline fisheyePipeline;							// The graphics pipeline for the fisheye render pass
+	//
+	//VkRenderPass maskRenderPass;					// The render pass for the offscreen buffers
+	//VkSampler maskSampler;							// The sampler for the offscreen buffers
+	//VkImage maskImage;								// The image being displayed on the offscreen buffers
+	//VkDeviceMemory maskBufferMemory;				// The memory location for offscreen buffer data
+	//VkImageView maskImageView;						// The image view for the offscreen buffer
+	//VkFramebuffer maskFrameBuffer;					// The offscreen framebuffer
+	////VkDescriptorImageInfo maskImageDescriptor;		// The image descriptor for the offscreen buffer
+	//VkDescriptorSetLayout maskDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
+	//VkDescriptorSet maskDescriptorSet;				// The descriptor set for the fisheye shader
+	//VkBuffer maskUniformBuffer;					// The uniform buffer for the fisheye shader
+	//VkDeviceMemory maskUniformBufferMemory;		// The memory storing unform buffer data for the fisheye shader
+	////VkPipelineLayout maskPipelineLayout;				// The graphics pipeline layout for the fisheye render pass
+	//VkPipeline maskPipeline;							// The graphics pipeline for the fisheye render pass
 
 	VkBuffer vertexBuffer;								// The vertex buffer
 	VkDeviceMemory vertexBufferMemory;					// The memory pointer for the vertex buffer
 	VkBuffer indexBuffer;								// The indices corresponding to vertices in the vertex buffer
 	VkDeviceMemory indexBufferMemory;					// The memory pointer for the index buffer
 
-	std::vector<VkBuffer> uniformBuffers;				// The uniform buffer for transferring data to the shaders
-	std::vector<VkDeviceMemory> uniformBuffersMemory;	// The memory storing uniform buffer data
-	std::vector<void*> uniformBuffersMapped;			// The mapping layout for uniform buffers
+	//std::vector<VkBuffer> uniformBuffers;				// The uniform buffer for transferring data to the shaders
+	//std::vector<VkDeviceMemory> uniformBuffersMemory;	// The memory storing uniform buffer data
+	//std::vector<void*> uniformBuffersMapped;			// The mapping layout for uniform buffers
 	VkDescriptorPool descriptorPool;					// The descriptor pool
 	std::vector<VkDescriptorSet> descriptorSets;		// The descriptor sets, there's one for each flight frame
 
@@ -850,34 +855,6 @@ private:
 	*/
 	/*********************************************************************************************/
 	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Reads in the given file
-
-		\param filename
-			The given file
-
-		\return
-			A string of the file
-	*/
-	/*********************************************************************************************/
-	static std::vector<char> ReadFile(const std::string& filename);
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Formats shaders for use
-
-		\param filename
-			The raw shader code
-
-		\return
-			The resultant shader module
-	*/
-	/*********************************************************************************************/
-	VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 	/*********************************************************************************************/
 	/*!
