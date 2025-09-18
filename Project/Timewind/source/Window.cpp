@@ -402,6 +402,11 @@ void Window::Shutdown()
 	// Cleans up the swap chain
 	CleanupSwapChain();
 
+	// Destroys the render passes
+	baseScenePass.DestroyRenderPass(logicalDevice);
+	glitchMaskPass.DestroyRenderPass(logicalDevice);
+	postProcessPass.DestroyRenderPass(logicalDevice);
+
 	// Cleans up the render pass, pipeline layout, and pipeline variables
 	//vkDestroyPipeline(logicalDevice, graphicsPipeline, NULL);
 	//vkDestroyPipeline(logicalDevice, fisheyePipeline, NULL);
@@ -1053,7 +1058,7 @@ void Window::CleanupSwapChain()
 {
 	// Destroys the texture parts of the render passes
 	baseScenePass.DestroyTexture(logicalDevice);
-	glitchMaskPass .DestroyTexture(logicalDevice);
+	glitchMaskPass.DestroyTexture(logicalDevice);
 	postProcessPass.DestroyTexture(logicalDevice);
 
 	// Destroys all the frame buffers
@@ -1710,7 +1715,7 @@ void Window::CreateRenderPass()
 {
 	postProcessPass.CreateRenderPass(true, logicalDevice, swapChainImageFormat);
 	glitchMaskPass.CreateRenderPass(false, logicalDevice, swapChainImageFormat);
-	postProcessPass.CreateRenderPass(false, logicalDevice, swapChainImageFormat);
+	baseScenePass.CreateRenderPass(false, logicalDevice, swapChainImageFormat);
 
 	//// Offscreen Render Pass
 	//// Sets up a single color buffer for the swap chain
@@ -2381,9 +2386,9 @@ void Window::CreateDescriptorPool()
 void Window::CreateDescriptorSets()
 {
 	// Creates the descriptor sets for the render passes
-	baseScenePass.CreateDescriptorSet(logicalDevice, descriptorPool);
-	glitchMaskPass.CreateDescriptorSet(logicalDevice, descriptorPool);
-	postProcessPass.CreateDescriptorSet(logicalDevice, descriptorPool);
+	baseScenePass.CreateDescriptorSet(logicalDevice, descriptorPool, 1);
+	glitchMaskPass.CreateDescriptorSet(logicalDevice, descriptorPool, 1);
+	postProcessPass.CreateDescriptorSet(logicalDevice, descriptorPool, MAX_FRAMES_IN_FLIGHT);
 
 	//// Sets the info struct for the descriptor set
 	//std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, fisheyeDescriptorSetLayout);
@@ -2448,7 +2453,7 @@ void Window::UpdateDescriptorSets()
 
 		VkWriteDescriptorSet descriptorWrite{};
 		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrite.dstSet = descriptorSets[i];
+		descriptorWrite.dstSet = postProcessPass.GetDescriptorSets()[i];
 		descriptorWrite.dstBinding = 1;
 		descriptorWrite.dstArrayElement = 0;
 		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -2622,7 +2627,7 @@ void Window::RunFisheyeRenderPass()
 	vkCmdBeginRenderPass(commandBuffer[currentFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// Sets the fisheye lense pass
-	vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, postProcessPass.GetGraphicsPipelineLayout(), 0, 1, &descriptorSets[currentFrame], 0, NULL);
+	vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, postProcessPass.GetGraphicsPipelineLayout(), 0, 1, &postProcessPass.GetDescriptorSets()[currentFrame], 0, NULL);
 	vkCmdBindPipeline(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, postProcessPass.GetGraphicsPipeline());
 	vkCmdDraw(commandBuffer[currentFrame], 3, 1, 0, 0);
 

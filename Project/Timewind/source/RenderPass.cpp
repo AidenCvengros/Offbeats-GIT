@@ -73,23 +73,7 @@ RenderPass::RenderPass() : singleOutput(false)
 /*************************************************************************************************/
 RenderPass::~RenderPass()
 {
-	// Gets the vulkan device
-	VkDevice vkDevice = _Window->GetLogicalDevice();
-
-	// Cleans up the render pass, pipeline layout, and pipeline variables
-	vkDestroyPipeline(vkDevice, graphicsPipeline, NULL);
-	vkDestroyPipelineLayout(vkDevice, pipelineLayout, NULL);
-	vkDestroyRenderPass(vkDevice, renderPass, NULL);
-
-	// Cleans up the uniform buffer objects
-	for (size_t i = 0; i < uniformBuffers.size(); i++)
-	{
-		vkDestroyBuffer(vkDevice, uniformBuffers[i], NULL);
-		vkFreeMemory(vkDevice, uniformBuffersMemory[i], NULL);
-	}
-
-	// Destroys the descriptor sets
-	vkDestroyDescriptorSetLayout(vkDevice, descriptorSetLayout, NULL);
+	
 }
 
 /*************************************************************************************************/
@@ -228,6 +212,8 @@ void RenderPass::CreateDescriptorSetLayout(VkDevice vkDevice, VkShaderStageFlags
 		newBinding.descriptorType = descriptorTypes[i];
 		newBinding.pImmutableSamplers = NULL;
 		newBinding.stageFlags = shaderStage;
+
+		uboLayoutBindings.push_back(newBinding);
 	}
 
 	// Sets the layout for the descriptor set
@@ -463,26 +449,22 @@ void RenderPass::SetSwapChainFramebuffers(VkDevice& vkDevice, std::vector<VkFram
 /*************************************************************************************************/
 void RenderPass::SetFramebuffers(VkDevice& vkDevice, VkExtent2D extent)
 {
-	// Sets the number of frame buffers
-	framebuffers.resize(imageViews.size());
+	// Sets the number of frame buffers																!!! Currently Hardcoded to 1
+	framebuffers.resize(1);
 
-	// Makes a frame buffer for each slot in the vector
-	for (size_t i = 0; i < imageViews.size(); i++)
+	// Creates the framebuffer info struct do set the details of the swap chain framebuffers
+	VkFramebufferCreateInfo framebufferInfo{};
+	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+	framebufferInfo.renderPass = renderPass;
+	framebufferInfo.attachmentCount = 1;
+	framebufferInfo.pAttachments = &outputTexture->GetImageView();
+	framebufferInfo.width = extent.width;
+	framebufferInfo.height = extent.height;
+	framebufferInfo.layers = 1;
+
+	if (vkCreateFramebuffer(vkDevice, &framebufferInfo, nullptr, &framebuffers[0]) != VK_SUCCESS)
 	{
-		// Creates the framebuffer info struct do set the details of the swap chain framebuffers
-		VkFramebufferCreateInfo framebufferInfo{};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderPass;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = &imageViews[i];
-		framebufferInfo.width = extent.width;
-		framebufferInfo.height = extent.height;
-		framebufferInfo.layers = 1;
-
-		if (vkCreateFramebuffer(vkDevice, &framebufferInfo, nullptr, &framebuffers[i]) != VK_SUCCESS)
-		{
-			throw std::runtime_error("failed to create framebuffer!");
-		}
+		throw std::runtime_error("failed to create framebuffer!");
 	}
 }
 
@@ -524,20 +506,23 @@ void RenderPass::CreateUniformBuffers(VkDevice& vkDevice, VkDeviceSize bufferSiz
 
 	\param descriptorPool
 		The descriptor pool the descriptor set is in
+
+	\param descriptorSetQuantity
+		How many frames worth of descriptor sets to create
 */
 /*************************************************************************************************/
-void RenderPass::CreateDescriptorSet(VkDevice& vkDevice, VkDescriptorPool& descriptorPool)
+void RenderPass::CreateDescriptorSet(VkDevice& vkDevice, VkDescriptorPool& descriptorPool, int descriptorSetQuantity)
 {
 	// Sets the info struct for the descriptor set
-	std::vector<VkDescriptorSetLayout> layouts(framebuffers.size(), descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> layouts(descriptorSetQuantity, descriptorSetLayout);
 	VkDescriptorSetAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(framebuffers.size());
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSetQuantity);
 	allocInfo.pSetLayouts = layouts.data();
 
 	// Allocates the memory for the descriptor sets
-	descriptorSets.resize(framebuffers.size());
+	descriptorSets.resize(descriptorSetQuantity);
 	if (vkAllocateDescriptorSets(vkDevice, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to allocate descriptor sets!");
@@ -639,6 +624,39 @@ void RenderPass::DestroyTexture(VkDevice& vkDevice)
 			vkDestroyImageView(vkDevice, imageViews[i], nullptr);
 		}
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Destroys the render pass
+
+	\param vkDevice
+		The virtual vulkan device for this render pass to work off of
+*/
+/*************************************************************************************************/
+void RenderPass::DestroyRenderPass(VkDevice& vkDevice)
+{
+	// Cleans up the render pass, pipeline layout, and pipeline variables
+	vkDestroyPipeline(vkDevice, graphicsPipeline, NULL);
+	vkDestroyPipelineLayout(vkDevice, pipelineLayout, NULL);
+	vkDestroyRenderPass(vkDevice, renderPass, NULL);
+
+	// Cleans up the uniform buffer objects
+	for (size_t i = 0; i < uniformBuffers.size(); i++)
+	{
+		vkDestroyBuffer(vkDevice, uniformBuffers[i], NULL);
+		vkFreeMemory(vkDevice, uniformBuffersMemory[i], NULL);
+	}
+
+	// Cleans up the uniform buffer objects
+	for (size_t i = 0; i < framebuffers.size(); i++)
+	{
+		vkDestroyFramebuffer(vkDevice, framebuffers[i], NULL);
+	}
+
+	// Destroys the descriptor sets
+	vkDestroyDescriptorSetLayout(vkDevice, descriptorSetLayout, NULL);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -586,7 +586,7 @@ private:
 	//std::vector<VkDeviceMemory> uniformBuffersMemory;	// The memory storing uniform buffer data
 	//std::vector<void*> uniformBuffersMapped;			// The mapping layout for uniform buffers
 	VkDescriptorPool descriptorPool;					// The descriptor pool
-	std::vector<VkDescriptorSet> descriptorSets;		// The descriptor sets, there's one for each flight frame
+	//std::vector<VkDescriptorSet> descriptorSets;		// The descriptor sets, there's one for each flight frame
 
 	std::vector<VkSemaphore> availableSemaphore;		// The semaphore for checking if the buffer is available
 	std::vector<VkSemaphore> finishedSemaphore;			// The semaphore for when the render is finished

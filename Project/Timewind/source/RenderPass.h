@@ -228,9 +228,12 @@ public:
 
 		\param descriptorPool
 			The descriptor pool the descriptor set is in
+
+		\param descriptorSetQuantity
+			How many frames worth of descriptor sets to create
 	*/
 	/*************************************************************************************************/
-	void CreateDescriptorSet(VkDevice& vkDevice, VkDescriptorPool& descriptorPool);
+	void CreateDescriptorSet(VkDevice& vkDevice, VkDescriptorPool& descriptorPool, int descriptorSetQuantity);
 
 	/*************************************************************************************************/
 	/*!
@@ -276,6 +279,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void DestroyTexture(VkDevice& vkDevice);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destroys the render pass
+
+		\param vkDevice
+			The virtual vulkan device for this render pass to work off of
+	*/
+	/*************************************************************************************************/
+	void DestroyRenderPass(VkDevice& vkDevice);
 
 	/*************************************************************************************************/
 	/*!
