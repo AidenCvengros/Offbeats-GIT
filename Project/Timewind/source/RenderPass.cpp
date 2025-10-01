@@ -60,7 +60,10 @@ Copyright (c) 2025 Aiden Cvengros
 		FILL
 */
 /*************************************************************************************************/
-RenderPass::RenderPass() : singleOutput(false)
+RenderPass::RenderPass() : singleOutput(false),
+	imageViews(0), outputTexture(NULL),
+	renderPass(NULL), descriptorSetLayout(NULL), pipelineLayout(NULL), graphicsPipeline(NULL),
+	framebuffers(0), uniformBuffers(0), uniformBuffersMemory(0), descriptorSets(0)
 {
 
 }
@@ -178,10 +181,7 @@ void RenderPass::CreateRenderPass(bool onScreen, VkDevice vkDevice, VkFormat tex
 	}
 
 	// Checks that the render pass was created correctly
-	if (vkCreateRenderPass(vkDevice, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create render pass!");
-	}
+	_Window->CheckVulkanSuccess(vkCreateRenderPass(vkDevice, &renderPassInfo, nullptr, &renderPass), "failed to create render pass!");
 }
 
 /*************************************************************************************************/
@@ -219,14 +219,11 @@ void RenderPass::CreateDescriptorSetLayout(VkDevice vkDevice, VkShaderStageFlags
 	// Sets the layout for the descriptor set
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = uboLayoutBindings.size();
+	layoutInfo.bindingCount = (uint32_t)uboLayoutBindings.size();
 	layoutInfo.pBindings = uboLayoutBindings.data();
 
 	// Makes the offscreen descriptor sets
-	if (vkCreateDescriptorSetLayout(vkDevice, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create descriptor set layout!");
-	}
+	_Window->CheckVulkanSuccess(vkCreateDescriptorSetLayout(vkDevice, &layoutInfo, NULL, &descriptorSetLayout), "failed to create descriptor set layout!");
 }
 
 /*************************************************************************************************/
@@ -355,10 +352,7 @@ void RenderPass::CreateGraphicsPipeline(VkDevice& vkDevice, VkPipelineCache& pip
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = pushConstantRange;
 	}
-	if (vkCreatePipelineLayout(vkDevice, &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create offscreen pipeline layout");
-	}
+	_Window->CheckVulkanSuccess(vkCreatePipelineLayout(vkDevice, &pipelineLayoutInfo, NULL, &pipelineLayout), "failed to create offscreen pipeline layout");
 
 	// Sets the vertex description structs
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -385,10 +379,7 @@ void RenderPass::CreateGraphicsPipeline(VkDevice& vkDevice, VkPipelineCache& pip
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-	if (vkCreateGraphicsPipelines(vkDevice, pipelineCache, 1, &pipelineInfo, NULL, &graphicsPipeline) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create offscreen graphics pipeline");
-	}
+	_Window->CheckVulkanSuccess(vkCreateGraphicsPipelines(vkDevice, pipelineCache, 1, &pipelineInfo, NULL, &graphicsPipeline), "failed to create offscreen graphics pipeline");
 
 	// Cleans up the shader modules
 	vkDestroyShaderModule(vkDevice, fragShaderModule, NULL);
@@ -428,10 +419,7 @@ void RenderPass::SetSwapChainFramebuffers(VkDevice& vkDevice, std::vector<VkFram
 		framebufferInfo.height = swapChainExtent.height;
 		framebufferInfo.layers = 1;
 
-		if (vkCreateFramebuffer(vkDevice, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS)
-		{
-			throw std::runtime_error("failed to create framebuffer!");
-		}
+		_Window->CheckVulkanSuccess(vkCreateFramebuffer(vkDevice, &framebufferInfo, nullptr, &swapChainFramebuffers[i]), "failed to create framebuffer!");
 	}
 }
 
@@ -462,10 +450,7 @@ void RenderPass::SetFramebuffers(VkDevice& vkDevice, VkExtent2D extent)
 	framebufferInfo.height = extent.height;
 	framebufferInfo.layers = 1;
 
-	if (vkCreateFramebuffer(vkDevice, &framebufferInfo, nullptr, &framebuffers[0]) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create framebuffer!");
-	}
+	_Window->CheckVulkanSuccess(vkCreateFramebuffer(vkDevice, &framebufferInfo, nullptr, &framebuffers[0]), "failed to create framebuffer!");
 }
 
 /*************************************************************************************************/
@@ -523,10 +508,7 @@ void RenderPass::CreateDescriptorSet(VkDevice& vkDevice, VkDescriptorPool& descr
 
 	// Allocates the memory for the descriptor sets
 	descriptorSets.resize(descriptorSetQuantity);
-	if (vkAllocateDescriptorSets(vkDevice, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to allocate descriptor sets!");
-	}
+	_Window->CheckVulkanSuccess(vkAllocateDescriptorSets(vkDevice, &allocInfo, descriptorSets.data()), "failed to allocate descriptor sets!");
 }
 
 /*************************************************************************************************/
@@ -690,10 +672,7 @@ VkShaderModule RenderPass::CreateShaderModule(VkDevice vkDevice, const std::vect
 	VkShaderModule shaderModule;
 
 	// Creates and checks that the shader module was created correctly
-	if (vkCreateShaderModule(vkDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create shader module!");
-	}
+	_Window->CheckVulkanSuccess(vkCreateShaderModule(vkDevice, &createInfo, nullptr, &shaderModule), "failed to create shader module!");
 
 	// Returns the shader module
 	return shaderModule;

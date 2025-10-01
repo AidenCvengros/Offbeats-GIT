@@ -84,15 +84,15 @@ public:
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
 
-	typedef struct 
+	typedef struct AttackStruct
 	{
-		AttackTypes attackType;						// The type of attack
-		AttackPhase attackPhase;				// The stage of this attack
-		int xCoord;								// The X map coordinate of the attack (Coordinate usage is attack specific)
-		int yCoord;								// The y map coordinate of the attack
-		bool facingRight;						// Whether the attack is aimed right or left
-		double phaseTimer;						// How much time is left in the current phase
-		std::vector<GameObject*> targetList;	// After an attack hits a target, tracks that game object so it isn't hit again
+		AttackTypes attackType = AttackTypes::NullAttack;	// The type of attack
+		AttackPhase attackPhase = AttackPhase::NullAttack;	// The stage of this attack
+		int xCoord = 0;										// The X map coordinate of the attack (Coordinate usage is attack specific)
+		int yCoord = 0;										// The y map coordinate of the attack
+		bool facingRight = true;							// Whether the attack is aimed right or left
+		double phaseTimer = 0.0;							// How much time is left in the current phase
+		std::vector<GameObject*> targetList;				// After an attack hits a target, tracks that game object so it isn't hit again
 	}AttackStruct;
 	
 	//---------------------------------------------------------------------------------------------

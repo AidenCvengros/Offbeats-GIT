@@ -42,7 +42,7 @@ static struct AttackDataStruct
 
 	float damage;
 	float manaCost;
-};
+}attackDataStruct;
 
 static const AttackDataStruct attackData[(unsigned long long)AttackManager::AttackTypes::Max] =
 {
@@ -176,14 +176,14 @@ void AttackManager::StartAttack(AttackManager::AttackTypes attack, int attackXCo
 	{
 		// Checks if the attack is facing right or left
 		glm::vec2 effectCoordinates = ConvertMapCoordsToWorldCoords( attackXCoordinate, attackYCoordinate);
-		effectCoordinates.y += 0.2;
+		effectCoordinates.y += 0.2f;
 		if (attackFacingRight)
 		{
-			effectCoordinates.x += 1.3;
+			effectCoordinates.x += 1.3f;
 		}
 		else
 		{
-			effectCoordinates.x -= 1.3;
+			effectCoordinates.x -= 1.3f;
 		}
 
 		_EffectManager->StartEffect(EffectManager::EffectType::Image, "Assets/Sprites/Slash1.png", effectCoordinates, 0.0f, { 1.5f, 1.5f }, attackFacingRight, CalculateTotalAttackTime(attack) + 0.25, { 0.9f, 0.3f, 0.1f, 0.85f }, 0.1);
@@ -193,14 +193,14 @@ void AttackManager::StartAttack(AttackManager::AttackTypes attack, int attackXCo
 	{
 		// Checks if the attack is facing right or left
 		glm::vec2 effectCoordinates = ConvertMapCoordsToWorldCoords(attackXCoordinate, attackYCoordinate);
-		effectCoordinates.y -= 0.2;
+		effectCoordinates.y -= 0.2f;
 		if (attackFacingRight)
 		{
-			effectCoordinates.x += 1.35;
+			effectCoordinates.x += 1.35f;
 		}
 		else
 		{
-			effectCoordinates.x -= 1.35;
+			effectCoordinates.x -= 1.35f;
 		}
 
 		_EffectManager->StartEffect(EffectManager::EffectType::Image, "Assets/Sprites/Slash1.png", effectCoordinates, 0.0f, { 1.5f, -1.5f }, attackFacingRight, CalculateTotalAttackTime(attack) + 0.25, { 0.9f, 0.3f, 0.1f, 0.85f }, 0.1);
@@ -212,11 +212,11 @@ void AttackManager::StartAttack(AttackManager::AttackTypes attack, int attackXCo
 		glm::vec2 effectCoordinates = ConvertMapCoordsToWorldCoords(attackXCoordinate, attackYCoordinate);
 		if (attackFacingRight)
 		{
-			effectCoordinates.x += 1.4;
+			effectCoordinates.x += 1.4f;
 		}
 		else
 		{
-			effectCoordinates.x -= 1.4;
+			effectCoordinates.x -= 1.4f;
 		}
 
 		_EffectManager->StartEffect(EffectManager::EffectType::Image, "Assets/Sprites/Slash1.png", effectCoordinates, -10.0f, { 2.25f, 1.2f }, attackFacingRight, CalculateTotalAttackTime(attack) + 0.25, { 1.0f, 0.2f, 0.1f, 0.9f }, 0.2);

@@ -400,11 +400,6 @@ private:
 	std::vector<VkBuffer> uniformBuffers;				// The uniform buffer for the fisheye shader
 	std::vector<VkDeviceMemory> uniformBuffersMemory;	// The memory storing unform buffer data for the fisheye shader
 	std::vector<VkDescriptorSet> descriptorSets;		// The descriptor set for the fisheye shader
-
-	//VkSampler offscreenSampler;							// The sampler for the offscreen buffers
-	//VkImage offscreenImage;								// The image being displayed on the offscreen buffers
-	//VkDeviceMemory offscreenBufferMemory;				// The memory location for offscreen buffer data
-	//VkDescriptorImageInfo offscreenImageDescriptor;		// The image descriptor for the offscreen buffer
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

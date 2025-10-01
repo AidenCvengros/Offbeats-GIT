@@ -28,7 +28,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Private Constants
 //-------------------------------------------------------------------------------------------------
 
-const int zDist = -10.0f;						// How far back the camera is in the z axis
+const float zDist = -10.0f;						// How far back the camera is in the z axis
 
 //-------------------------------------------------------------------------------------------------
 // Public Declarations

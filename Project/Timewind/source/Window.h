@@ -115,16 +115,17 @@ public:
 	*/
 	/*********************************************************************************************/
 	Window(int initWidth, int initHeight, std::string initWindowName) :
-		window(NULL),
-		vulkanInstance(NULL),
-		physicalCard(NULL),
-		logicalDevice(NULL),
-		graphicsQueue(NULL),
-		surface(NULL),
-		blankTexture(NULL),
-		width(initWidth),
-		height(initHeight),
-		name(initWindowName) {}
+		window(NULL), vulkanInstance(NULL), physicalCard(NULL), logicalDevice(NULL),
+		graphicsQueue(NULL), surface(NULL), presentQueue(NULL), commandPool(NULL), commandBuffer(),
+		imageIndex(0), textureDescriptorSetLayout(NULL), descriptorPool(NULL), pipelineCache(NULL), debugMessenger(NULL),
+		swapChain(NULL), swapChainImages(0), swapChainImageFormat(), swapChainExtent(), swapChainFramebuffers(),
+		camera(NULL), blankTexture(NULL),
+		baseScenePass(), glitchMaskPass(), postProcessPass(),
+		vertexBuffer(NULL), vertexBufferMemory(NULL), indexBuffer(NULL), indexBufferMemory(NULL),
+		availableSemaphore(), finishedSemaphore(), inFlightFence(),
+		currentFrame(0), framebufferResized(false), width(initWidth), height(initHeight), name(initWindowName) 
+	{
+	}
 
 	/*********************************************************************************************/
 	/*!
@@ -266,7 +267,7 @@ public:
 			The window's dimensions
 	*/
 	/*********************************************************************************************/
-	glm::vec2 GetWindowSize();
+	glm::vec2 GetWindowSize() { return glm::vec2(swapChainExtent.width, swapChainExtent.height); }
 
 	/*********************************************************************************************/
 	/*!
@@ -277,7 +278,7 @@ public:
 			The new camera
 	*/
 	/*********************************************************************************************/
-	void SetCamera(Camera* newCamera);
+	void SetCamera(Camera* newCamera) { camera = newCamera; }
 
 	/*********************************************************************************************/
 	/*!
@@ -377,7 +378,7 @@ public:
 			The new command buffer
 	*/
 	/*********************************************************************************************/
-	VkCommandBuffer BeginSingleTimeCommands();
+	VkCommandBuffer BeginSingleTimeCommands() const;
 
 	/*********************************************************************************************/
 	/*!
@@ -388,7 +389,7 @@ public:
 			The command buffer to be ended
 	*/
 	/*********************************************************************************************/
-	void EndSingleTimeCommands(VkCommandBuffer commandBuffer_);
+	void EndSingleTimeCommands(VkCommandBuffer commandBuffer_) const;
 
 	/*********************************************************************************************/
 	/*!
@@ -471,7 +472,7 @@ private:
 				Whether the struct is complete
 		*/
 		/*****************************************************************************************/
-		bool IsComplete();
+		bool IsComplete() { return graphicsFamily.has_value() && presentFamily.has_value(); }
 	};
 
 	/*********************************************************************************************/
@@ -482,7 +483,7 @@ private:
 	/*********************************************************************************************/
 	struct SwapChainSupportDetails
 	{
-		VkSurfaceCapabilitiesKHR capabilities;		// Holds the capabilities of the screen surface
+		VkSurfaceCapabilitiesKHR capabilities = { 0 };		// Holds the capabilities of the screen surface
 		std::vector<VkSurfaceFormatKHR> formats;	// Tracks how the screen wants info formatted
 		std::vector<VkPresentModeKHR> presentModes;	// What presentation modes are available
 	};
@@ -520,84 +521,55 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
+	// Important objects
 	VkInstance vulkanInstance;							// Handles the vulkan instance
 	VkPhysicalDevice physicalCard;						// Tracks the graphics card being used
 	VkDevice logicalDevice;								// Holds the logical device that communicates with the graphics card
+
+	// Graphics objects
 	VkQueue graphicsQueue;								// Holds the command queue for the logical device
 	VkSurfaceKHR surface;								// The virtual screen surface to be drawn to
 	VkQueue presentQueue;								// Holds the command queue for drawing to the surface
+	VkCommandPool commandPool;							// Holds the list of commands for the graphics system
+	std::vector<VkCommandBuffer> commandBuffer;			// Gets the commands
+	uint32_t imageIndex;								// Keeps track of which image the swap chain is on
+	VkDescriptorSetLayout textureDescriptorSetLayout;	// Specifies the layout for texture descriptors.
+	VkDescriptorPool descriptorPool;					// The descriptor pool
+	VkPipelineCache pipelineCache;						// The cache to track different stages of the graphics pipeline
+	VkDebugUtilsMessengerEXT debugMessenger;			// The debug messenger
+
+	// Swap Chain objects
 	VkSwapchainKHR swapChain;							// The swap chain
 	std::vector<VkImage> swapChainImages;				// The frame buffers being drawn to
 	VkFormat swapChainImageFormat;						// The image format (should be srgb)
 	VkExtent2D swapChainExtent;							// Holds the dimensions of the frame buffers
-	//std::vector<VkImageView> imageViews;				// Holds how to view the images
-	uint32_t imageIndex;								// Keeps track of which image the swap chain is on
-	//VkRenderPass renderPass;							// The variable to manage render passes
-	//VkDescriptorSetLayout descriptorSetLayout;			// Specifies the layout for shader descriptors
-	VkDescriptorSetLayout textureDescriptorSetLayout;	// Specifies the layout for texture descriptors.
-	//VkPipelineLayout pipelineLayout;					// Holds the layout of the graphics pipeline so it can be adjusted
-	//VkPipeline graphicsPipeline;						// The graphics pipeline
 	std::vector<VkFramebuffer> swapChainFramebuffers;	// The framebuffers for the swap chain
-	VkCommandPool commandPool;							// Holds the list of commands for the graphics system
-	std::vector<VkCommandBuffer> commandBuffer;			// Gets the commands
-	VkDebugUtilsMessengerEXT debugMessenger;			// The debug messenger
+	
+	// Game Dependencies
 	Camera* camera;										// The main camera object
 	Texture* blankTexture;								// Default texture used to draw game objects without a texture
-	VkPipelineCache pipelineCache;						// The cache to track different stages of the graphics pipeline
 
+	// Render Passes
 	RenderPass baseScenePass;							// The render pass for drawing the base scene
 	RenderPass glitchMaskPass;							// The render pass that creates the mask for where to render glitch effects
 	RenderPass postProcessPass;							// The post-processing render pass
 
-	//VkRenderPass offscreenRenderPass;					// The render pass for the offscreen buffers
-	//VkSampler offscreenSampler;							// The sampler for the offscreen buffers
-	//VkImage offscreenImage;								// The image being displayed on the offscreen buffers
-	//VkDeviceMemory offscreenBufferMemory;				// The memory location for offscreen buffer data
-	//VkImageView offscreenImageView;						// The image view for the offscreen buffer
-	//VkFramebuffer offscreenFrameBuffer;					// The offscreen framebuffer
-	////VkDescriptorImageInfo offscreenImageDescriptor;		// The image descriptor for the offscreen buffer
-	//VkDescriptorSetLayout fisheyeDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
-	//VkDescriptorSet offscreenDescriptorSet;				// The descriptor set for the fisheye shader
-	//VkBuffer offscreenUniformBuffer;					// The uniform buffer for the fisheye shader
-	//VkDeviceMemory offscreenUniformBufferMemory;		// The memory storing unform buffer data for the fisheye shader
-	//VkPipelineLayout fisheyePipelineLayout;				// The graphics pipeline layout for the fisheye render pass
-	//VkPipeline fisheyePipeline;							// The graphics pipeline for the fisheye render pass
-	//
-	//VkRenderPass maskRenderPass;					// The render pass for the offscreen buffers
-	//VkSampler maskSampler;							// The sampler for the offscreen buffers
-	//VkImage maskImage;								// The image being displayed on the offscreen buffers
-	//VkDeviceMemory maskBufferMemory;				// The memory location for offscreen buffer data
-	//VkImageView maskImageView;						// The image view for the offscreen buffer
-	//VkFramebuffer maskFrameBuffer;					// The offscreen framebuffer
-	////VkDescriptorImageInfo maskImageDescriptor;		// The image descriptor for the offscreen buffer
-	//VkDescriptorSetLayout maskDescriptorSetLayout;	// The descriptor set layout for the fisheye shader
-	//VkDescriptorSet maskDescriptorSet;				// The descriptor set for the fisheye shader
-	//VkBuffer maskUniformBuffer;					// The uniform buffer for the fisheye shader
-	//VkDeviceMemory maskUniformBufferMemory;		// The memory storing unform buffer data for the fisheye shader
-	////VkPipelineLayout maskPipelineLayout;				// The graphics pipeline layout for the fisheye render pass
-	//VkPipeline maskPipeline;							// The graphics pipeline for the fisheye render pass
-
+	// Memory Buffers
 	VkBuffer vertexBuffer;								// The vertex buffer
 	VkDeviceMemory vertexBufferMemory;					// The memory pointer for the vertex buffer
 	VkBuffer indexBuffer;								// The indices corresponding to vertices in the vertex buffer
 	VkDeviceMemory indexBufferMemory;					// The memory pointer for the index buffer
 
-	//std::vector<VkBuffer> uniformBuffers;				// The uniform buffer for transferring data to the shaders
-	//std::vector<VkDeviceMemory> uniformBuffersMemory;	// The memory storing uniform buffer data
-	//std::vector<void*> uniformBuffersMapped;			// The mapping layout for uniform buffers
-	VkDescriptorPool descriptorPool;					// The descriptor pool
-	//std::vector<VkDescriptorSet> descriptorSets;		// The descriptor sets, there's one for each flight frame
-
+	// Thread Syncing
 	std::vector<VkSemaphore> availableSemaphore;		// The semaphore for checking if the buffer is available
 	std::vector<VkSemaphore> finishedSemaphore;			// The semaphore for when the render is finished
 	std::vector<VkFence> inFlightFence;					// The fence to make sure only one frame happens at a time
 
+	// Window variables
 	uint32_t currentFrame = 0;							// Keeps track of the frame count
 	bool framebufferResized = false;					// Manually tells the program to recreate the swap chain
-
 	int width;											// The width of the window
 	int height;											// The height of the window
-
 	std::string name;									// The name of the window
 
 	// Holds the list of graphics device extensions that we want
@@ -736,8 +708,26 @@ private:
 	/*********************************************************************************************/
 	bool IsDeviceSuitable(VkPhysicalDevice device);
 
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Finds what types of queues the graphics card supports that we want to use
+	
+		\param device_
+			The given graphics card
+	
+		\return
+			The types of queue families for our program to use
+	*/
+	/*********************************************************************************************/
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Creates the virtual vulkan logic device
+	*/
+	/*********************************************************************************************/
 	void CreateLogicalDevice();
 
 	/*********************************************************************************************/
@@ -1003,14 +993,6 @@ private:
 	*/
 	/*********************************************************************************************/
 	void UpdateDescriptorSets();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Prepares the offscreen buffers for post-processing effects
-	*/
-	/*********************************************************************************************/
-	void PrepareOffscreenBuffers();
 
 	/*********************************************************************************************/
 	/*!

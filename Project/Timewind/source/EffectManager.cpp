@@ -124,9 +124,9 @@ void EffectManager::Update(double dt)
 				if (i->effectTotalTime - i->effectTimer > i->fadingStartingTime)
 				{
 					// Calculates interpolation between starting color and fade color
-					float currentFadeTime = (i->effectTotalTime - i->effectTimer) - i->fadingStartingTime;
-					float totalFadeTime = i->effectTotalTime - i->fadingStartingTime;
-					i->object->SetColor(i->startingColor + ((currentFadeTime / totalFadeTime) * (i->fadeColor - i->startingColor)));
+					double currentFadeTime = (i->effectTotalTime - i->effectTimer) - i->fadingStartingTime;
+					double totalFadeTime = i->effectTotalTime - i->fadingStartingTime;
+					i->object->SetColor(i->startingColor + ((float)(currentFadeTime / totalFadeTime) * (i->fadeColor - i->startingColor)));
 				}
 				
 				// Moves on to the next effect in the list

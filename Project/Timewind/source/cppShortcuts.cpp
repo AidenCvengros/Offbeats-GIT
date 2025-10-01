@@ -115,7 +115,7 @@ glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates)
 /*************************************************************************************************/
 int ConvertWorldCoordToMapCoord(double worldCoordinate)
 {
-	return std::floor(worldCoordinate) / 2;
+	return (int)std::floor(worldCoordinate / 2.0);
 }
 
 /*************************************************************************************************/
