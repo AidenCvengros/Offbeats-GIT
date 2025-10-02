@@ -1,21 +1,29 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file Engine.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2023.9.7
 \brief
-    Sandbox level for quick testing
+    Creates and manages the game engine
 
-    Functions include:
-        + [FILL]
+    Public Functions:
+        + Engine::createEngine
+		+ Engine::~Engine
+		+ Engine::Init
+		+ Engine::Update
+		+ Engine::Draw
+		+ Engine::Shutdown
+
+	Private Functions:
+		+ Engine::Engine
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_Engine_H_
+#define Syncopatience_Engine_H_
 
 #pragma once
 
@@ -23,15 +31,20 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
-#include "../Engine/stdafx.h"
+#include "stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// Includes to make system vector
+#include "System.h"
+#include <vector>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
+
+// Forward references to reduce dependencies because engine.h is included in every cpp file
+class Window;
+class Scene;
+class MapMatrix;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -44,19 +57,31 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		Singleton class that defines and manages the game engine.
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class Engine
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
+
+	enum SystemTypes
+	{
+		window,
+		inputManager,
+		gameObjectManager,
+		textureManager,
+		sceneManager,
+		mapMatrix,
+		effectManager,
+		max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -69,37 +94,84 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
+			Static function that creates the singleton game engine. Also will return the game engine
+			reference
 
-		\param engine_
-			The engine the scene is loaded into
+		\return
+			Returns the game engine.
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
+	static Engine* createEngine();
 
-	/*************************************************************************************************/
+	/*********************************************************************************************/
 	/*!
 		\brief
-			Deconstructor for the base scene class
+			Engine destructor.
 	*/
-	/*************************************************************************************************/
-	~Sandbox() {}
+	/*********************************************************************************************/
+	~Engine();
 
-	/*************************************************************************************************/
+	/*********************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Initializes the engine
 	*/
-	/*************************************************************************************************/
-	void LoadScene();
+	/*********************************************************************************************/
+	void Init();
 
-	/*************************************************************************************************/
+	/*********************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Updates the game engine. Also defines an in-engine frame
+	*/
+	/*********************************************************************************************/
+	void Update();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Draws the engine updates to the screen.
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	void Draw();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Shuts down the game engine
+	*/
+	/*********************************************************************************************/
+	void Shutdown();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Gets a system from the system list of the given type
+
+		\param systemType
+			The given system type
+	*/
+	/*********************************************************************************************/
+	System* GetSystem(SystemTypes systemType);
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Gets a system from the system list of the given type
+
+		\param systemType
+			The given system type
+	*/
+	/*********************************************************************************************/
+	Window* GetWindow() { return gameWindow; }
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Gets the currently running scene
+	*/
+	/*********************************************************************************************/
+	Scene* GetCurrentScene();
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -113,11 +185,25 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+	
+	static Engine* engineInstance;			// Points to the singleton engine instance
+
+	std::vector<System *> systemList;		// Holds a list of all systems that need to be managed
+	Window* gameWindow;						// Points to the window so the engine can communicate directly with the window
+
+	double lastTime;						// Tracks the last recorded time for calculating dt
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
 
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Engine class initializer.
+	*/
+	/*********************************************************************************************/
+	Engine();
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +214,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_[FILL]_H_

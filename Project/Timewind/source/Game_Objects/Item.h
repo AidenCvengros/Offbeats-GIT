@@ -1,21 +1,24 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file Item.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2025.4.28
 \brief
-    Sandbox level for quick testing
+    The base class for item game objects
 
-    Functions include:
-        + [FILL]
+    Public Functions:
+        + FILL
+		
+	Private Functions:
+		+ FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_Item_H_
+#define Syncopatience_Item_H_
 
 #pragma once
 
@@ -23,11 +26,11 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
+// Base include
 #include "../Engine/stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// The base game object class
+#include "GameObject.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,15 +47,23 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		The interactible game object class
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class Item : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
+
+	enum class ItemType
+	{
+		Null = -1,
+		Key,
+		Coin,
+		Max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
@@ -65,46 +76,79 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the item game object class
+
+		\param itemType_
+			The type of the item
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in
+	*/
+	/*************************************************************************************************/
+	Item(ItemType itemType_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), itemType(itemType_) {}
+	Item(ItemType itemType_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), itemType(itemType_) {}
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for FILL class
+	*/
+	/*************************************************************************************************/
+	virtual ~Item() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
+			Updates the game object. Can be overwritten by derived classes
 
-		\param engine_
-			The engine the scene is loaded into
+		\param dt
+			The time elapsed since the previous frame
+
+		\param inputManager
+			Allows the game objects to check inputs
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Deconstructor for the base scene class
-	*/
-	/*************************************************************************************************/
-	~Sandbox() {}
+	virtual void Update(double dt, InputManager* inputManager) {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	void LoadScene();
+			Returns the type of the item
 
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Loads in all the objects of the scene
+		\return
+			The item type
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	ItemType GetItemType() { return itemType; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	ItemType itemType;							// The type of this item
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -117,7 +161,6 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +171,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_Item_H_

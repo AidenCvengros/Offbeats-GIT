@@ -1,21 +1,24 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file ChildObject.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2025.3.17
 \brief
-    Sandbox level for quick testing
+    The base class for child game objects
 
-    Functions include:
-        + [FILL]
+    Public Functions:
+        + FILL
+		
+	Private Functions:
+		+ FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_ChildObject_H_
+#define Syncopatience_ChildObject_H_
 
 #pragma once
 
@@ -23,11 +26,11 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
+// Base include
 #include "../Engine/stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// The base game object class
+#include "GameObject.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,10 +47,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		The child game object class
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class ChildObject : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -65,41 +68,40 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the child game object class
+			
+		\param parentObject_
+			The parent game object
+
+		\param flipWithParent_
+			Whether the child should flip direction and sides when the parent flips
+	*/
+	/*************************************************************************************************/
+	ChildObject(GameObject* parentObject_, bool flipWithParent_) : GameObject(parentObject_->GetPosition(), parentObject_->GetRotation(), parentObject_->GetScale(), parentObject_->GetDrawPriority(), parentObject_->GetIsFacingRight(), parentObject_->GetColor()),
+		parentObject(parentObject_), flipWithParent(flipWithParent_) {}
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for FILL class
+	*/
+	/*************************************************************************************************/
+	~ChildObject() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
+			Returns the transformation matrix for the game object
 
-		\param engine_
-			The engine the scene is loaded into
+		\return
+			The game object's transformation matrix
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Deconstructor for the base scene class
-	*/
-	/*************************************************************************************************/
-	~Sandbox() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Loads in all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	void LoadScene();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Loads in all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	void UnloadScene();
+	glm::mat4x4 GetTransformationMatrix();
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -113,11 +115,13 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+	
+	GameObject* parentObject;					// The parent object that this child is attached to
+	bool flipWithParent;						// Flips the child object when the parent object flips direction
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +132,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_ChildObject_H_

@@ -18,11 +18,18 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
+// Base includes
 #include "Enemy.h"
+#include "../Engine/cppShortcuts.h"
 
-#include "../cppShortcuts.h"
+// Includes the window class to draw children of the enemy
+#include "../Engine/Window.h"
 
-#include "../Window.h"
+// Includes the pool object to be the enemy's health bar
+#include "Pool.h"
+
+// Includes the map matrix so the enemy can interact with map objects
+#include "../Gameplay/MapMatrix.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -75,10 +82,9 @@ Copyright (c) 2023 Aiden Cvengros
 		The starting coordinates of the enemy
 */
 /*************************************************************************************************/
-Enemy::Enemy(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, MapMatrix* mapMatrix_, std::pair<int, int> mapCoords) :
+Enemy::Enemy(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, false, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	attackTimer(0.0),
-	mapMatrix(mapMatrix_)
+	attackTimer(0.0)
 {
 	healthPool = new Pool({ pos.x, pos.y + 0.5 }, rot, sca, 40, true, { 1.0, 0.0, 0.0, 0.7 });
 	healthPool->SetRender(true);
@@ -125,17 +131,17 @@ void Enemy::Update(double dt, InputManager* inputManager)
 		The game window the objects are being drawn to
 */
 /*************************************************************************************************/
-void Enemy::DrawChildObjects(Window* window)
+void Enemy::DrawChildObjects()
 {
 	// Draws the enemy's health bar
 	healthPool->SetPosition({ GetPosition().x, GetPosition().y + 1.3 });
 	healthPool->SetScale({ 1.0f, 0.3f });
 	healthPool->SetColor({ 1.0, 1.0, 1.0, 1.0 });
-	window->DrawGameObject(healthPool);
+	_Window->DrawGameObject(healthPool);
 	healthPool->SetPosition({ GetPosition().x, GetPosition().y + 1.3 });
 	healthPool->SetScale({ healthPool->GetPoolRatio(), 0.3f });
 	healthPool->SetColor({ 0.6, 0.1, 0.1, 1.0 });
-	window->DrawGameObject(healthPool);
+	_Window->DrawGameObject(healthPool);
 }
 
 /*************************************************************************************************/
@@ -172,7 +178,7 @@ bool Enemy::MoveEnemy(std::pair<int, int>& enemyPosition, int horizontalMove, in
 	}
 
 	// Moves the enemy in logic
-	if (mapMatrix->MoveTile(enemyPosition, { enemyPosition.first + horizontalMove, enemyPosition.second + verticalMove }, MapMatrix::TileStatus::Enemy, this))
+	if (_MapMatrix->MoveTile(enemyPosition, { enemyPosition.first + horizontalMove, enemyPosition.second + verticalMove }, MapMatrix::TileStatus::Enemy, this))
 	{
 		enemyPosition.first += horizontalMove;
 		enemyPosition.second += verticalMove;
@@ -232,7 +238,7 @@ void Enemy::DamageEnemy(float damage)
 	if (healthPool->GetPoolValue() <= 0)
 	{
 		SetToBeDestroyed(true);
-		mapMatrix->SetTile(GetMapCoords(), MapMatrix::TileStatus::Empty);
+		_MapMatrix->SetTile(GetMapCoords(), MapMatrix::TileStatus::Empty);
 	}
 }
 

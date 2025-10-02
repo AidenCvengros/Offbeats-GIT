@@ -1,21 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file InputManager.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2024.2.16
 \brief
-    Sandbox level for quick testing
-
-    Functions include:
-        + [FILL]
+    Gathers and manages inputs from the window instance
+		
+	Private Functions:
+		+ FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_InputManager_H_
+#define Syncopatience_InputManager_H_
 
 #pragma once
 
@@ -23,11 +23,14 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
-#include "../Engine/stdafx.h"
+#include "stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// Includes the base system class, window class, and glfw functions
+#include "System.h"
+
+// Includes the map container for tracking input keys
+#include <vector>
+#include <map>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,16 +47,40 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		InputManager
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class InputManager : System
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 	
+	enum class Inputs
+	{
+		Escape,
+		Left,
+		Right,
+		Up,
+		Down,
+		Jump,
+		Attack,
+		F1,
+		F2,
+		F3,
+		Max
+	};
+
+	enum class InputStatus
+	{
+		Off,
+		Pressed,
+		Held,
+		Released,
+		Max
+	};
+
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
@@ -65,41 +92,93 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the input manager class
+	*/
+	/*************************************************************************************************/
+	InputManager() {}
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for FILL class
+	*/
+	/*************************************************************************************************/
+	~InputManager() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
-
-		\param engine_
-			The engine the scene is loaded into
+			Initializes the system.
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
+	void Init();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Deconstructor for the base scene class
+			Updates the system.
+
+		\param
+			The time elapsed since the previous frame.
 	*/
 	/*************************************************************************************************/
-	~Sandbox() {}
+	void Update(double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Draws the system to the screen.
 	*/
 	/*************************************************************************************************/
-	void LoadScene();
+	void Draw();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Shuts down the system.
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	void Shutdown();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Check the status of the given input
+
+		\param input
+			The given input
+
+		\return
+			The status of the input
+	*/
+	/*************************************************************************************************/
+	InputStatus CheckInputStatus(Inputs input);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the coordinates of the mouse
+
+		\return
+			The mouse coordinates
+	*/
+	/*************************************************************************************************/
+	std::pair<double, double> CheckMouseCoordinates() { return mouseCoords; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the coordinates of the mouse
+
+		\return
+			The mouse coordinates
+	*/
+	/*************************************************************************************************/
+	std::pair<double, double> CheckMouseDelta() { return mouseDelta; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -113,11 +192,27 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+	
+	std::vector<InputStatus> inputTracker;						// Keeps track of the different input and they're statuses
+	std::vector<std::pair<double, bool>> timeSincePressed;		// Functions as a buffer by mapping when this button was most recently pressed (doesn't count held). The boolean limits the buffer to a single pressed input
+	std::multimap<Inputs, int> keybinds;						// Holds the different keys that map to a certain input
+	std::pair<double, double> mouseCoords;						// The position of the mouse
+	std::pair<double, double> mouseDelta;						// How the mouse position has changed since the previous frame
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates the given input status on the tracker
+
+		\param input
+			The given input
+	*/
+	/*************************************************************************************************/
+	void UpdateInputStatus(Inputs input);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +223,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_InputManager_H_

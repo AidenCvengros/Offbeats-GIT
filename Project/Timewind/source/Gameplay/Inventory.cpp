@@ -1,14 +1,14 @@
 /*************************************************************************************************/
 /*!
-\file FILL.cpp
+\file Inventory.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2025.FILL.FILL
+\date 2025.5.7
 \brief
-    FILL
+    Manages the player's inventory
 
     Functions include:
-        + FILL
+        + [FILL]
 
 Copyright (c) 2025 Aiden Cvengros
 */
@@ -19,8 +19,11 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "FILL.h"
+#include "Inventory.h"
 #include "../Engine/cppShortcuts.h"
+
+// Includes the key class so we can add keys
+#include "../Game_Objects/Key.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -35,23 +38,56 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
+// Public Function Declarations
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// Private Function Declarations
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
 
 /*************************************************************************************************/
 /*!
 	\brief
-		FILL
-		
-	\param
-		FILL
-		
+		Adds the given key to the inventory
+
+	\param newKey
+		The new key to be added into the inventory
+
 	\return
-		FILL
+		Returns true if the key was added, false if not
 */
 /*************************************************************************************************/
-void FILL::FILL ()
+bool Inventory::AddKey(Key* newKey)
 {
+	if (newKey)
+	{
+		keyList[newKey->GetKeyValue()] = newKey;
+		return true;
+	}
+
+	// Otherwise return false
+	return false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Adds the given key to the inventory
+
+	\return
+		Returns true if coin count hit 100.
+*/
+/*************************************************************************************************/
+bool Inventory::AddCoin()
+{
+	// Adds a coin to the count
+	coinCount++;
+
+	return false;
 }
 
 //-------------------------------------------------------------------------------------------------

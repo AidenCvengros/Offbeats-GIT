@@ -1,21 +1,24 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file Vertex.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2023.11.12
 \brief
-    Sandbox level for quick testing
+    Defines a vertex for drawing purposes
 
-    Functions include:
-        + [FILL]
+    Public Functions:
+        + FILL
+		
+	Private Functions:
+		+ FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_Vertex_H_
+#define Syncopatience_Vertex_H_
 
 #pragma once
 
@@ -23,11 +26,16 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
-#include "../Engine/stdafx.h"
+#include "stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// Includes glm libraries for vector math
+#include <glm/glm.hpp>
+#define VK_USE_PLATFORM_WIN32_KHR
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+// Vertex lists are stored in an array container
+#include <array>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,10 +52,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		Defines a vertex for rendering purposes
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class Vertex
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -65,41 +73,53 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for vertex class
+			
+		\param pos_
+			The position vector
+			
+		\param color_
+			The color of the vertex
+
+		\param texCoord_
+			The texture coordinates of the vertex
+	*/
+	/*************************************************************************************************/
+	Vertex(glm::vec2 pos_, glm::vec3 color_, glm::vec2 texCoord_) : pos(pos_), color(color_), texCoord(texCoord_) {}
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for vertex class
+	*/
+	/*************************************************************************************************/
+	~Vertex() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
+			Gets the description that tells vulkan how to load vertices
 
-		\param engine_
-			The engine the scene is loaded into
+		\return
+			The description struct
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Deconstructor for the base scene class
-	*/
-	/*************************************************************************************************/
-	~Sandbox() {}
+	static VkVertexInputBindingDescription getBindingDescription();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	void LoadScene();
+			Defines how vertices are laid out in memory
 
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Loads in all the objects of the scene
+		\return
+			The description structs (position and color)
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -113,11 +133,14 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+	
+	glm::vec2 pos;								// The position vector
+	glm::vec3 color;							// The color of the vertex
+	glm::vec2 texCoord;							// The texture coordinates
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +151,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_Vertex_H_

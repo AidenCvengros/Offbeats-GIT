@@ -1,21 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file LockedWall.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2025.5.11
 \brief
-    Sandbox level for quick testing
+    The locked wall game object
 
     Functions include:
-        + [FILL]
+        + FILL
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_LockedWall_H_
+#define Syncopatience_LockedWall_H_
 
 #pragma once
 
@@ -23,11 +23,11 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
+// Base include
 #include "../Engine/stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// The base game object class
+#include "GameObject.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,10 +44,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		The locked wall game object class
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class LockedWall : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -65,46 +65,82 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+  
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Constructor for the locked wall game object class
+
+		\param keyValue_
+			The value of the key needed to open the lock
+
+		\param insideObject_
+			The object inside the wall that will pop out when destroyed. Set to null if nothing is supposed to pop out.
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in
+	*/
+	/*********************************************************************************************/
+	LockedWall(int keyValue_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), keyValue(keyValue_) {}
+	LockedWall(int keyValue_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), keyValue(keyValue_) {}
+  
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Destructor for locked wall game object class
+	*/
+	/*********************************************************************************************/
+	virtual ~LockedWall() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
+			Updates the game object. Can be overwritten by derived classes
 
-		\param engine_
-			The engine the scene is loaded into
+		\param dt
+			The time elapsed since the previous frame
+
+		\param inputManager
+			Allows the game objects to check inputs
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Deconstructor for the base scene class
-	*/
-	/*************************************************************************************************/
-	~Sandbox() {}
+	virtual void Update(double dt, InputManager* inputManager) {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	void LoadScene();
+			Gets the door's key value
 
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Loads in all the objects of the scene
+		\return
+			The key value
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	virtual int GetKeyValue() { return keyValue; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	int keyValue;								// The key needed to unlock the door
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -113,11 +149,10 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-
+	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +163,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_LockedWall_H_

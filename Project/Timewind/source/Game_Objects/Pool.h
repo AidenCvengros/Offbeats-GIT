@@ -1,21 +1,24 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file Pool.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2024.7.14
 \brief
-    Sandbox level for quick testing
+    The pool game object that helps track resources
 
-    Functions include:
-        + [FILL]
+    Public Functions:
+        + FILL
+		
+	Private Functions:
+		+ FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_Pool_H_
+#define Syncopatience_Pool_H_
 
 #pragma once
 
@@ -23,11 +26,11 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
+// Base include
 #include "../Engine/stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// The base game object class
+#include "GameObject.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,10 +47,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		The pool object class
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class Pool : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -65,47 +68,100 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the pool object class
+
+		\param scene
+			The scene that this game object is in
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param maxValue_
+			The maximum value of the resource in the pool
+
+		\param overflow_
+			Whether the pool value can go over the normal maximum
+	*/
+	/*************************************************************************************************/
+	Pool(glm::vec2 pos, float rot, glm::vec2 sca, float maxValue_, bool overflow_, glm::vec4 color_) :
+		GameObject(pos, rot, sca, 60, true, color_),
+		maxValue(maxValue_),
+		currValue(maxValue_),
+		overflow(overflow_) {}
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for the game object class
+	*/
+	/*************************************************************************************************/
+	~Pool() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
+			Adds the given amount to the pool
 
-		\param engine_
-			The engine the scene is loaded into
+		\param addAmount
+			The amount to add to the pool
+
+		\return
+			How much was added to the pool (for instance will differ from addAmount if it hits max)
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Deconstructor for the base scene class
-	*/
-	/*************************************************************************************************/
-	~Sandbox() {}
+	float AddToPool(float addAmount);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Subtracts the given amount from the pool
+
+		\param subtractAmount
+			The amount to subtract from the pool
+
+		\return
+			How much was subtracted from the pool (for instance will differ from subtractAmount if it hits min)
 	*/
 	/*************************************************************************************************/
-	void LoadScene();
+	float SubtractFromPool(float subtractAmount);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Return the amount of resources in this pool object
+
+		\return
+			The current amount in the pool
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	float GetPoolValue() { return currValue; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Return the percentage of the pool that is filled
+
+		\return
+			The current ratio of the amount in the pool
+	*/
+	/*************************************************************************************************/
+	float GetPoolRatio() { return currValue / maxValue; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
@@ -113,11 +169,14 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+	
+	float maxValue;								// The maximum value of the resource
+	float currValue;							// The current amount of resource in the pool
+	bool overflow;								// Whether the current value can go above the maximum
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +187,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_Pool_H_

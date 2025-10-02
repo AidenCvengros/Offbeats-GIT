@@ -26,9 +26,11 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "../stdafx.h"
+// Base include
+#include "../Engine/stdafx.h"
 
-#include "../GameObject.h"
+// The base game object class
+#include "GameObject.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References

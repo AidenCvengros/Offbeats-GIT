@@ -26,9 +26,11 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "../stdafx.h"
+// Base include
+#include "../Engine/stdafx.h"
 
-#include "../Item.h"
+// The base item class
+#include "Item.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -141,4 +143,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_InteractibleObject_H_
+#endif // Syncopatience_Key_H_

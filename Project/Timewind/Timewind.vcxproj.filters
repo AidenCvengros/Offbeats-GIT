@@ -45,73 +45,73 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Engine.h">
+    <ClInclude Include="source\Engine\Engine.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\GameObjectManager.h">
+    <ClInclude Include="source\Engine\GameObjectManager.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\InputManager.h">
+    <ClInclude Include="source\Engine\InputManager.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\System.h">
+    <ClInclude Include="source\Engine\System.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\Vertex.h">
+    <ClInclude Include="source\Engine\Vertex.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\Window.h">
+    <ClInclude Include="source\Engine\Window.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\Camera.h">
+    <ClInclude Include="source\Game_Objects\Camera.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="source\GameObject.h">
+    <ClInclude Include="source\Game_Objects\GameObject.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="source\Player.h">
+    <ClInclude Include="source\Game_Objects\Player.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="source\stdafx.h">
+    <ClInclude Include="source\Engine\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\Texture.h">
+    <ClInclude Include="source\Engine\Texture.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\TextureManager.h">
+    <ClInclude Include="source\Engine\TextureManager.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\SceneManager.h">
+    <ClInclude Include="source\Engine\SceneManager.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\Scene.h">
+    <ClInclude Include="source\Scenes\Scene.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="source\Scenes\Sandbox.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="source\MapMatrix.h">
+    <ClInclude Include="source\Gameplay\MapMatrix.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="source\Game_Objects\Enemy.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="source\Pool.h">
+    <ClInclude Include="source\Game_Objects\Pool.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="source\AttackManager.h">
+    <ClInclude Include="source\Gameplay\AttackManager.h">
       <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
-    <ClInclude Include="source\EffectManager.h">
+    <ClInclude Include="source\Engine\EffectManager.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\cppShortcuts.h">
+    <ClInclude Include="source\Engine\cppShortcuts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\ChildObject.h">
+    <ClInclude Include="source\Game_Objects\ChildObject.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="source\Item.h">
+    <ClInclude Include="source\Game_Objects\Item.h">
       <Filter>Header Files\Game Objects\Interactibles</Filter>
     </ClInclude>
     <ClInclude Include="source\Game_Objects\Key.h">
@@ -120,10 +120,10 @@
     <ClInclude Include="source\Game_Objects\DestructibleWall.h">
       <Filter>Header Files\Game Objects\Interactibles</Filter>
     </ClInclude>
-    <ClInclude Include="source\Inventory.h">
+    <ClInclude Include="source\Gameplay\Inventory.h">
       <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
-    <ClInclude Include="source\LockedWall.h">
+    <ClInclude Include="source\Game_Objects\LockedWall.h">
       <Filter>Header Files\Game Objects\Interactibles</Filter>
     </ClInclude>
     <ClInclude Include="source\Game_Objects\Coin.h">
@@ -132,81 +132,81 @@
     <ClInclude Include="source\Game_Objects\ScreenCrack.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="source\RenderPass.h">
+    <ClInclude Include="source\Engine\RenderPass.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="source\File.h">
+    <ClInclude Include="source\Engine\File.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\Engine.cpp">
+    <ClCompile Include="source\Engine\Engine.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\GameObjectManager.cpp">
+    <ClCompile Include="source\Engine\GameObjectManager.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\System.cpp">
+    <ClCompile Include="source\Engine\System.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\Vertex.cpp">
+    <ClCompile Include="source\Engine\Vertex.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\Window.cpp">
+    <ClCompile Include="source\Engine\Window.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\Camera.cpp">
+    <ClCompile Include="source\Game_Objects\Camera.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="source\GameObject.cpp">
+    <ClCompile Include="source\Game_Objects\GameObject.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="source\Player.cpp">
+    <ClCompile Include="source\Game_Objects\Player.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="source\main.cpp">
+    <ClCompile Include="source\Engine\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Texture.cpp">
+    <ClCompile Include="source\Engine\Texture.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\TextureManager.cpp">
+    <ClCompile Include="source\Engine\TextureManager.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\Scene.cpp">
+    <ClCompile Include="source\Scenes\Scene.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="source\Scenes\Sandbox.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="source\SceneManager.cpp">
+    <ClCompile Include="source\Engine\SceneManager.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\MapMatrix.cpp">
+    <ClCompile Include="source\Gameplay\MapMatrix.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="source\Game_Objects\Enemy.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="source\Pool.cpp">
+    <ClCompile Include="source\Game_Objects\Pool.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="source\AttackManager.cpp">
+    <ClCompile Include="source\Gameplay\AttackManager.cpp">
       <Filter>Source Files\Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="source\InputManager.cpp">
+    <ClCompile Include="source\Engine\InputManager.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\EffectManager.cpp">
+    <ClCompile Include="source\Engine\EffectManager.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\cppShortcuts.cpp">
+    <ClCompile Include="source\Engine\cppShortcuts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\ChildObject.cpp">
+    <ClCompile Include="source\Game_Objects\ChildObject.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="source\Item.cpp">
+    <ClCompile Include="source\Game_Objects\Item.cpp">
       <Filter>Source Files\Game Objects\Interactibles</Filter>
     </ClCompile>
     <ClCompile Include="source\Game_Objects\Key.cpp">
@@ -215,10 +215,10 @@
     <ClCompile Include="source\Game_Objects\DestructibleWall.cpp">
       <Filter>Source Files\Game Objects\Interactibles</Filter>
     </ClCompile>
-    <ClCompile Include="source\Inventory.cpp">
+    <ClCompile Include="source\Gameplay\Inventory.cpp">
       <Filter>Source Files\Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="source\LockedWall.cpp">
+    <ClCompile Include="source\Game_Objects\LockedWall.cpp">
       <Filter>Source Files\Game Objects\Interactibles</Filter>
     </ClCompile>
     <ClCompile Include="source\Game_Objects\Coin.cpp">
@@ -227,24 +227,24 @@
     <ClCompile Include="source\Game_Objects\ScreenCrack.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="source\RenderPass.cpp">
+    <ClCompile Include="source\Engine\RenderPass.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="source\File.cpp">
+    <ClCompile Include="source\Engine\File.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="source\2d_frag.spv">
+    <None Include="source\Shaders\2d_frag.spv">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="source\2d_vert.spv">
+    <None Include="source\Shaders\2d_vert.spv">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="source\fisheye_frag.spv">
+    <None Include="source\Shaders\fisheye_frag.spv">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="source\post_process_vert.spv">
+    <None Include="source\Shaders\post_process_vert.spv">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

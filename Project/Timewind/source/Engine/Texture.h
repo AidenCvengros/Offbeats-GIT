@@ -1,24 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Enemy.h
+\file Texture.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.7.11
+\date 2024.3.11
 \brief
-    The base game object class representing enemies
+    The texture class holds textures for rendering detailed visuals
 
-    Public Functions:
-        + FILL
-		
-	Private Functions:
-		+ FILL
+    Functions include:
+        + [FILL]
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Enemy_H_
-#define Syncopatience_Enemy_H_
+#ifndef Syncopatience_Texture_H_
+#define Syncopatience_Texture_H_
 
 #pragma once
 
@@ -26,18 +23,21 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base include
-#include "../Engine/stdafx.h"
+#include "stdafx.h"
 
-// The base game object class
-#include "GameObject.h"
+// has the string class for filenames
+#include <string>
+
+// Includes glfw library for texture management
+#define VK_USE_PLATFORM_WIN32_KHR
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
-
-// Dependency Reference
-class Pool;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -50,10 +50,10 @@ class Pool;
 /*************************************************************************************************/
 /*!
 	\brief
-		The base enemy game object class
+		The texture class. It's a wrapper for holding textures.
 */
 /*************************************************************************************************/
-class Enemy : public GameObject
+class Texture
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -71,113 +71,95 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-	
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base enemy game object class
-			
-		\param pos
-			The position of the game object
+			Constructor for the texturee class
 
-		\param rot
-			The rotation of the game object
-
-		\param sca
-			The scale of the game object
-
-		\param drawPriority_
-			Higher draw priorities are drawn in front of objects with lower priority
-
-		\param texture_
-			The texture of the enemy object
-
-		\param mapCoords
-			The starting coordinates of the enemy
+		\param filename_
+			The name and location of the texture file
 	*/
 	/*************************************************************************************************/
-	Enemy(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords);
-	
+	Texture(std::string filename_);
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Destructor for base enemy class
+			Constructor for the texture class
+
+		\param textureWidth
+			The width of the new texture
+
+		\param textureHeight
+			The height of the new texture
+
+		\param imageFormat
+			The format for the new texture
 	*/
 	/*************************************************************************************************/
-	virtual ~Enemy();
+	Texture(int textureWidth, int textureHeight, VkFormat imageFormat);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the game object.
-
-		\param dt
-			The time elapsed since the previous frame
-
-		\param inputManager
-			The input manager
+			Destructor for the camera class
 	*/
 	/*************************************************************************************************/
-	virtual void Update(double dt, InputManager* inputManager);
+	~Texture();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Draws the child game objects
-
-		\param window
-			The game window the objects are being drawn to
+			Frees the texture from memory
 	*/
 	/*************************************************************************************************/
-	virtual void DrawChildObjects();
+	void Free();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Helper function to manage moving the enemy
-
-		\param enemyPosition
-			The current position of the enemy (will be modified if the enemy moves)
-
-		\param horizontalMove
-			The horizontal movement (positive for right, negative for left)
-
-		\param verticalMove
-			The vertical movement (positive for up, negative for left)
-
-		\param moveSpeed
-			How long the movement takes
+			Returns whether the game object should be rendered
 
 		\return
-			Returns true if the move was successful, false if not (enemyPosition is not changed if false is returned)
+			Whether the game object should be rendered
 	*/
 	/*************************************************************************************************/
-	bool MoveEnemy(std::pair<int, int>& enemyPosition, int horizontalMove, int verticalMove, double moveSpeed);
+	VkDescriptorSet* GetDescriptorSet() { return &descriptorSet; }
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Helper function to manage moving the enemy
+			Returns the texture's image view object
 
-		\param dt
-			The time elapsed since the previous frame
-
-		\param enemyPosition
-			The current position of the enemy (will be modified if the enemy moves)
+		\return
+			The texture's image view object
 	*/
 	/*************************************************************************************************/
-	virtual void Attack(double dt, std::pair<int, int>& enemyPosition);
+	VkImageView& GetImageView() { return textureImageView; }
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Deals the given amount of damage to the enemy
+			Returns the texture's sampler object
 
-		\param damage
-			The amount of damage to deal
+		\return
+			The texture's sampler object
 	*/
 	/*************************************************************************************************/
-	void DamageEnemy(float damage);
+	VkSampler& GetSampler() { return textureSampler; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Determines whether the given filename matches this texture's filename
+
+		\return
+			Whether the two filenames are the same
+	*/
+	/*************************************************************************************************/
+	friend bool operator==(const Texture& lhs, const std::string& rhs);
+	friend bool operator==(const std::string& lhs, const Texture& rhs);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -191,15 +173,119 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+	
+	std::string filename;						// The name of the texture file
 
-	double attackTimer;							// The active time on the attack
+	VkBuffer textureBuffer;						// The buffer that holds loaded textures
+	VkDeviceMemory textureBufferMemory;			// The memory pointer for the texture buffer
+	VkImage textureImage;						// The image texture
+	VkDeviceMemory textureImageMemory;			// The memory pointer to the image texture
 
-	Pool* healthPool;							// The health pool of the enemy
+	VkImageView textureImageView;				// The image view object for textures
+	VkSampler textureSampler;					// The texture image sampler
+	
+	VkDescriptorSet descriptorSet;				// The base descriptor set memory
+
+	bool freed;									// Ticks true if the texture has been freed
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
 
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Creates an image object with the given parameters
+
+		\param width
+			The width of the image
+
+		\param height
+			The height of the image
+
+		\param format
+			Format of the image
+
+		\param tiling
+			Whether and how the image should be tiled
+
+		\param usage
+			Tells how the image will be used
+
+		\param properties
+			Defines the properties of the image for Vulkan
+
+		\param image
+			Output: The image texture
+
+		\param imageMemory
+			Output: The image pointer in memory
+	*/
+	/*********************************************************************************************/
+	void CreateImage(
+		uint32_t width, uint32_t height,
+		VkFormat format,
+		VkImageTiling tiling,
+		VkImageUsageFlags usage,
+		VkMemoryPropertyFlags properties,
+		VkImage& image,
+		VkDeviceMemory& imageMemory);
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Makes sure image data is formatted correctly to be written to the screen
+	
+		\param image
+			The image being formatted
+	
+		\param format
+			The format for the image
+	
+		\param oldLayout
+			The old data layout
+	
+		\param newLayout
+			The new data layout
+	*/
+	/*********************************************************************************************/
+	void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Converts the given buffer data into a Vulkan image
+	
+		\param buffer
+			The given buffer data
+	
+		\param image
+			The vulkan image converted to
+	
+		\param width
+			The width the image
+	
+		\param height
+			The height of the image
+	*/
+	/*********************************************************************************************/
+	void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Creates a texture sampler object
+	*/
+	/*********************************************************************************************/
+	void CreateTextureSampler();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Creates a descriptor set for the texture
+	*/
+	/*********************************************************************************************/
+	void CreateTextureDescriptorSet();
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -210,4 +296,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Enemy_H_
+#endif // Syncopatience_Texture_H_

@@ -1,21 +1,24 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file GameObjectManager.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2024.2.10
 \brief
-    Sandbox level for quick testing
+    Manager to keep track of all game objects in a scene and ensure they get drawn, cleared, loaded, etc.
 
-    Functions include:
-        + [FILL]
+    Public Functions:
+        + FILL
+		
+	Private Functions:
+		+ FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_GameObjectManager_H_
+#define Syncopatience_GameObjectManager_H_
 
 #pragma once
 
@@ -23,15 +26,20 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
-#include "../Engine/stdafx.h"
+#include "stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// The system base class
+#include "System.h"
+
+// The list type to hold all the game objects
+#include <map>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
+
+// Dependency Reference
+class GameObject;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -44,10 +52,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		The game object manager class
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class GameObjectManager : public System
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -65,41 +73,73 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the game object manager class
+	*/
+	/*************************************************************************************************/
+	GameObjectManager() {}
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for the game object manager class
+	*/
+	/*************************************************************************************************/
+	~GameObjectManager() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
-
-		\param engine_
-			The engine the scene is loaded into
+			Initializes the game object manager
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
+	void Init();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Deconstructor for the base scene class
+			Updates all game objects.
+
+		\param
+			The time elapsed since the previous frame.
 	*/
 	/*************************************************************************************************/
-	~Sandbox() {}
+	void Update(double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Draws the game objects in the manager to the screen.
 	*/
 	/*************************************************************************************************/
-	void LoadScene();
+	void Draw();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Shuts down the game object manager and all game objects in it.
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	void Shutdown();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Draws the glitched game objects in the manager to the screen.
+	*/
+	/*************************************************************************************************/
+	void DrawGlitches();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Adds a game object to the manager's list.
+	*/
+	/*************************************************************************************************/
+	void AddGameObject(GameObject* newGameObject);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -113,11 +153,12 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+	
+	std::multimap<int, GameObject*> gameObjectList;			// The list of game objects being managed
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +169,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_GameObjectManager_H_

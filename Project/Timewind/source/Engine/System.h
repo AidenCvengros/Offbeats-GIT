@@ -1,21 +1,28 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file System.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2023.9.9
 \brief
-    Sandbox level for quick testing
+    Creates the base system class that can be run by the game engine
 
-    Functions include:
-        + [FILL]
+    Public Functions:
+        + System
+		+ ~System
+		+ Init
+		+ Update
+		+ Draw
+		+ Shutdown
+		
+	Private Functions:
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_System_H_
+#define Syncopatience_System_H_
 
 #pragma once
 
@@ -23,11 +30,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
-#include "../Engine/stdafx.h"
-
-// The base scene class
-#include "Scene.h"
+#include "stdafx.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,10 +47,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		The base class for game engine systems
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class System
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -65,41 +68,57 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for base system class
+	*/
+	/*************************************************************************************************/
+	System();
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for System class
+	*/
+	/*************************************************************************************************/
+	~System();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
-
-		\param engine_
-			The engine the scene is loaded into
+			Initializes the system. Virtual function that must be overwritten by derived class
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
+	virtual void Init() = 0;
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Deconstructor for the base scene class
+			Updates the system. Virtual function that must be overwritten by derived class
+
+		\param
+			The time elapsed since the previous frame.
 	*/
 	/*************************************************************************************************/
-	~Sandbox() {}
+	virtual void Update(double dt) = 0;
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Draws the system to the screen. Virtual function that must be overwritten by derived class
 	*/
 	/*************************************************************************************************/
-	void LoadScene();
+	virtual void Draw() = 0;
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Shuts down the system. Virtual function that must be overwritten by derived class
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	virtual void Shutdown() = 0;
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -113,11 +132,10 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-
+	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +146,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_System_H_

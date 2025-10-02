@@ -18,13 +18,15 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
+// Base includes
 #include "DestructibleWall.h"
+#include "../Engine/cppShortcuts.h"
 
-#include "../cppShortcuts.h"
+// Includes the game object manager to add the inside object when destroyed
+#include "../Engine/GameObjectManager.h"
 
-#include "../GameObjectManager.h"
-#include "../SceneManager.h"
-#include "../MapMatrix.h"
+// Includes the map matrix to be updated when destroyed
+#include "../Gameplay/MapMatrix.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants

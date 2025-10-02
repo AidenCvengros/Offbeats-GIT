@@ -159,94 +159,94 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="source\AttackManager.h" />
-    <ClInclude Include="source\Camera.h" />
-    <ClInclude Include="source\ChildObject.h" />
-    <ClInclude Include="source\cppShortcuts.h" />
-    <ClInclude Include="source\EffectManager.h" />
-    <ClInclude Include="source\Engine.h" />
-    <ClInclude Include="source\File.h" />
-    <ClInclude Include="source\GameObject.h" />
-    <ClInclude Include="source\GameObjectManager.h" />
+    <ClInclude Include="source\Gameplay\AttackManager.h" />
+    <ClInclude Include="source\Game_Objects\Camera.h" />
+    <ClInclude Include="source\Game_Objects\ChildObject.h" />
+    <ClInclude Include="source\Engine\cppShortcuts.h" />
+    <ClInclude Include="source\Engine\EffectManager.h" />
+    <ClInclude Include="source\Engine\Engine.h" />
+    <ClInclude Include="source\Engine\File.h" />
+    <ClInclude Include="source\Game_Objects\GameObject.h" />
+    <ClInclude Include="source\Engine\GameObjectManager.h" />
     <ClInclude Include="source\Game_Objects\Coin.h" />
     <ClInclude Include="source\Game_Objects\DestructibleWall.h" />
     <ClInclude Include="source\Game_Objects\Enemy.h" />
     <ClInclude Include="source\Game_Objects\ScreenCrack.h" />
-    <ClInclude Include="source\InputManager.h" />
-    <ClInclude Include="source\Inventory.h" />
-    <ClInclude Include="source\Item.h" />
+    <ClInclude Include="source\Engine\InputManager.h" />
+    <ClInclude Include="source\Gameplay\Inventory.h" />
+    <ClInclude Include="source\Game_Objects\Item.h" />
     <ClInclude Include="source\Game_Objects\Key.h" />
-    <ClInclude Include="source\LockedWall.h" />
-    <ClInclude Include="source\MapMatrix.h" />
-    <ClInclude Include="source\Player.h" />
-    <ClInclude Include="source\Pool.h" />
-    <ClInclude Include="source\RenderPass.h" />
-    <ClInclude Include="source\Scene.h" />
-    <ClInclude Include="source\SceneManager.h" />
+    <ClInclude Include="source\Game_Objects\LockedWall.h" />
+    <ClInclude Include="source\Gameplay\MapMatrix.h" />
+    <ClInclude Include="source\Game_Objects\Player.h" />
+    <ClInclude Include="source\Game_Objects\Pool.h" />
+    <ClInclude Include="source\Engine\RenderPass.h" />
+    <ClInclude Include="source\Scenes\Scene.h" />
+    <ClInclude Include="source\Engine\SceneManager.h" />
     <ClInclude Include="source\Scenes\Sandbox.h" />
-    <ClInclude Include="source\stdafx.h" />
-    <ClInclude Include="source\System.h" />
-    <ClInclude Include="source\Texture.h" />
-    <ClInclude Include="source\TextureManager.h" />
-    <ClInclude Include="source\Vertex.h" />
-    <ClInclude Include="source\Window.h" />
+    <ClInclude Include="source\Engine\stdafx.h" />
+    <ClInclude Include="source\Engine\System.h" />
+    <ClInclude Include="source\Engine\Texture.h" />
+    <ClInclude Include="source\Engine\TextureManager.h" />
+    <ClInclude Include="source\Engine\Vertex.h" />
+    <ClInclude Include="source\Engine\Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\AttackManager.cpp" />
-    <ClCompile Include="source\Camera.cpp" />
-    <ClCompile Include="source\ChildObject.cpp" />
-    <ClCompile Include="source\cppShortcuts.cpp" />
-    <ClCompile Include="source\EffectManager.cpp" />
-    <ClCompile Include="source\Engine.cpp" />
-    <ClCompile Include="source\File.cpp" />
-    <ClCompile Include="source\GameObject.cpp" />
-    <ClCompile Include="source\GameObjectManager.cpp" />
+    <ClCompile Include="source\Gameplay\AttackManager.cpp" />
+    <ClCompile Include="source\Game_Objects\Camera.cpp" />
+    <ClCompile Include="source\Game_Objects\ChildObject.cpp" />
+    <ClCompile Include="source\Engine\cppShortcuts.cpp" />
+    <ClCompile Include="source\Engine\EffectManager.cpp" />
+    <ClCompile Include="source\Engine\Engine.cpp" />
+    <ClCompile Include="source\Engine\File.cpp" />
+    <ClCompile Include="source\Game_Objects\GameObject.cpp" />
+    <ClCompile Include="source\Engine\GameObjectManager.cpp" />
     <ClCompile Include="source\Game_Objects\Coin.cpp" />
     <ClCompile Include="source\Game_Objects\DestructibleWall.cpp" />
     <ClCompile Include="source\Game_Objects\Enemy.cpp" />
     <ClCompile Include="source\Game_Objects\ScreenCrack.cpp" />
-    <ClCompile Include="source\InputManager.cpp" />
-    <ClCompile Include="source\Inventory.cpp" />
-    <ClCompile Include="source\Item.cpp" />
+    <ClCompile Include="source\Engine\InputManager.cpp" />
+    <ClCompile Include="source\Gameplay\Inventory.cpp" />
+    <ClCompile Include="source\Game_Objects\Item.cpp" />
     <ClCompile Include="source\Game_Objects\Key.cpp" />
-    <ClCompile Include="source\LockedWall.cpp" />
-    <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\MapMatrix.cpp" />
-    <ClCompile Include="source\Player.cpp" />
-    <ClCompile Include="source\Pool.cpp" />
-    <ClCompile Include="source\RenderPass.cpp" />
-    <ClCompile Include="source\Scene.cpp" />
-    <ClCompile Include="source\SceneManager.cpp" />
+    <ClCompile Include="source\Game_Objects\LockedWall.cpp" />
+    <ClCompile Include="source\Engine\main.cpp" />
+    <ClCompile Include="source\Gameplay\MapMatrix.cpp" />
+    <ClCompile Include="source\Game_Objects\Player.cpp" />
+    <ClCompile Include="source\Game_Objects\Pool.cpp" />
+    <ClCompile Include="source\Engine\RenderPass.cpp" />
+    <ClCompile Include="source\Scenes\Scene.cpp" />
+    <ClCompile Include="source\Engine\SceneManager.cpp" />
     <ClCompile Include="source\Scenes\Sandbox.cpp" />
-    <ClCompile Include="source\System.cpp" />
-    <ClCompile Include="source\Texture.cpp" />
-    <ClCompile Include="source\TextureManager.cpp" />
-    <ClCompile Include="source\Vertex.cpp" />
-    <ClCompile Include="source\Window.cpp" />
+    <ClCompile Include="source\Engine\System.cpp" />
+    <ClCompile Include="source\Engine\Texture.cpp" />
+    <ClCompile Include="source\Engine\TextureManager.cpp" />
+    <ClCompile Include="source\Engine\Vertex.cpp" />
+    <ClCompile Include="source\Engine\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="source\2d_frag.spv">
+    <None Include="source\Shaders\2d_frag.spv">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </None>
-    <None Include="source\2d_vert.spv">
+    <None Include="source\Shaders\2d_vert.spv">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </None>
-    <None Include="source\fisheye_frag.spv">
+    <None Include="source\Shaders\fisheye_frag.spv">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </None>
-    <None Include="source\post_process_vert.spv">
+    <None Include="source\Shaders\post_process_vert.spv">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

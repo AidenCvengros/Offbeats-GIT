@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file Scene.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
 \date 2024.5.22
 \brief
-    Sandbox level for quick testing
+    The base scene class to facilitate scene functionality
 
     Functions include:
         + [FILL]
@@ -14,8 +14,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_Scene_H_
+#define Syncopatience_Scene_H_
 
 #pragma once
 
@@ -23,11 +23,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
+// Base include
 #include "../Engine/stdafx.h"
-
-// The base scene class
-#include "Scene.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,10 +41,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		The base scene class
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class Scene
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -70,12 +67,9 @@ public:
 	/*!
 		\brief
 			Constructor for the base scene class
-
-		\param engine_
-			The engine the scene is loaded into
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
+	Scene();
 
 	/*************************************************************************************************/
 	/*!
@@ -83,7 +77,7 @@ public:
 			Deconstructor for the base scene class
 	*/
 	/*************************************************************************************************/
-	~Sandbox() {}
+	~Scene();
 
 	/*************************************************************************************************/
 	/*!
@@ -91,15 +85,15 @@ public:
 			Loads in all the objects of the scene
 	*/
 	/*************************************************************************************************/
-	void LoadScene();
+	virtual void LoadScene() = 0;
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Unloads all the objects of the scene
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	virtual void UnloadScene() = 0;
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -113,11 +107,13 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-
+	
+	// Determines whether the scene is in use
+	bool inUse;
+	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +124,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_Scene_H_

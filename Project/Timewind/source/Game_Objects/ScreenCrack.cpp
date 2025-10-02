@@ -18,9 +18,9 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
+// Base includes
 #include "ScreenCrack.h"
-
-#include "../cppShortcuts.h"
+#include "../Engine/cppShortcuts.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants

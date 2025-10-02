@@ -1,0 +1,720 @@
+/*************************************************************************************************/
+/*!
+\file Player.cpp
+\author Aiden Cvengros
+\par email: ajcvengros\@gmail.com
+\date 2024.2.16
+\brief
+    The game object representing the player
+
+    Functions include:
+        + FILL
+
+Copyright (c) 2023 Aiden Cvengros
+*/
+/*************************************************************************************************/
+
+//-------------------------------------------------------------------------------------------------
+// Include Header Files
+//-------------------------------------------------------------------------------------------------
+
+// Base includes
+#include "Player.h"
+#include "../Engine/cppShortcuts.h"
+
+// The inventory class
+#include "../Gameplay/Inventory.h"
+
+// The input manager class so the player can use inputs
+#include "../Engine/InputManager.h"
+
+// The map matrix class so the player can exist within the map
+#include "../Gameplay/MapMatrix.h"
+
+// Other game object classes so the player can interact with them
+#include "Enemy.h"
+#include "LockedWall.h"
+#include "Item.h"
+#include "Key.h"
+
+//-------------------------------------------------------------------------------------------------
+// Private Constants
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// Public Declarations
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// Private Variables
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// Public Function Declarations
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// Private Function Declarations
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// Public Function Definitions
+//-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Constructor for the player game object class
+
+	\param scene
+		The scene that this game object is in
+
+	\param pos
+		The position of the game object
+
+	\param rot
+		The rotation of the game object
+
+	\param sca
+		The scale of the game object
+
+	\param drawPriority_
+		Higher draw priorities are drawn in front of objects with lower priority
+
+	\param texture_
+		The texture of the player object
+
+	\param mapCoords
+		The starting coordinates of the player
+*/
+/*************************************************************************************************/
+Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
+	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
+	jumpPhase(0),
+	playerPrevPos(mapCoords),
+	timeSinceMove(0.0),
+	fallingDelay(0),
+	actionQueued(PlayerActions::NOATTACK),
+	jumpAttacked(false)
+{
+	_MapMatrix->SetPlayerPosition(mapCoords, this);
+	inventory = new Inventory();
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Destructor for the player class
+*/
+/*************************************************************************************************/
+Player::~Player()
+{
+	delete inventory;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Updates the game object.
+
+	\param dt
+		The time elapsed since the previous frame
+*/
+/*************************************************************************************************/
+void Player::Update(double dt)
+{
+	// Updates movements if any are active
+	if (GetMoving())
+	{
+		MoveToUpdate(dt);
+	}
+
+	std::pair playerPosition = _MapMatrix->GetPlayerPosition();
+
+	// The buffer zone
+	bool shortHopAttack = false;
+	if (GetIsMoving() == true)
+	{
+		// Jump buffer for having just started a grounded movement
+		if (jumpPhase == 0 && timeSinceMove < 0.1 && _InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
+		{
+			if (MovePlayer(playerPrevPos, 0, 1, 0.07))
+			{
+				jumpPhase = 1;
+			}
+		}
+
+		// Pressing attack and jump together should let you attack at the lowest part of your jump
+		//if (jumpPhase = 1 && timeSinceMove < 0.05 && inputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
+		//{
+		//	shortHopAttack = true;
+		//}
+	
+		// Updates the time since move tracker
+		timeSinceMove += dt;
+	}
+
+	// Checks for actions being set
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
+	{
+		actionQueued = PlayerActions::INTERACT;
+	}
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
+	{
+		actionQueued = PlayerActions::JUMP;
+	}
+
+	// Performs attacks if queued
+	Interact(dt, playerPosition);
+	
+	// Checks that the previous movement finished
+	if (GetIsMoving() == false && jumpPhase == 0)
+	{
+		// Checks if the player isn't grounded
+		if (_MapMatrix->GetTile(playerPosition.first, playerPosition.second - 1).tileStatus < MapMatrix::TileStatus::Player)
+		{
+			// Begin falling
+			jumpPhase = 3;
+		}
+
+		// Checks for a jump (start of jump is quick up one tile
+		else if (actionQueued == PlayerActions::JUMP || _InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Held)
+		{
+			if (MovePlayer(playerPosition, 0, 1, 0.07))
+			{
+				jumpPhase = 1;
+			}
+		}
+
+		// Checks for moving right
+		else if (CheckInput(InputManager::Inputs::Right))
+		{
+			MovePlayer(playerPosition, 1, 0, 0.25);
+		}
+		// Checks for moving left
+		else if (CheckInput(InputManager::Inputs::Left))
+		{
+			MovePlayer(playerPosition, -1, 0, 0.25);
+		}
+
+		// Resets the grounded check for jump attacks
+		jumpAttacked = false;
+		actionQueued = PlayerActions::NOATTACK;
+	}
+
+	if (shortHopAttack)
+	{
+		actionQueued = PlayerActions::INTERACT;
+	}
+
+	// Checks for end of jump phase 1 (float to apex of jump)
+	if (GetIsMoving() == false && jumpPhase == 1)
+	{
+		// First checks if the space directly above is occupied (if it is we hit a ceiling and start falling)
+		if (_MapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus < MapMatrix::TileStatus::Player)
+		{
+			InteractWithTile(playerPosition.first, playerPosition.second + 1, true, true);
+
+			// Boolean to save on rewriting the code for jumping straight up if certain spaces are preventing sideways movement
+			bool jumpUp = true;
+
+			// Checks for moving right
+			if (CheckInput(InputManager::Inputs::Right))
+			{
+				// Checks if the space diagonally up is occupied (if it is we'll just treat it as a jump straight up)
+				if (_MapMatrix->GetTile(playerPosition.first + 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
+				{
+					// Attempt to move the player up and to the right
+					if (MovePlayer(playerPosition, 1, 2, 0.225) == false)
+					{
+						// If the move was unsuccessful, then we move to the open space diagonally up
+						if (MovePlayer(playerPosition, 1, 1, 0.225) == false)
+						{
+							// If the move was unsuccessful, moves into the open space to the side
+							MovePlayer(playerPosition, 1, 0, 0.225);
+						}
+					}
+
+					// Either way we should have moved, so we don't need the jump up routine
+					jumpUp = false;
+				}
+			}
+			// Checks for moving left
+			else if (CheckInput(InputManager::Inputs::Left))
+			{
+				// Checks if the space diagonally up is occupied (if it is we'll just treat it as a jump straight up)
+				if (_MapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
+				{
+					// Attempt to move the player up and to the left
+					if (MovePlayer(playerPosition, -1, 2, 0.225) == false)
+					{
+						// If the move was unsuccessful, then we move to the open space diagonally up
+						if (MovePlayer(playerPosition, -1, 1, 0.225) == false)
+						{
+							// If the move was unsuccessful, moves into the open space to the side
+							MovePlayer(playerPosition, -1, 0, 0.225);
+						}
+					}
+
+					// Either way we should have moved, so we don't need the jump up routine
+					jumpUp = false;
+				}
+			}
+			// Checks for moving up
+			if (jumpUp)
+			{
+				// Attempts to move the full distance up
+				if (MovePlayer(playerPosition, 0, 2, 0.225) == false)
+				{
+					// If the full upward movement fails, only goes up one space
+					MovePlayer(playerPosition, 0, 1, 0.15);
+				}
+			}
+		}
+		else
+		{
+			InteractWithTile(playerPosition.first, playerPosition.second + 1, true, true);
+		}
+
+		jumpPhase = 2;
+	}
+	// Checks for end of jump phase 2 (apex of jump)
+	if (GetIsMoving() == false && jumpPhase == 2)
+	{
+		// Checks for moving right
+		if (CheckInput(InputManager::Inputs::Right))
+		{
+			MovePlayer(playerPosition, 1, 0, 0.15);
+		}
+		// Checks for moving left
+		else if (CheckInput(InputManager::Inputs::Left))
+		{
+			MovePlayer(playerPosition, -1, 0, 0.15);
+		}
+		// Otherwise hangs in the air
+		else
+		{
+			MoveTo(GetPosition(), 0.15, false);
+		}
+
+		// Afterwards continues the jump
+		jumpPhase = 3;
+	}
+	// Checks for end of jump phase 3 (begin falling)
+	if (GetIsMoving() == false && jumpPhase == 3)
+	{
+		// First checks if the space directly below is occupied (if it is we're grounded)
+		if (_MapMatrix->GetTile(playerPosition.first, playerPosition.second - 1).tileStatus != MapMatrix::TileStatus::Empty)
+		{
+			jumpPhase = 0;
+		}
+		// Otherwise falls
+		else
+		{
+			// Boolean to save on rewriting the code for falling straight down if certain spaces are preventing sideways movement
+			bool fallDown = true;
+
+			// Checks for moving right
+			if (CheckInput(InputManager::Inputs::Right))
+			{
+				// Checks if the space diagonally down is occupied (if it is we'll just treat it as a fall straight down)
+				if (_MapMatrix->GetTile(playerPosition.first + 1, playerPosition.second - 1).tileStatus == MapMatrix::TileStatus::Empty)
+				{
+					// Attempt to move the player down and to the right
+					if (MovePlayer(playerPosition, 1, -2, 0.225) == false)
+					{
+						// If the move was unsuccessful, then we move to the open space diagonally down
+						MovePlayer(playerPosition, 1, -1, 0.15);
+					}
+
+					// Either way we should have moved, so we don't need the fall down routine
+					fallDown = false;
+				}
+			}
+			// Checks for moving left
+			else if (CheckInput(InputManager::Inputs::Left))
+			{
+				// Checks if the space diagonally down is occupied (if it is we'll just treat it as a fall straight down)
+				if (_MapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
+				{
+					// Attempt to move the player down and to the left
+					if (MovePlayer(playerPosition, -1, -2, 0.225) == false)
+					{
+						// If the move was unsuccessful, then we move to the open space diagonally down
+						MovePlayer(playerPosition, -1, -1, 0.15);
+					}
+
+					// Either way we should have moved, so we don't need the fall down routine
+					fallDown = false;
+				}
+			}
+			// Checks for falling straight down
+			if (fallDown)
+			{
+				// Attempts to move the full distance down
+				if (MovePlayer(playerPosition, 0, -2, 0.225) == false)
+				{
+					// If the full downward movement fails, only goes down one space
+					MovePlayer(playerPosition, 0, -1, 0.15);
+				}
+			}
+
+			// Marks that jump phase 3 has been resolved
+			jumpPhase = 4;
+		}
+	}
+	// Checks for end of jump phase 4 (Quick fall into possible landing)
+	if (GetIsMoving() == false && jumpPhase == 4)
+	{
+		// Attempts to move down
+		if (fallingDelay >= 2)
+		{
+			if (CheckInput(InputManager::Inputs::Right))
+			{
+				if (MovePlayer(playerPosition, 1, -1, 0.07) == false)
+				{
+					jumpPhase = 0;
+				}
+			}
+			else if (CheckInput(InputManager::Inputs::Left))
+			{
+				if (MovePlayer(playerPosition, -1, -1, 0.07) == false)
+				{
+					jumpPhase = 0;
+				}
+			}
+			else
+			{
+				if (MovePlayer(playerPosition, 0, -1, 0.07) == false)
+				{
+					// If there is ground below, becomes grounded
+					jumpPhase = 0;
+				}
+			}
+			
+			// Resets the falling delay
+			fallingDelay = 0;
+		}
+		else if (MovePlayer(playerPosition, 0, -1, 0.07) == false)
+		{
+			// If there is ground below, becomes grounded
+			jumpPhase = 0;
+			fallingDelay = 0;
+		}
+		else
+		{
+			fallingDelay++;
+		}
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
+// Private Function Definitions
+//-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Returns whether the given input was either pressed or held
+
+	\param input
+		The given input
+
+	\return
+		Whether the input was pressed or held
+*/
+/*************************************************************************************************/
+bool Player::CheckInput(InputManager::Inputs input)
+{
+	return _InputManager->CheckInputStatus(input) == InputManager::InputStatus::Pressed
+		|| _InputManager->CheckInputStatus(input) == InputManager::InputStatus::Held;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to manage moving the player
+
+	\param playerPosition
+		The current position of the player (will be modified if the player moves)
+
+	\param horizontalMove
+		The horizontal movement (positive for right, negative for left)
+
+	\param verticalMove
+		The vertical movement (positive for up, negative for left)
+
+	\param moveSpeed
+		How long the movement takes
+
+	\return
+		Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+*/
+/*************************************************************************************************/
+bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, double moveSpeed)
+{
+	// Corrects if the player is facing right or left
+	if (horizontalMove > 0)
+	{
+		SetIsFacingRight(true);
+	}
+	else if (horizontalMove < 0)
+	{
+		SetIsFacingRight(false);
+	}
+
+	// Get values for the target tile
+	int newXCoord = playerPosition.first + horizontalMove;
+	int newYCoord = playerPosition.second + verticalMove;
+	MapMatrix::MapTile targetTile = _MapMatrix->GetTile(newXCoord, newYCoord);
+
+	// If we are moving into a key or door, interact with it
+	InteractWithTile(newXCoord, newYCoord, false, true);
+
+	// If we are moving upwards and trying to go into a destructible block, destroys that block
+	if (verticalMove > 0)
+	{
+		if (targetTile.tileStatus == MapMatrix::TileStatus::Destructible && _MapMatrix->SetPlayerPosition(newXCoord, newYCoord - 1, this))
+		{
+			// Moves the player to underneath that block
+			_MapMatrix->ClearTile(newXCoord, newYCoord);
+			playerPosition = { newXCoord, newYCoord - 1 };
+			MoveTo(glm::vec2(ConvertMapCoordsToWorldCoords(playerPosition)), moveSpeed, false);
+			SetMapCoords(playerPosition);
+			jumpPhase = 2;
+
+			// Resets time since moving
+			timeSinceMove = 0.0;
+			actionQueued = PlayerActions::NOATTACK;
+
+			// Now that the player has been moved, returns true
+			return true;
+		}
+	}
+
+	// Moves the player
+	if (_MapMatrix->SetPlayerPosition(newXCoord, newYCoord, this))
+	{
+		playerPrevPos = playerPosition;
+		playerPosition.first = newXCoord;
+		playerPosition.second = newYCoord;
+		MoveTo(glm::vec2(ConvertMapCoordToWorldCoord(playerPosition.first), ConvertMapCoordToWorldCoord(playerPosition.second)), moveSpeed, false);
+		SetMapCoords(playerPosition);
+
+		// Resets time since moving
+		timeSinceMove = 0.0;
+		actionQueued = PlayerActions::NOATTACK;
+
+		// Since the move was successful, returns true
+		return true;
+	}
+
+	// If the move failed, returns false
+	return false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function that moves the player to the given map position
+
+	\param newPosition
+		The new map position for the player
+
+	\param moveSpeed
+		How long the movement takes
+
+	\return
+		Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+*/
+/*************************************************************************************************/
+bool Player::MovePlayer(std::pair<int, int>& newPosition, double moveSpeed)
+{
+	// Gets the player's current position
+	std::pair<int, int> currentPosition = _MapMatrix->GetPlayerPosition();
+
+	// Calculates the offsets
+	int xOffset = newPosition.first - currentPosition.first;
+	int yOffset = newPosition.second - currentPosition.second;
+
+	// Moves the player
+	return MovePlayer(currentPosition, xOffset, yOffset, moveSpeed);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to update the coordinates of what square the player is in
+*/
+/*************************************************************************************************/
+void Player::UpdatePlayerCoords()
+{
+	std::pair<int, int> playerCoords = ConvertWorldCoordsToMapCoords(GetPosition().x, GetPosition().y);
+
+	if (playerCoords != _MapMatrix->GetPlayerPosition())
+	{
+		MovePlayer(playerCoords, 0.0f);
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to manage moving the player
+
+	\param dt
+		The time elapsed since the previous frame
+
+	\param playerPosition
+		The current position of the player (will be modified if the player moves)
+*/
+/*************************************************************************************************/
+void Player::Interact(double dt, std::pair<int, int>& playerPosition)
+{
+	// Checks if the player is starting an attack
+	if (actionQueued == PlayerActions::INTERACT)
+	{
+		// If the player isn't moving, they can start the attack
+		if (GetIsMoving() == false)
+		{
+			// If it's a basic attack, progresses the basic attack
+			//if (actionQueued == PlayerActions::INTERACT)
+			//{
+			//	//ProgressBasicAttack();
+			//}
+
+			std::pair<int, int> interactionCoords = _MapMatrix->CalculateOffsetTile(GetMapCoords(), GetIsFacingRight(), 1);
+			InteractWithTile(interactionCoords, true, true);
+		}
+		// If the player is doing a move, they count as moving, so we check if we can cancel the current move into the new move
+		//else
+		//{
+		//	auto currentAttack = attackManager.GetCurrentAttackStatus();
+		//
+		//	// Checks that there is an attack happening
+		//	if (currentAttack.attackType != AttackManager::AttackTypes::NullAttack)
+		//	{
+		//		// Checks if the current attack are part of the basic combo
+		//		if (currentAttack.attackType == AttackManager::AttackTypes::Slash1 || currentAttack.attackType == AttackManager::AttackTypes::Slash2)
+		//		{
+		//			// Checks if the current attack is past the startup step
+		//			if (currentAttack.attackPhase == AttackManager::AttackPhase::Active || currentAttack.attackPhase == AttackManager::AttackPhase::Ending)
+		//			{
+		//				// Checks if we are continuing the basic combo
+		//				if (actionQueued == PlayerActions::BASICATTACK)
+		//				{
+		//					ProgressBasicAttack();
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
+
+		// Checks if the player is jumping
+		//if (jumpPhase > 0)
+		//{
+		//	jumpAttacked = true;
+		//}
+	}
+
+	// Updates the attack manager
+	//attackManager.UpdateAttacks(mapMatrix, dt);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Starts and manages the three hit basic attack combo
+*/
+/*************************************************************************************************/
+//void Player::ProgressBasicAttack()
+//{
+//	// Checks if we are already in the combo
+//	if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash1)
+//	{
+//		attackManager.StartAttack(AttackManager::AttackTypes::Slash2, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
+//		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash2), false);
+//	}
+//	else if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash2)
+//	{
+//		attackManager.StartAttack(AttackManager::AttackTypes::Slash3, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
+//		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash3), false);
+//	}
+//	// Otherwise starts the first slash
+//	else
+//	{
+//		// Only allows a single attack sequence per jump
+//		if (jumpPhase == 0 || jumpAttacked == false)
+//		{
+//			attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
+//			MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash1), false);
+//
+//			// If we are jumping, marks this as the jump attack
+//			if (jumpPhase > 0)
+//			{
+//				jumpAttacked = true;
+//			}
+//		}
+//	}
+//
+//	// Clears the queued attack now that an attack has been started
+//	actionQueued = PlayerActions::NOATTACK;
+//}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to manage interacting with tiles
+
+	\param targetTileCoords
+		The tile being interacted with
+
+	\param destructibles
+		Whether this interaction should destroy objects
+
+	\param collectibles
+		Whether this interaction should collect objects
+*/
+/*************************************************************************************************/
+void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destructibles, bool collectibles)
+{
+	// Gets the tile
+	MapMatrix::MapTile targetTile = _MapMatrix->GetTile(targetTileCoords);
+
+	// Destroys destructible walls
+	if (destructibles)
+	{
+		if (targetTile.tileStatus == MapMatrix::TileStatus::Destructible)
+		{
+			_MapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+		}
+	}
+
+	// Grabs collectibles and adds it to inventory
+	if (collectibles)
+	{
+		// Checks for key
+		if (targetTile.tileStatus == MapMatrix::TileStatus::Key && targetTile.tileObject && ((Item*)targetTile.tileObject)->GetItemType() == Item::ItemType::Key)
+		{
+			if (inventory->AddKey((Key*)targetTile.tileObject))
+			{
+				_MapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+			}
+		}
+		// Checks for coin
+		if (targetTile.tileStatus == MapMatrix::TileStatus::Coin)
+		{
+			inventory->AddCoin();
+			_MapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+		}
+	}
+
+	// Opens doors
+	if (targetTile.tileStatus == MapMatrix::TileStatus::LockedDoor && targetTile.tileObject)
+	{
+		if (inventory->HaveKey(((LockedWall*)targetTile.tileObject)->GetKeyValue()))
+		{
+			_MapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+		}
+	}
+}

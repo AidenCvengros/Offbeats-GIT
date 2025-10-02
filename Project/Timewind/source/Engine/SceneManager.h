@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Sandbox.h
+\file SceneManager.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
 \date 2024.5.22
 \brief
-    Sandbox level for quick testing
+    Manages loading, unloading, and running scenes
 
     Functions include:
         + [FILL]
@@ -14,8 +14,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Sandbox_H_
-#define Syncopatience_Sandbox_H_
+#ifndef Syncopatience_SceneManager_H_
+#define Syncopatience_SceneManager_H_
 
 #pragma once
 
@@ -23,15 +23,26 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
-#include "../Engine/stdafx.h"
+#include "stdafx.h"
 
-// The base scene class
-#include "Scene.h"
+// Gets the base system class
+#include "System.h"
+
+// The scene class
+#include "../Scenes/Scene.h"
+
+// Uses vectors to hold the list of available scenes
+#include <vector>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
+
+// Forward references the engine class to prevent header loops
+class Engine;
+
+// Dependency reference
+class MapMatrix;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -44,10 +55,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The sandbox scene used for quick testing
+		Manages scenes in the game
 */
 /*************************************************************************************************/
-class Sandbox : public Scene
+class SceneManager : public System
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -69,37 +80,64 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
-
-		\param engine_
-			The engine the scene is loaded into
+			Constructor for the texture manager class
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
+	SceneManager();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Deconstructor for the base scene class
+			Destructor for the scene manager class
 	*/
 	/*************************************************************************************************/
-	~Sandbox() {}
+	~SceneManager() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Initializes the scene manager (defaults to: sandbox)
 	*/
 	/*************************************************************************************************/
-	void LoadScene();
+	void Init();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Updates the current scene
+
+		\param
+			The time elapsed since the previous frame.
 	*/
 	/*************************************************************************************************/
-	void UnloadScene();
+	void Update(double dt);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Draws the current scene (currently empty)
+	*/
+	/*************************************************************************************************/
+	void Draw();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Shuts down the scene manager and the current scene
+	*/
+	/*************************************************************************************************/
+	void Shutdown();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets the current scene being run
+
+		\return
+			The current scene
+	*/
+	/*************************************************************************************************/
+	Scene* GetCurrentScene() { return sceneList[currentSceneIndex]; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -114,10 +152,14 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 
+	std::vector<Scene*> sceneList;				// The list of scenes
+	int currentSceneIndex;						// The index of the current scene
+	int nextSceneIndex;							// The index of the next scene
+	bool changeScene;							// Boolean telling whether the scene should change
+	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +170,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Sandbox_H_
+#endif // Syncopatience_SceneManager_H_

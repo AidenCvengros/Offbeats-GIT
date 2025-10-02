@@ -1,24 +1,26 @@
 /*************************************************************************************************/
 /*!
-\file Enemy.h
+\file AttackManager.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.7.11
+\date 2024.9.6
 \brief
-    The base game object class representing enemies
+    Manages the player's attacks.
 
-    Public Functions:
-        + FILL
-		
-	Private Functions:
-		+ FILL
+    Functions include:
+        + AttackManager
+		+ ~AttackManager
+		+ UpdateAttacks
+		+ StartAttack
+		+ EndAttack
+		+ GetAttackStatus
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Enemy_H_
-#define Syncopatience_Enemy_H_
+#ifndef Syncopatience_AttackManager_H_
+#define Syncopatience_AttackManager_H_
 
 #pragma once
 
@@ -29,15 +31,15 @@ Copyright (c) 2023 Aiden Cvengros
 // Base include
 #include "../Engine/stdafx.h"
 
-// The base game object class
-#include "GameObject.h"
+// The actions are stored in a vector list
+#include <vector>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
-// Dependency Reference
-class Pool;
+// Dependency reference
+class GameObject;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -50,19 +52,51 @@ class Pool;
 /*************************************************************************************************/
 /*!
 	\brief
-		The base enemy game object class
+		Manages the players attacks
 */
 /*************************************************************************************************/
-class Enemy : public GameObject
+class AttackManager
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
+
+	enum class AttackTypes
+	{
+		NullAttack,
+		Slash1,
+		Slash2,
+		Slash3,
+		ConductingStrike,
+		UpwardsSlash,
+		Slamdown,
+		Max
+	};
+
+	enum class AttackPhase
+	{
+		NullAttack = -1,
+		Startup,
+		Active,
+		Ending,
+		Max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
+
+	typedef struct AttackStruct
+	{
+		AttackTypes attackType = AttackTypes::NullAttack;	// The type of attack
+		AttackPhase attackPhase = AttackPhase::NullAttack;	// The stage of this attack
+		int xCoord = 0;										// The X map coordinate of the attack (Coordinate usage is attack specific)
+		int yCoord = 0;										// The y map coordinate of the attack
+		bool facingRight = true;							// Whether the attack is aimed right or left
+		double phaseTimer = 0.0;							// How much time is left in the current phase
+		std::vector<GameObject*> targetList;				// After an attack hits a target, tracks that game object so it isn't hit again
+	}AttackStruct;
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -71,113 +105,89 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-	
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base enemy game object class
-			
-		\param pos
-			The position of the game object
-
-		\param rot
-			The rotation of the game object
-
-		\param sca
-			The scale of the game object
-
-		\param drawPriority_
-			Higher draw priorities are drawn in front of objects with lower priority
-
-		\param texture_
-			The texture of the enemy object
-
-		\param mapCoords
-			The starting coordinates of the enemy
+			Constructor for the attack manager class
 	*/
 	/*************************************************************************************************/
-	Enemy(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords);
-	
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Destructor for base enemy class
-	*/
-	/*************************************************************************************************/
-	virtual ~Enemy();
+	AttackManager();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the game object.
+			Destructor for attack manager class
+	*/
+	/*************************************************************************************************/
+	~AttackManager();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates all currently active attacks checking within the given map matrix
+
+		\param mapMatrix
+			The given map matrix
 
 		\param dt
-			The time elapsed since the previous frame
-
-		\param inputManager
-			The input manager
+			How much time elapsed since the previous frame
 	*/
 	/*************************************************************************************************/
-	virtual void Update(double dt, InputManager* inputManager);
+	void UpdateAttacks(double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Draws the child game objects
+			Starts the given attack regardless of current attack status
 
-		\param window
-			The game window the objects are being drawn to
+		\param attack
+			The attack to start
+
+		\param attackXCoordinate
+			The x coordinate of the attack
+
+		\param attackYCoordinate
+			The y coordinate of the attack
+
+		\param attackFacingRight
+			Boolean for whether the attack is going to the right (true) or the left (false)
 	*/
 	/*************************************************************************************************/
-	virtual void DrawChildObjects();
+	void StartAttack(AttackTypes attack, int attackXCoordinate, int attackYCoordinate, bool attackFacingRight);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Helper function to manage moving the enemy
+			Ends the given attack regardless of current attack status
+	*/
+	/*************************************************************************************************/
+	void EndAttack();
 
-		\param enemyPosition
-			The current position of the enemy (will be modified if the enemy moves)
-
-		\param horizontalMove
-			The horizontal movement (positive for right, negative for left)
-
-		\param verticalMove
-			The vertical movement (positive for up, negative for left)
-
-		\param moveSpeed
-			How long the movement takes
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the current attack
 
 		\return
-			Returns true if the move was successful, false if not (enemyPosition is not changed if false is returned)
+			The current attack
 	*/
 	/*************************************************************************************************/
-	bool MoveEnemy(std::pair<int, int>& enemyPosition, int horizontalMove, int verticalMove, double moveSpeed);
+	AttackStruct GetCurrentAttackStatus();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Helper function to manage moving the enemy
+			Returns how long the given type of attack takes to execute
 
-		\param dt
-			The time elapsed since the previous frame
+		\param attackType
+			The type of attack
 
-		\param enemyPosition
-			The current position of the enemy (will be modified if the enemy moves)
+		\return
+			The total time for the attack in seconds
 	*/
 	/*************************************************************************************************/
-	virtual void Attack(double dt, std::pair<int, int>& enemyPosition);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Deals the given amount of damage to the enemy
-
-		\param damage
-			The amount of damage to deal
-	*/
-	/*************************************************************************************************/
-	void DamageEnemy(float damage);
+	double GetAttackLength(AttackTypes attackType);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -192,14 +202,67 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 
-	double attackTimer;							// The active time on the attack
+	AttackStruct currentAttack;					// The current attack the player is performing
 
-	Pool* healthPool;							// The health pool of the enemy
-
+	std::vector<AttackStruct> activeAttacks;	// Holds the active attacks (like projectiles that linger)
+	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Checks if an active attack hits
+
+		\param mapMatrix
+			The map the attack is in
+
+		\param activeAttack
+			The attack being checked
+
+		\return
+			Whether the attack hit anything
+	*/
+	/*************************************************************************************************/
+	bool CheckActiveAttack(AttackStruct& activeAttack);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Calculates tile coordinates with a left or right offset
+
+		\param xCoord
+			The X coordinate of the center tile
+
+		\param yCoord
+			The Y coordinate of the center tile
+
+		\param facingRight
+			Whether the attack is facing right
+
+		\param xOffset
+			The offset from the center tile. Will be used in conjunction with the facingRight variable to check the correct tile
+
+		\return
+			Returns the tile coordinates
+	*/
+	/*************************************************************************************************/
+	std::pair<int, int> CalculateOffsetTile(int xCoord, int yCoord, bool facingRight, int xOffset);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the total attack length of the given attack
+
+		\param attack
+			The attack to check
+
+		\return
+			The attack length
+	*/
+	/*************************************************************************************************/
+	double CalculateTotalAttackTime(AttackManager::AttackTypes attack);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -210,4 +273,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Enemy_H_
+#endif // Syncopatience_AttackManager_H_

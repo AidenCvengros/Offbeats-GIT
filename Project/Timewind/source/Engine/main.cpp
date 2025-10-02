@@ -1,16 +1,16 @@
 /*************************************************************************************************/
 /*!
-\file FILL.cpp
+\file main.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2025.FILL.FILL
+\date 2023.9.7
 \brief
-    FILL
+    The start of the program
 
     Functions include:
-        + FILL
+        + main
 
-Copyright (c) 2025 Aiden Cvengros
+Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
@@ -18,9 +18,8 @@ Copyright (c) 2025 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base includes
-#include "FILL.h"
-#include "../Engine/cppShortcuts.h"
+// Includes the engine class to start and run the game engine
+#include "Engine.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -34,6 +33,16 @@ Copyright (c) 2025 Aiden Cvengros
 // Private Variables
 //-------------------------------------------------------------------------------------------------
 
+Engine* gameEngine;								// The game engine
+
+//-------------------------------------------------------------------------------------------------
+// Public Function Declarations
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+// Private Function Declarations
+//-------------------------------------------------------------------------------------------------
+
 //-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
@@ -41,17 +50,25 @@ Copyright (c) 2025 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		FILL
-		
-	\param
-		FILL
+		The starting function of the program
 		
 	\return
-		FILL
+		Returns any error code if the program failed or 0 if the program suceeded.
 */
 /*************************************************************************************************/
-void FILL::FILL ()
+int main()
 {
+	// Creates the game engine
+	gameEngine = Engine::createEngine();
+
+	// Runs the engines main gameplay loop
+	gameEngine->Update();
+
+	// Shuts down the engine and all its systems
+	gameEngine->Shutdown();
+
+	// Returns 0 if everything went well
+	return 0;
 }
 
 //-------------------------------------------------------------------------------------------------
