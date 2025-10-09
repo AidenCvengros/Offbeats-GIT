@@ -214,4 +214,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_[FILL]_H_
+#endif // Syncopatience_Engine_H_

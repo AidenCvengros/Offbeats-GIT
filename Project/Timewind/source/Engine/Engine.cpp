@@ -164,6 +164,7 @@ void Engine::Update()
 		double newTime = glfwGetTime();
 		double dt = newTime - lastTime;
 		lastTime = newTime;
+		fmin(dt, 0.1);
 #ifdef _DEBUG
 		// Prints out the framerate. Debug only
 		//std::cout << 1 / dt << std::endl;

@@ -441,12 +441,15 @@ public:
 		\param xOffset
 			The offset from the center tile. Will be used in conjunction with the facingRight variable to check the correct tile
 
+		\param yOffset
+			The vertical offset from the center tile. Defaults to 0 if you're just doing horizontal offsets
+
 		\return
 			Returns the tile coordinates
 	*/
 	/*************************************************************************************************/
-	std::pair<int, int> CalculateOffsetTile(int xCoord, int yCoord, bool facingRight, int xOffset);
-	std::pair<int, int> CalculateOffsetTile(std::pair<int, int> coords, bool facingRight, int xOffset) { return CalculateOffsetTile(coords.first, coords.second, facingRight, xOffset); }
+	std::pair<int, int> CalculateOffsetTile(int xCoord, int yCoord, bool facingRight, int xOffset, int yOffset = 0);
+	std::pair<int, int> CalculateOffsetTile(std::pair<int, int> coords, bool facingRight, int xOffset, int yOffset = 0) { return CalculateOffsetTile(coords.first, coords.second, facingRight, xOffset, yOffset); }
 
 	/*************************************************************************************************/
 	/*!

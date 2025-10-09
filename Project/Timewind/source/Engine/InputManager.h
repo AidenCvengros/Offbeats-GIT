@@ -65,7 +65,7 @@ public:
 		Up,
 		Down,
 		Jump,
-		Attack,
+		Action,
 		F1,
 		F2,
 		F3,

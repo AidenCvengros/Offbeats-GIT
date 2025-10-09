@@ -79,7 +79,7 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::Down, GLFW_KEY_DOWN));
 	keybinds.insert(std::pair(Inputs::Down, GLFW_KEY_S));
 	keybinds.insert(std::pair(Inputs::Jump, GLFW_KEY_SPACE));
-	keybinds.insert(std::pair(Inputs::Attack, GLFW_KEY_E));
+	keybinds.insert(std::pair(Inputs::Action, GLFW_KEY_E));
 	keybinds.insert(std::pair(Inputs::F1, GLFW_KEY_F1));
 	keybinds.insert(std::pair(Inputs::F2, GLFW_KEY_F2));
 	keybinds.insert(std::pair(Inputs::F3, GLFW_KEY_F3));

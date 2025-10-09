@@ -32,8 +32,8 @@ Copyright (c) 2023 Aiden Cvengros
 // The base game object class
 #include "GameObject.h"
 
-// The attack manager class to keep track of what actions the player is taking
-#include "../Gameplay/AttackManager.h"
+// The action manager class to keep track of what actions the player is taking
+#include "../Gameplay/ActionManager.h"
 
 // Includes the input manager because we need to check for specific inputs
 #include "../Engine/InputManager.h"
@@ -66,14 +66,6 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-	
-	enum class PlayerActions
-	{
-		NOATTACK,
-		JUMP,
-		INTERACT,
-		MAX,
-	};
 
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
@@ -145,14 +137,15 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	int jumpPhase;								// Tracks the progress of a jump
-	std::pair<int, int> playerPrevPos;			// The previous player position in map coordinates
 	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
-	int fallingDelay;							// Lets the player move while falling once per three tiles
+	float horizontalVelocity;					// How quickly the player is moving horizontally
+	float verticalVelocity;						// How quickly the player is moving vertically
+	bool grounded;								// Whether the player is grounded
 
-	PlayerActions actionQueued;					// Denotes whether an attack has been pressed (0 is no attack, it should activate the next time the player is at a tile)
-	bool jumpAttacked;							// Boolean to prevent the player from whiffing multiple times in a jump
-	AttackManager attackManager;				// Keeps track of attacks the player uses
+	float halfWidth;							// Half the width of the player (so it can be measured from the player's center)
+	float halfHeight;							// Half the height of the player (so it can be measured from the player's center)
+
+	ActionManager actionManager;				// Keeps track of actions the player uses
 
 	Inventory* inventory;						// The player's inventory
 
@@ -177,42 +170,44 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Helper function to manage moving the player
+			Helper function to accelerate the player horizontally
+	
+		\param accelerationAmount
+			How much the player should accelerate by
 
-		\param playerPosition
-			The current position of the player (will be modified if the player moves)
-
-		\param horizontalMove
-			The horizontal movement (positive for right, negative for left)
-
-		\param verticalMove
-			The vertical movement (positive for up, negative for left)
-
-		\param moveSpeed
-			How long the movement takes
-
-		\return
-			Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+		\param dt
+			The time elapsed since the previous frame
 	*/
 	/*************************************************************************************************/
-	bool MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, double moveSpeed);
+	void AcceleratePlayerHorizontal(float accelerationAmount, double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Helper function that moves the player to the given map position
+			Helper function to manage moving the player
 
-		\param newPosition
-			The new map position for the player
-
-		\param moveSpeed
-			How long the movement takes
-
-		\return
-			Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+		\param dt
+			The time elapsed since the previous frame
 	*/
 	/*************************************************************************************************/
-	bool MovePlayer(std::pair<int, int>& newPosition, double moveSpeed);
+	void MovePlayer(double dt);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Helper function to check if the player is going to run into anything this turn
+
+		\param horizontalMovement
+			How far the player plans to move horizontally this frame
+
+		\param verticalMovement
+			How far the player plans to move vertically this frame
+
+		\return
+			Returns a pair of booleans. The first one says if we hit horizontally, the second says if we hit vertically
+	*/
+	/*************************************************************************************************/
+	std::pair<bool, bool> CollisionCheck(float horizontalMovement, float verticalMovement);
 
 	/*************************************************************************************************/
 	/*!
@@ -257,10 +252,10 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Starts and manages the three hit basic attack combo
+			Starts and manages the three hit basic action combo
 	*/
 	/*************************************************************************************************/
-	//void ProgressBasicAttack();
+	//void ProgressBasicAction();
 };
 
 //-------------------------------------------------------------------------------------------------

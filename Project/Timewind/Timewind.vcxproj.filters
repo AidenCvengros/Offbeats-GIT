@@ -99,7 +99,7 @@
     <ClInclude Include="source\Game_Objects\Pool.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="source\Gameplay\AttackManager.h">
+    <ClInclude Include="source\Gameplay\ActionManager.h">
       <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="source\Engine\EffectManager.h">
@@ -191,7 +191,7 @@
     <ClCompile Include="source\Game_Objects\Pool.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="source\Gameplay\AttackManager.cpp">
+    <ClCompile Include="source\Gameplay\ActionManager.cpp">
       <Filter>Source Files\Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="source\Engine\InputManager.cpp">

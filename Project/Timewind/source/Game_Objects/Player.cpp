@@ -37,6 +37,9 @@ Copyright (c) 2023 Aiden Cvengros
 #include "Item.h"
 #include "Key.h"
 
+// std::clamp is used to clamp the player's speed
+#include <algorithm>
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -90,12 +93,8 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	jumpPhase(0),
-	playerPrevPos(mapCoords),
-	timeSinceMove(0.0),
-	fallingDelay(0),
-	actionQueued(PlayerActions::NOATTACK),
-	jumpAttacked(false)
+	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true),
+	halfWidth(0.3f), halfHeight(0.5f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords, this);
 	inventory = new Inventory();
@@ -123,289 +122,34 @@ Player::~Player()
 /*************************************************************************************************/
 void Player::Update(double dt)
 {
-	// Updates movements if any are active
-	if (GetMoving())
+	//// Updates movements if any are active
+	//if (GetMoving())
+	//{
+	//	MoveToUpdate(dt);
+	//}
+
+	// Checks if the player is trying to move left
+	if (CheckInput(InputManager::Inputs::Left) && !CheckInput(InputManager::Inputs::Right))
 	{
-		MoveToUpdate(dt);
+		// Accelerates the player to the left
+		AcceleratePlayerHorizontal(-10.0f, dt);
+	}
+	// Checks if the player is trying to move right
+	else if (CheckInput(InputManager::Inputs::Right) && !CheckInput(InputManager::Inputs::Left))
+	{
+		// Accelerates the player to the right
+		AcceleratePlayerHorizontal(10.0f, dt);
+	}
+	// Otherwise doesn't accelerate the player
+	else
+	{
+		AcceleratePlayerHorizontal(0.0f, dt);
 	}
 
-	std::pair playerPosition = _MapMatrix->GetPlayerPosition();
+	// Check if we are grounded
 
-	// The buffer zone
-	bool shortHopAttack = false;
-	if (GetIsMoving() == true)
-	{
-		// Jump buffer for having just started a grounded movement
-		if (jumpPhase == 0 && timeSinceMove < 0.1 && _InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
-		{
-			if (MovePlayer(playerPrevPos, 0, 1, 0.07))
-			{
-				jumpPhase = 1;
-			}
-		}
-
-		// Pressing attack and jump together should let you attack at the lowest part of your jump
-		//if (jumpPhase = 1 && timeSinceMove < 0.05 && inputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
-		//{
-		//	shortHopAttack = true;
-		//}
-	
-		// Updates the time since move tracker
-		timeSinceMove += dt;
-	}
-
-	// Checks for actions being set
-	if (_InputManager->CheckInputStatus(InputManager::Inputs::Attack) == InputManager::InputStatus::Pressed)
-	{
-		actionQueued = PlayerActions::INTERACT;
-	}
-	if (_InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Pressed)
-	{
-		actionQueued = PlayerActions::JUMP;
-	}
-
-	// Performs attacks if queued
-	Interact(dt, playerPosition);
-	
-	// Checks that the previous movement finished
-	if (GetIsMoving() == false && jumpPhase == 0)
-	{
-		// Checks if the player isn't grounded
-		if (_MapMatrix->GetTile(playerPosition.first, playerPosition.second - 1).tileStatus < MapMatrix::TileStatus::Player)
-		{
-			// Begin falling
-			jumpPhase = 3;
-		}
-
-		// Checks for a jump (start of jump is quick up one tile
-		else if (actionQueued == PlayerActions::JUMP || _InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Held)
-		{
-			if (MovePlayer(playerPosition, 0, 1, 0.07))
-			{
-				jumpPhase = 1;
-			}
-		}
-
-		// Checks for moving right
-		else if (CheckInput(InputManager::Inputs::Right))
-		{
-			MovePlayer(playerPosition, 1, 0, 0.25);
-		}
-		// Checks for moving left
-		else if (CheckInput(InputManager::Inputs::Left))
-		{
-			MovePlayer(playerPosition, -1, 0, 0.25);
-		}
-
-		// Resets the grounded check for jump attacks
-		jumpAttacked = false;
-		actionQueued = PlayerActions::NOATTACK;
-	}
-
-	if (shortHopAttack)
-	{
-		actionQueued = PlayerActions::INTERACT;
-	}
-
-	// Checks for end of jump phase 1 (float to apex of jump)
-	if (GetIsMoving() == false && jumpPhase == 1)
-	{
-		// First checks if the space directly above is occupied (if it is we hit a ceiling and start falling)
-		if (_MapMatrix->GetTile(playerPosition.first, playerPosition.second + 1).tileStatus < MapMatrix::TileStatus::Player)
-		{
-			InteractWithTile(playerPosition.first, playerPosition.second + 1, true, true);
-
-			// Boolean to save on rewriting the code for jumping straight up if certain spaces are preventing sideways movement
-			bool jumpUp = true;
-
-			// Checks for moving right
-			if (CheckInput(InputManager::Inputs::Right))
-			{
-				// Checks if the space diagonally up is occupied (if it is we'll just treat it as a jump straight up)
-				if (_MapMatrix->GetTile(playerPosition.first + 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
-				{
-					// Attempt to move the player up and to the right
-					if (MovePlayer(playerPosition, 1, 2, 0.225) == false)
-					{
-						// If the move was unsuccessful, then we move to the open space diagonally up
-						if (MovePlayer(playerPosition, 1, 1, 0.225) == false)
-						{
-							// If the move was unsuccessful, moves into the open space to the side
-							MovePlayer(playerPosition, 1, 0, 0.225);
-						}
-					}
-
-					// Either way we should have moved, so we don't need the jump up routine
-					jumpUp = false;
-				}
-			}
-			// Checks for moving left
-			else if (CheckInput(InputManager::Inputs::Left))
-			{
-				// Checks if the space diagonally up is occupied (if it is we'll just treat it as a jump straight up)
-				if (_MapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
-				{
-					// Attempt to move the player up and to the left
-					if (MovePlayer(playerPosition, -1, 2, 0.225) == false)
-					{
-						// If the move was unsuccessful, then we move to the open space diagonally up
-						if (MovePlayer(playerPosition, -1, 1, 0.225) == false)
-						{
-							// If the move was unsuccessful, moves into the open space to the side
-							MovePlayer(playerPosition, -1, 0, 0.225);
-						}
-					}
-
-					// Either way we should have moved, so we don't need the jump up routine
-					jumpUp = false;
-				}
-			}
-			// Checks for moving up
-			if (jumpUp)
-			{
-				// Attempts to move the full distance up
-				if (MovePlayer(playerPosition, 0, 2, 0.225) == false)
-				{
-					// If the full upward movement fails, only goes up one space
-					MovePlayer(playerPosition, 0, 1, 0.15);
-				}
-			}
-		}
-		else
-		{
-			InteractWithTile(playerPosition.first, playerPosition.second + 1, true, true);
-		}
-
-		jumpPhase = 2;
-	}
-	// Checks for end of jump phase 2 (apex of jump)
-	if (GetIsMoving() == false && jumpPhase == 2)
-	{
-		// Checks for moving right
-		if (CheckInput(InputManager::Inputs::Right))
-		{
-			MovePlayer(playerPosition, 1, 0, 0.15);
-		}
-		// Checks for moving left
-		else if (CheckInput(InputManager::Inputs::Left))
-		{
-			MovePlayer(playerPosition, -1, 0, 0.15);
-		}
-		// Otherwise hangs in the air
-		else
-		{
-			MoveTo(GetPosition(), 0.15, false);
-		}
-
-		// Afterwards continues the jump
-		jumpPhase = 3;
-	}
-	// Checks for end of jump phase 3 (begin falling)
-	if (GetIsMoving() == false && jumpPhase == 3)
-	{
-		// First checks if the space directly below is occupied (if it is we're grounded)
-		if (_MapMatrix->GetTile(playerPosition.first, playerPosition.second - 1).tileStatus != MapMatrix::TileStatus::Empty)
-		{
-			jumpPhase = 0;
-		}
-		// Otherwise falls
-		else
-		{
-			// Boolean to save on rewriting the code for falling straight down if certain spaces are preventing sideways movement
-			bool fallDown = true;
-
-			// Checks for moving right
-			if (CheckInput(InputManager::Inputs::Right))
-			{
-				// Checks if the space diagonally down is occupied (if it is we'll just treat it as a fall straight down)
-				if (_MapMatrix->GetTile(playerPosition.first + 1, playerPosition.second - 1).tileStatus == MapMatrix::TileStatus::Empty)
-				{
-					// Attempt to move the player down and to the right
-					if (MovePlayer(playerPosition, 1, -2, 0.225) == false)
-					{
-						// If the move was unsuccessful, then we move to the open space diagonally down
-						MovePlayer(playerPosition, 1, -1, 0.15);
-					}
-
-					// Either way we should have moved, so we don't need the fall down routine
-					fallDown = false;
-				}
-			}
-			// Checks for moving left
-			else if (CheckInput(InputManager::Inputs::Left))
-			{
-				// Checks if the space diagonally down is occupied (if it is we'll just treat it as a fall straight down)
-				if (_MapMatrix->GetTile(playerPosition.first - 1, playerPosition.second + 1).tileStatus == MapMatrix::TileStatus::Empty)
-				{
-					// Attempt to move the player down and to the left
-					if (MovePlayer(playerPosition, -1, -2, 0.225) == false)
-					{
-						// If the move was unsuccessful, then we move to the open space diagonally down
-						MovePlayer(playerPosition, -1, -1, 0.15);
-					}
-
-					// Either way we should have moved, so we don't need the fall down routine
-					fallDown = false;
-				}
-			}
-			// Checks for falling straight down
-			if (fallDown)
-			{
-				// Attempts to move the full distance down
-				if (MovePlayer(playerPosition, 0, -2, 0.225) == false)
-				{
-					// If the full downward movement fails, only goes down one space
-					MovePlayer(playerPosition, 0, -1, 0.15);
-				}
-			}
-
-			// Marks that jump phase 3 has been resolved
-			jumpPhase = 4;
-		}
-	}
-	// Checks for end of jump phase 4 (Quick fall into possible landing)
-	if (GetIsMoving() == false && jumpPhase == 4)
-	{
-		// Attempts to move down
-		if (fallingDelay >= 2)
-		{
-			if (CheckInput(InputManager::Inputs::Right))
-			{
-				if (MovePlayer(playerPosition, 1, -1, 0.07) == false)
-				{
-					jumpPhase = 0;
-				}
-			}
-			else if (CheckInput(InputManager::Inputs::Left))
-			{
-				if (MovePlayer(playerPosition, -1, -1, 0.07) == false)
-				{
-					jumpPhase = 0;
-				}
-			}
-			else
-			{
-				if (MovePlayer(playerPosition, 0, -1, 0.07) == false)
-				{
-					// If there is ground below, becomes grounded
-					jumpPhase = 0;
-				}
-			}
-			
-			// Resets the falling delay
-			fallingDelay = 0;
-		}
-		else if (MovePlayer(playerPosition, 0, -1, 0.07) == false)
-		{
-			// If there is ground below, becomes grounded
-			jumpPhase = 0;
-			fallingDelay = 0;
-		}
-		else
-		{
-			fallingDelay++;
-		}
-	}
+	// Moves the player
+	MovePlayer(dt);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -433,112 +177,232 @@ bool Player::CheckInput(InputManager::Inputs input)
 /*************************************************************************************************/
 /*!
 	\brief
-		Helper function to manage moving the player
+		Helper function to accelerate the player horizontally
 
-	\param playerPosition
-		The current position of the player (will be modified if the player moves)
+	\param accelerationAmount
+		How much the player should accelerate by
 
-	\param horizontalMove
-		The horizontal movement (positive for right, negative for left)
-
-	\param verticalMove
-		The vertical movement (positive for up, negative for left)
-
-	\param moveSpeed
-		How long the movement takes
-
-	\return
-		Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+	\param dt
+		The time elapsed since the previous frame
 */
 /*************************************************************************************************/
-bool Player::MovePlayer(std::pair<int, int>& playerPosition, int horizontalMove, int verticalMove, double moveSpeed)
+void Player::AcceleratePlayerHorizontal(float accelerationAmount, double dt)
 {
-	// Corrects if the player is facing right or left
-	if (horizontalMove > 0)
+	// If we are accelerating
+	if (horizontalVelocity * accelerationAmount > 0.0f)
 	{
-		SetIsFacingRight(true);
-	}
-	else if (horizontalMove < 0)
-	{
-		SetIsFacingRight(false);
-	}
-
-	// Get values for the target tile
-	int newXCoord = playerPosition.first + horizontalMove;
-	int newYCoord = playerPosition.second + verticalMove;
-	MapMatrix::MapTile targetTile = _MapMatrix->GetTile(newXCoord, newYCoord);
-
-	// If we are moving into a key or door, interact with it
-	InteractWithTile(newXCoord, newYCoord, false, true);
-
-	// If we are moving upwards and trying to go into a destructible block, destroys that block
-	if (verticalMove > 0)
-	{
-		if (targetTile.tileStatus == MapMatrix::TileStatus::Destructible && _MapMatrix->SetPlayerPosition(newXCoord, newYCoord - 1, this))
+		// Accelerates faster at first
+		if (abs(horizontalVelocity) <= 8.0)
 		{
-			// Moves the player to underneath that block
-			_MapMatrix->ClearTile(newXCoord, newYCoord);
-			playerPosition = { newXCoord, newYCoord - 1 };
-			MoveTo(glm::vec2(ConvertMapCoordsToWorldCoords(playerPosition)), moveSpeed, false);
-			SetMapCoords(playerPosition);
-			jumpPhase = 2;
+			// Adjusts the horizontal velocity of the player
+			horizontalVelocity += accelerationAmount * (float)dt;
+		}
+		// But maxxing out speed takes a little longer
+		else
+		{
+			horizontalVelocity += accelerationAmount * (float)dt / 4.0f;
+			std::cout << horizontalVelocity << std::endl;
+		}
+	}
+	// If we are starting from a standstill, gets an extra boost
+	else if (horizontalVelocity == 0.0f)
+	{
+		horizontalVelocity += accelerationAmount * 0.1;
+	}
+	// If we are stopping
+	else
+	{
+		horizontalVelocity += accelerationAmount * (float)dt * 1.5f;
+	}
 
-			// Resets time since moving
-			timeSinceMove = 0.0;
-			actionQueued = PlayerActions::NOATTACK;
-
-			// Now that the player has been moved, returns true
-			return true;
+	// Horizontal velocity deteriorates over time if not being added
+	if (accelerationAmount == 0.0f)
+	{
+		// If we've basically stopped, just stops
+		if (abs(horizontalVelocity) < 0.25f)
+		{
+			horizontalVelocity = 0.0f;
+		}
+		// Otherwise, slows down
+		else
+		{
+			horizontalVelocity /= 1.0f + (1.0f * (float)dt);
 		}
 	}
 
-	// Moves the player
-	if (_MapMatrix->SetPlayerPosition(newXCoord, newYCoord, this))
-	{
-		playerPrevPos = playerPosition;
-		playerPosition.first = newXCoord;
-		playerPosition.second = newYCoord;
-		MoveTo(glm::vec2(ConvertMapCoordToWorldCoord(playerPosition.first), ConvertMapCoordToWorldCoord(playerPosition.second)), moveSpeed, false);
-		SetMapCoords(playerPosition);
-
-		// Resets time since moving
-		timeSinceMove = 0.0;
-		actionQueued = PlayerActions::NOATTACK;
-
-		// Since the move was successful, returns true
-		return true;
-	}
-
-	// If the move failed, returns false
-	return false;
+	// Puts a max cap to the player's velocity
+	horizontalVelocity = std::clamp(horizontalVelocity, -15.0f, 15.0f);
 }
 
 /*************************************************************************************************/
 /*!
 	\brief
-		Helper function that moves the player to the given map position
+		Helper function to manage moving the player
 
-	\param newPosition
-		The new map position for the player
-
-	\param moveSpeed
-		How long the movement takes
-
-	\return
-		Returns true if the move was successful, false if not (playerPosition is not changed if false is returned)
+	\param dt
+		The time elapsed since the previous frame
 */
 /*************************************************************************************************/
-bool Player::MovePlayer(std::pair<int, int>& newPosition, double moveSpeed)
+void Player::MovePlayer(double dt)
 {
-	// Gets the player's current position
-	std::pair<int, int> currentPosition = _MapMatrix->GetPlayerPosition();
+	// Gets the player's position
+	std::pair playerMapPosition = _MapMatrix->GetPlayerPosition();
+	glm::vec2 playerWorldPosition = GetPosition();
 
-	// Calculates the offsets
-	int xOffset = newPosition.first - currentPosition.first;
-	int yOffset = newPosition.second - currentPosition.second;
+	// Calculates how far we are moving this frame
+	float horizontalMovement = horizontalVelocity * (float)dt;
+	float verticalMovement = verticalVelocity * (float)dt;
 
-	// Moves the player
-	return MovePlayer(currentPosition, xOffset, yOffset, moveSpeed);
+	// Updates whether we're facing right or left
+	if (horizontalMovement > 0.0f)
+	{
+		SetIsFacingRight(true);
+	}
+	else if (horizontalMovement < 0.0f)
+	{
+		SetIsFacingRight(false);
+	}
+
+	// Runs collision checks
+	std::pair<bool, bool> collisionChecks = CollisionCheck(horizontalMovement, verticalMovement);
+
+	// If we're not at risk of hitting anything horizontally
+	if (collisionChecks.first == false)
+	{
+		// Just moves the player
+		playerWorldPosition.x += horizontalMovement;
+	}
+	// If we can hit something horizontally
+	else
+	{
+		// Calculates the distance between the player and the block next to them
+		float nextTileWorldXPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->CalculateOffsetTile(playerMapPosition, GetIsFacingRight(), 1)).x;
+		float distFromObject = nextTileWorldXPosition - GetPosition().x;
+
+		// Checks if the amount we move this frame would put us in that object
+		if (1.0f + halfWidth + horizontalMovement > abs(distFromObject))
+		{
+			// If so, moves us up against the wall
+			if (distFromObject > 0)
+			{
+				playerWorldPosition.x = nextTileWorldXPosition - (1.0f + halfWidth);
+			}
+			else if (distFromObject < 0)
+			{
+				playerWorldPosition.x = nextTileWorldXPosition + (1.0f + halfWidth);
+			}
+
+			// Kills the player's velocity
+			horizontalVelocity = 0;
+		}
+		// If we aren't going to collide, moves the player
+		else
+		{
+			playerWorldPosition.x += horizontalMovement;
+		}
+	}
+
+	// If we're not at risk of hitting anything vertically
+	if (collisionChecks.second == false)
+	{
+		// Just moves the player
+		playerWorldPosition.y += verticalMovement;
+	}
+	// If we can hit something vertically
+	else
+	{
+		// Determines if we are going up or down
+		int directionModifier = 1;
+		if (verticalMovement < 0)
+		{
+			directionModifier = -1;
+		}
+
+		// Calculates the distance between the player and the block next to them
+		float nextTileWorldYPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->CalculateOffsetTile(playerMapPosition, GetIsFacingRight(), 0, directionModifier)).x;
+		float distFromObject = nextTileWorldYPosition - GetPosition().y;
+
+		// Checks if the amount we move this frame would put us in that object
+		if (1.0f + halfHeight + verticalMovement > abs(distFromObject))
+		{
+			// If so, moves us up against the wall
+			if (distFromObject > 0)
+			{
+				playerWorldPosition.y = nextTileWorldYPosition - (1.0f + halfHeight);
+			}
+			else if (distFromObject < 0)
+			{
+				playerWorldPosition.y = nextTileWorldYPosition + (1.0f + halfHeight);
+			}
+
+			// Kills the player's velocity
+			verticalVelocity = 0;
+		}
+		// If we aren't going to collide, moves the player
+		else
+		{
+			playerWorldPosition.y += horizontalMovement;
+		}
+	}
+
+	// Sets the player's new position
+	SetPosition(playerWorldPosition);
+
+	// Updates the player coordinates now that we've moved
+	UpdatePlayerCoords();
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to check if the player is going to run into anything this turn
+
+	\param horizontalMovement
+		How far the player plans to move horizontally this frame
+
+	\param verticalMovement
+		How far the player plans to move vertically this frame
+
+	\return
+		Returns a pair of booleans. The first one says if we hit horizontally, the second says if we hit vertically
+*/
+/*************************************************************************************************/
+std::pair<bool, bool> Player::CollisionCheck(float horizontalMovement, float verticalMovement)
+{
+	// Variables to track collision
+	bool horizontalCollision = false;
+	bool verticalCollsion = false;
+
+	// Checks if there even is anything to collide with in the space to the side
+	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 1)).tileStatus > MapMatrix::TileStatus::Player)
+	{
+		horizontalCollision = true;
+	}
+	
+	// Checks if there even is anything to collide with in the space vertical
+	int verticalOffset = 0;
+	if (verticalMovement > 0.0f)
+	{
+		verticalOffset = 1;
+	}
+	else if (verticalMovement < 0.0f)
+	{
+		verticalOffset = -1;
+	}
+	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player)
+	{
+		verticalCollsion = true;
+	}
+
+	// Checks if we have a case where we're coming directly at a corner
+	if (horizontalCollision == false && verticalCollsion == false && _MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 1, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player)
+	{
+		// We turn on the horizontal collision so the player effectively hits the wall
+		horizontalCollision = true;
+	}
+
+	// Returns the collision results
+	return { horizontalCollision, verticalCollsion };
 }
 
 /*************************************************************************************************/
@@ -553,7 +417,7 @@ void Player::UpdatePlayerCoords()
 
 	if (playerCoords != _MapMatrix->GetPlayerPosition())
 	{
-		MovePlayer(playerCoords, 0.0f);
+		_MapMatrix->SetPlayerPosition(playerCoords, this);
 	}
 }
 
@@ -571,95 +435,17 @@ void Player::UpdatePlayerCoords()
 /*************************************************************************************************/
 void Player::Interact(double dt, std::pair<int, int>& playerPosition)
 {
-	// Checks if the player is starting an attack
-	if (actionQueued == PlayerActions::INTERACT)
-	{
-		// If the player isn't moving, they can start the attack
-		if (GetIsMoving() == false)
-		{
-			// If it's a basic attack, progresses the basic attack
-			//if (actionQueued == PlayerActions::INTERACT)
-			//{
-			//	//ProgressBasicAttack();
-			//}
-
-			std::pair<int, int> interactionCoords = _MapMatrix->CalculateOffsetTile(GetMapCoords(), GetIsFacingRight(), 1);
-			InteractWithTile(interactionCoords, true, true);
-		}
-		// If the player is doing a move, they count as moving, so we check if we can cancel the current move into the new move
-		//else
-		//{
-		//	auto currentAttack = attackManager.GetCurrentAttackStatus();
-		//
-		//	// Checks that there is an attack happening
-		//	if (currentAttack.attackType != AttackManager::AttackTypes::NullAttack)
-		//	{
-		//		// Checks if the current attack are part of the basic combo
-		//		if (currentAttack.attackType == AttackManager::AttackTypes::Slash1 || currentAttack.attackType == AttackManager::AttackTypes::Slash2)
-		//		{
-		//			// Checks if the current attack is past the startup step
-		//			if (currentAttack.attackPhase == AttackManager::AttackPhase::Active || currentAttack.attackPhase == AttackManager::AttackPhase::Ending)
-		//			{
-		//				// Checks if we are continuing the basic combo
-		//				if (actionQueued == PlayerActions::BASICATTACK)
-		//				{
-		//					ProgressBasicAttack();
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
-
-		// Checks if the player is jumping
-		//if (jumpPhase > 0)
-		//{
-		//	jumpAttacked = true;
-		//}
-	}
-
-	// Updates the attack manager
-	//attackManager.UpdateAttacks(mapMatrix, dt);
+	// Checks if the player is starting an action
+	//if (actionQueued == PlayerActions::INTERACT)
+	//{
+	//	// If the player isn't moving, they can start the action
+	//	if (GetIsMoving() == false)
+	//	{
+	//		std::pair<int, int> interactionCoords = _MapMatrix->CalculateOffsetTile(GetMapCoords(), GetIsFacingRight(), 1);
+	//		InteractWithTile(interactionCoords, true, true);
+	//	}
+	//}
 }
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Starts and manages the three hit basic attack combo
-*/
-/*************************************************************************************************/
-//void Player::ProgressBasicAttack()
-//{
-//	// Checks if we are already in the combo
-//	if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash1)
-//	{
-//		attackManager.StartAttack(AttackManager::AttackTypes::Slash2, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
-//		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash2), false);
-//	}
-//	else if (attackManager.GetCurrentAttackStatus().attackType == AttackManager::AttackTypes::Slash2)
-//	{
-//		attackManager.StartAttack(AttackManager::AttackTypes::Slash3, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
-//		MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash3), false);
-//	}
-//	// Otherwise starts the first slash
-//	else
-//	{
-//		// Only allows a single attack sequence per jump
-//		if (jumpPhase == 0 || jumpAttacked == false)
-//		{
-//			attackManager.StartAttack(AttackManager::AttackTypes::Slash1, mapMatrix->GetPlayerPosition().first, mapMatrix->GetPlayerPosition().second, GetIsFacingRight());
-//			MoveTo(GetPosition(), attackManager.GetAttackLength(AttackManager::AttackTypes::Slash1), false);
-//
-//			// If we are jumping, marks this as the jump attack
-//			if (jumpPhase > 0)
-//			{
-//				jumpAttacked = true;
-//			}
-//		}
-//	}
-//
-//	// Clears the queued attack now that an attack has been started
-//	actionQueued = PlayerActions::NOATTACK;
-//}
 
 /*************************************************************************************************/
 /*!

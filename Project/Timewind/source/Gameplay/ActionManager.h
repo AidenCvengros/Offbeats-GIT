@@ -1,26 +1,26 @@
 /*************************************************************************************************/
 /*!
-\file AttackManager.h
+\file ActionManager.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
 \date 2024.9.6
 \brief
-    Manages the player's attacks.
+    Manages the player's actions.
 
     Functions include:
-        + AttackManager
-		+ ~AttackManager
-		+ UpdateAttacks
-		+ StartAttack
-		+ EndAttack
-		+ GetAttackStatus
+        + ActionManager
+		+ ~ActionManager
+		+ UpdateActions
+		+ StartAction
+		+ EndAction
+		+ GetActionStatus
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_AttackManager_H_
-#define Syncopatience_AttackManager_H_
+#ifndef Syncopatience_ActionManager_H_
+#define Syncopatience_ActionManager_H_
 
 #pragma once
 
@@ -52,31 +52,28 @@ class GameObject;
 /*************************************************************************************************/
 /*!
 	\brief
-		Manages the players attacks
+		Manages the players action
 */
 /*************************************************************************************************/
-class AttackManager
+class ActionManager
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 
-	enum class AttackTypes
+	enum class ActionTypes
 	{
-		NullAttack,
-		Slash1,
-		Slash2,
-		Slash3,
-		ConductingStrike,
-		UpwardsSlash,
-		Slamdown,
+		NullAction,
+		Interact,
+		Dash,
+		DoubleJump,
 		Max
 	};
 
-	enum class AttackPhase
+	enum class ActionPhase
 	{
-		NullAttack = -1,
+		NullAction = -1,
 		Startup,
 		Active,
 		Ending,
@@ -87,16 +84,16 @@ public:
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
 
-	typedef struct AttackStruct
+	typedef struct ActionStruct
 	{
-		AttackTypes attackType = AttackTypes::NullAttack;	// The type of attack
-		AttackPhase attackPhase = AttackPhase::NullAttack;	// The stage of this attack
-		int xCoord = 0;										// The X map coordinate of the attack (Coordinate usage is attack specific)
-		int yCoord = 0;										// The y map coordinate of the attack
-		bool facingRight = true;							// Whether the attack is aimed right or left
+		ActionTypes actionType = ActionTypes::NullAction;	// The type of action
+		ActionPhase actionPhase = ActionPhase::NullAction;	// The stage of this action
+		int xCoord = 0;										// The X map coordinate of the action (Coordinate usage is action specific)
+		int yCoord = 0;										// The y map coordinate of the action
+		bool facingRight = true;							// Whether the action is aimed right or left
 		double phaseTimer = 0.0;							// How much time is left in the current phase
-		std::vector<GameObject*> targetList;				// After an attack hits a target, tracks that game object so it isn't hit again
-	}AttackStruct;
+		std::vector<GameObject*> targetList;				// After an action hits a target, tracks that game object so it isn't hit again
+	}ActionStruct;
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -109,23 +106,23 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the attack manager class
+			Constructor for the action manager class
 	*/
 	/*************************************************************************************************/
-	AttackManager();
+	ActionManager();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Destructor for attack manager class
+			Destructor for action manager class
 	*/
 	/*************************************************************************************************/
-	~AttackManager();
+	~ActionManager();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates all currently active attacks checking within the given map matrix
+			Updates all currently active actions checking within the given map matrix
 
 		\param mapMatrix
 			The given map matrix
@@ -134,60 +131,60 @@ public:
 			How much time elapsed since the previous frame
 	*/
 	/*************************************************************************************************/
-	void UpdateAttacks(double dt);
+	void UpdateActions(double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Starts the given attack regardless of current attack status
+			Starts the given action regardless of current action status
 
-		\param attack
-			The attack to start
+		\param action
+			The action to start
 
-		\param attackXCoordinate
-			The x coordinate of the attack
+		\param actionXCoordinate
+			The x coordinate of the action
 
-		\param attackYCoordinate
-			The y coordinate of the attack
+		\param actionYCoordinate
+			The y coordinate of the action
 
-		\param attackFacingRight
-			Boolean for whether the attack is going to the right (true) or the left (false)
+		\param actionFacingRight
+			Boolean for whether the action is going to the right (true) or the left (false)
 	*/
 	/*************************************************************************************************/
-	void StartAttack(AttackTypes attack, int attackXCoordinate, int attackYCoordinate, bool attackFacingRight);
+	void StartAction(ActionTypes action, int actionXCoordinate, int actionYCoordinate, bool actionFacingRight);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Ends the given attack regardless of current attack status
+			Ends the given action regardless of current action status
 	*/
 	/*************************************************************************************************/
-	void EndAttack();
+	void EndAction();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the current attack
+			Returns the current action
 
 		\return
-			The current attack
+			The current action
 	*/
 	/*************************************************************************************************/
-	AttackStruct GetCurrentAttackStatus();
+	ActionStruct GetCurrentActionStatus();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns how long the given type of attack takes to execute
+			Returns how long the given type of action takes to execute
 
-		\param attackType
-			The type of attack
+		\param actionType
+			The type of action
 
 		\return
-			The total time for the attack in seconds
+			The total time for the action in seconds
 	*/
 	/*************************************************************************************************/
-	double GetAttackLength(AttackTypes attackType);
+	double GetActionLength(ActionTypes actionType);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -202,9 +199,7 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 
-	AttackStruct currentAttack;					// The current attack the player is performing
-
-	std::vector<AttackStruct> activeAttacks;	// Holds the active attacks (like projectiles that linger)
+	ActionStruct currentAction;					// The current action the player is performing
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -213,19 +208,19 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Checks if an active attack hits
+			Checks if an active action hits
 
 		\param mapMatrix
-			The map the attack is in
+			The map the action is in
 
-		\param activeAttack
-			The attack being checked
+		\param activeAction
+			The action being checked
 
 		\return
-			Whether the attack hit anything
+			Whether the action hit anything
 	*/
 	/*************************************************************************************************/
-	bool CheckActiveAttack(AttackStruct& activeAttack);
+	bool CheckActiveAction(ActionStruct& activeAction);
 
 	/*************************************************************************************************/
 	/*!
@@ -239,7 +234,7 @@ private:
 			The Y coordinate of the center tile
 
 		\param facingRight
-			Whether the attack is facing right
+			Whether the action is facing right
 
 		\param xOffset
 			The offset from the center tile. Will be used in conjunction with the facingRight variable to check the correct tile
@@ -253,16 +248,16 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the total attack length of the given attack
+			Returns the total action length of the given action
 
-		\param attack
-			The attack to check
+		\param action
+			The action to check
 
 		\return
-			The attack length
+			The action length
 	*/
 	/*************************************************************************************************/
-	double CalculateTotalAttackTime(AttackManager::AttackTypes attack);
+	double CalculateTotalActionTime(ActionTypes action);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -273,4 +268,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_AttackManager_H_
+#endif // Syncopatience_ActionManager_H_
