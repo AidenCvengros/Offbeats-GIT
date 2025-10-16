@@ -94,7 +94,7 @@ Copyright (c) 2023 Aiden Cvengros
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
 	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true),
-	halfWidth(0.3f), halfHeight(0.5f), actionManager(), inventory(NULL)
+	halfWidth(0.75f), halfHeight(1.0f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords, this);
 	inventory = new Inventory();
@@ -131,14 +131,32 @@ void Player::Update(double dt)
 	// Checks if the player is trying to move left
 	if (CheckInput(InputManager::Inputs::Left) && !CheckInput(InputManager::Inputs::Right))
 	{
-		// Accelerates the player to the left
-		AcceleratePlayerHorizontal(-10.0f, dt);
+		// Accelerates normally on the ground
+		if (grounded)
+		{
+			// Accelerates the player to the left
+			AcceleratePlayerHorizontal(-10.0f, dt);
+		}
+		else
+		{
+			// Accelerates the player to the left more slowly in the air
+			AcceleratePlayerHorizontal(-2.0f, dt);
+		}
 	}
 	// Checks if the player is trying to move right
 	else if (CheckInput(InputManager::Inputs::Right) && !CheckInput(InputManager::Inputs::Left))
 	{
-		// Accelerates the player to the right
-		AcceleratePlayerHorizontal(10.0f, dt);
+		// Accelerates normally on the ground
+		if (grounded)
+		{
+			// Accelerates the player to the right
+			AcceleratePlayerHorizontal(10.0f, dt);
+		}
+		else
+		{
+			// Accelerates the player to the right more slowly in the air
+			AcceleratePlayerHorizontal(2.0f, dt);
+		}
 	}
 	// Otherwise doesn't accelerate the player
 	else
@@ -146,7 +164,23 @@ void Player::Update(double dt)
 		AcceleratePlayerHorizontal(0.0f, dt);
 	}
 
-	// Check if we are grounded
+	// Checks if the player has left the ground
+	if (UngroundedCheck())
+	{
+		AcceleratePlayerVertical(-50.0f, dt);
+	}
+
+	// Checks for the jump input
+	if (CheckInput(InputManager::Inputs::Jump))
+	{
+		// Checks if the player is grounded
+		if (grounded)
+		{
+			// Jumps
+			AcceleratePlayerVertical(21.0f, 1.0f);
+			grounded = false;
+		}
+	}
 
 	// Moves the player
 	MovePlayer(dt);
@@ -201,7 +235,6 @@ void Player::AcceleratePlayerHorizontal(float accelerationAmount, double dt)
 		else
 		{
 			horizontalVelocity += accelerationAmount * (float)dt / 4.0f;
-			std::cout << horizontalVelocity << std::endl;
 		}
 	}
 	// If we are starting from a standstill, gets an extra boost
@@ -232,6 +265,27 @@ void Player::AcceleratePlayerHorizontal(float accelerationAmount, double dt)
 
 	// Puts a max cap to the player's velocity
 	horizontalVelocity = std::clamp(horizontalVelocity, -15.0f, 15.0f);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Helper function to accelerate the player vertically
+
+	\param accelerationAmount
+		How much the player should accelerate by
+
+	\param dt
+		The time elapsed since the previous frame
+*/
+/*************************************************************************************************/
+void Player::AcceleratePlayerVertical(float accelerationAmount, double dt)
+{
+	// Applies the acceleration amount to the vertical velocity
+	verticalVelocity += accelerationAmount * dt;
+
+	// Clamps the player's max speed
+	verticalVelocity = std::clamp(verticalVelocity, -30.0f, 30.0f);
 }
 
 /*************************************************************************************************/
@@ -319,11 +373,11 @@ void Player::MovePlayer(double dt)
 		}
 
 		// Calculates the distance between the player and the block next to them
-		float nextTileWorldYPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->CalculateOffsetTile(playerMapPosition, GetIsFacingRight(), 0, directionModifier)).x;
+		float nextTileWorldYPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->CalculateOffsetTile(playerMapPosition, GetIsFacingRight(), 0, directionModifier)).y;
 		float distFromObject = nextTileWorldYPosition - GetPosition().y;
 
 		// Checks if the amount we move this frame would put us in that object
-		if (1.0f + halfHeight + verticalMovement > abs(distFromObject))
+		if (1.0f + halfHeight + abs(verticalMovement) > abs(distFromObject))
 		{
 			// If so, moves us up against the wall
 			if (distFromObject > 0)
@@ -333,6 +387,9 @@ void Player::MovePlayer(double dt)
 			else if (distFromObject < 0)
 			{
 				playerWorldPosition.y = nextTileWorldYPosition + (1.0f + halfHeight);
+
+				// If we moved onto something below us, marks us as grounded
+				grounded = true;
 			}
 
 			// Kills the player's velocity
@@ -341,7 +398,7 @@ void Player::MovePlayer(double dt)
 		// If we aren't going to collide, moves the player
 		else
 		{
-			playerWorldPosition.y += horizontalMovement;
+			playerWorldPosition.y += verticalMovement;
 		}
 	}
 
@@ -373,8 +430,19 @@ std::pair<bool, bool> Player::CollisionCheck(float horizontalMovement, float ver
 	bool horizontalCollision = false;
 	bool verticalCollsion = false;
 
+	// Gets the player position
+	std::pair<int, int> playerPosition = _MapMatrix->GetPlayerPosition();
+
+	// Calculates if the right side of the player is over a tile
+	std::pair<int, int> playerRightSidePosition = playerPosition;
+	if (ConvertWorldCoordToMapCoord(GetPosition().x + (halfWidth + GetScale().x)) != playerPosition.first)
+	{
+		// Marks the right side of the player in the next tile
+		playerRightSidePosition.first += 1;
+	}
+
 	// Checks if there even is anything to collide with in the space to the side
-	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 1)).tileStatus > MapMatrix::TileStatus::Player)
+	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(playerPosition, GetIsFacingRight(), 1)).tileStatus > MapMatrix::TileStatus::Player)
 	{
 		horizontalCollision = true;
 	}
@@ -389,7 +457,8 @@ std::pair<bool, bool> Player::CollisionCheck(float horizontalMovement, float ver
 	{
 		verticalOffset = -1;
 	}
-	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player)
+	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(playerPosition, GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player ||
+		_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(playerRightSidePosition, GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player)
 	{
 		verticalCollsion = true;
 	}
@@ -408,6 +477,37 @@ std::pair<bool, bool> Player::CollisionCheck(float horizontalMovement, float ver
 /*************************************************************************************************/
 /*!
 	\brief
+		Helper function to check if the player has left the ground (usually by walking off a ledge)
+
+	\return
+		Whether the player left the ground
+*/
+/*************************************************************************************************/
+bool Player::UngroundedCheck()
+{
+	// Checks if the player was grounded
+	if (grounded)
+	{
+		// Checks if there is now nothing to collide with in the space under the player
+		if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player)
+		{
+			// Marks the player as ungrounded
+			grounded = false;
+		}
+		else
+		{
+			// If the player is still grounded, returns false
+			return false;
+		}
+	}
+	
+	// If the player isn't grounded, returns true
+	return true;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Helper function to update the coordinates of what square the player is in
 */
 /*************************************************************************************************/
@@ -418,6 +518,7 @@ void Player::UpdatePlayerCoords()
 	if (playerCoords != _MapMatrix->GetPlayerPosition())
 	{
 		_MapMatrix->SetPlayerPosition(playerCoords, this);
+		std::cout << playerCoords.first << ", " << playerCoords.second << std::endl;
 	}
 }
 

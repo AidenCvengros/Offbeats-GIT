@@ -184,6 +184,20 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Helper function to accelerate the player vertically
+
+		\param accelerationAmount
+			How much the player should accelerate by
+
+		\param dt
+			The time elapsed since the previous frame
+	*/
+	/*************************************************************************************************/
+	void AcceleratePlayerVertical(float accelerationAmount, double dt);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Helper function to manage moving the player
 
 		\param dt
@@ -208,6 +222,17 @@ private:
 	*/
 	/*************************************************************************************************/
 	std::pair<bool, bool> CollisionCheck(float horizontalMovement, float verticalMovement);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Helper function to check if the player has left the ground (usually by walking off a ledge)
+
+		\return
+			Whether the player left the ground
+	*/
+	/*************************************************************************************************/
+	bool UngroundedCheck();
 
 	/*************************************************************************************************/
 	/*!
