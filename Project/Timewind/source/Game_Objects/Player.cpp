@@ -94,7 +94,7 @@ Copyright (c) 2023 Aiden Cvengros
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
 	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true),
-	halfWidth(0.75f), halfHeight(1.0f), actionManager(), inventory(NULL)
+	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.0625f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords, this);
 	inventory = new Inventory();
@@ -135,12 +135,12 @@ void Player::Update(double dt)
 		if (grounded)
 		{
 			// Accelerates the player to the left
-			AcceleratePlayerHorizontal(-10.0f, dt);
+			AcceleratePlayerHorizontal(-24.0f, dt);
 		}
 		else
 		{
 			// Accelerates the player to the left more slowly in the air
-			AcceleratePlayerHorizontal(-2.0f, dt);
+			AcceleratePlayerHorizontal(-8.0f, dt);
 		}
 	}
 	// Checks if the player is trying to move right
@@ -150,12 +150,12 @@ void Player::Update(double dt)
 		if (grounded)
 		{
 			// Accelerates the player to the right
-			AcceleratePlayerHorizontal(10.0f, dt);
+			AcceleratePlayerHorizontal(24.0f, dt);
 		}
 		else
 		{
 			// Accelerates the player to the right more slowly in the air
-			AcceleratePlayerHorizontal(2.0f, dt);
+			AcceleratePlayerHorizontal(8.0f, dt);
 		}
 	}
 	// Otherwise doesn't accelerate the player
@@ -167,7 +167,7 @@ void Player::Update(double dt)
 	// Checks if the player has left the ground
 	if (UngroundedCheck())
 	{
-		AcceleratePlayerVertical(-50.0f, dt);
+		AcceleratePlayerVertical(-70.0f, dt);
 	}
 
 	// Checks for the jump input
@@ -177,7 +177,7 @@ void Player::Update(double dt)
 		if (grounded)
 		{
 			// Jumps
-			AcceleratePlayerVertical(21.0f, 1.0f);
+			AcceleratePlayerVertical(30.0f, 1.0f);
 			grounded = false;
 		}
 	}
@@ -264,7 +264,7 @@ void Player::AcceleratePlayerHorizontal(float accelerationAmount, double dt)
 	}
 
 	// Puts a max cap to the player's velocity
-	horizontalVelocity = std::clamp(horizontalVelocity, -15.0f, 15.0f);
+	horizontalVelocity = std::clamp(horizontalVelocity, -20.0f, 20.0f);
 }
 
 /*************************************************************************************************/
@@ -300,107 +300,168 @@ void Player::AcceleratePlayerVertical(float accelerationAmount, double dt)
 void Player::MovePlayer(double dt)
 {
 	// Gets the player's position
-	std::pair playerMapPosition = _MapMatrix->GetPlayerPosition();
 	glm::vec2 playerWorldPosition = GetPosition();
 
 	// Calculates how far we are moving this frame
 	float horizontalMovement = horizontalVelocity * (float)dt;
 	float verticalMovement = verticalVelocity * (float)dt;
 
+	// Tries to move the player horizontally
+	playerWorldPosition.x += horizontalMovement;
+
 	// Updates whether we're facing right or left
 	if (horizontalMovement > 0.0f)
 	{
 		SetIsFacingRight(true);
-	}
-	else if (horizontalMovement < 0.0f)
-	{
-		SetIsFacingRight(false);
-	}
 
-	// Runs collision checks
-	std::pair<bool, bool> collisionChecks = CollisionCheck(horizontalMovement, verticalMovement);
-
-	// If we're not at risk of hitting anything horizontally
-	if (collisionChecks.first == false)
-	{
-		// Just moves the player
-		playerWorldPosition.x += horizontalMovement;
-	}
-	// If we can hit something horizontally
-	else
-	{
-		// Calculates the distance between the player and the block next to them
-		float nextTileWorldXPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->CalculateOffsetTile(playerMapPosition, GetIsFacingRight(), 1)).x;
-		float distFromObject = nextTileWorldXPosition - GetPosition().x;
-
-		// Checks if the amount we move this frame would put us in that object
-		if (1.0f + halfWidth + horizontalMovement > abs(distFromObject))
+		// Checks if the right side of the player has moved into an object
+		std::pair<int, int> rightBottomSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomRightOut);
+		std::pair<int, int> rightTopSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn);
+		if (_MapMatrix->GetTile(rightBottomSideTile).tileStatus > MapMatrix::TileStatus::Player ||
+			_MapMatrix->GetTile(rightTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			// If so, moves us up against the wall
-			if (distFromObject > 0)
-			{
-				playerWorldPosition.x = nextTileWorldXPosition - (1.0f + halfWidth);
-			}
-			else if (distFromObject < 0)
-			{
-				playerWorldPosition.x = nextTileWorldXPosition + (1.0f + halfWidth);
-			}
+			playerWorldPosition.x = ConvertMapCoordsToWorldCoords(rightBottomSideTile).x - 2.015625f;
 
 			// Kills the player's velocity
 			horizontalVelocity = 0;
 		}
-		// If we aren't going to collide, moves the player
-		else
+	}
+	else if (horizontalMovement < 0.0f)
+	{
+		SetIsFacingRight(false);
+
+		// Checks if the left side of the player has moved into an object
+		std::pair<int, int> leftBottomSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomLeftOut);
+		std::pair<int, int> leftTopSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn);
+		if (_MapMatrix->GetTile(leftBottomSideTile).tileStatus > MapMatrix::TileStatus::Player ||
+			_MapMatrix->GetTile(leftTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.x += horizontalMovement;
+			playerWorldPosition.x = ConvertMapCoordsToWorldCoords(leftBottomSideTile).x + 2.015625f;
+
+			// Kills the player's velocity
+			horizontalVelocity = 0;
 		}
 	}
 
-	// If we're not at risk of hitting anything vertically
-	if (collisionChecks.second == false)
+	// Tries to move the player vertically 
+	playerWorldPosition.y += verticalMovement;
+
+	// Checks if the player is moving up or down
+	if (verticalMovement > 0.0f)
 	{
-		// Just moves the player
-		playerWorldPosition.y += verticalMovement;
-	}
-	// If we can hit something vertically
-	else
-	{
-		// Determines if we are going up or down
-		int directionModifier = 1;
-		if (verticalMovement < 0)
+		// Checks if the right side of the player has moved into an object
+		std::pair<int, int> topLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn);
+		std::pair<int, int> topRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn);
+		if (_MapMatrix->GetTile(topLeftSideTile).tileStatus > MapMatrix::TileStatus::Player ||
+			_MapMatrix->GetTile(topRightSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			directionModifier = -1;
-		}
-
-		// Calculates the distance between the player and the block next to them
-		float nextTileWorldYPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->CalculateOffsetTile(playerMapPosition, GetIsFacingRight(), 0, directionModifier)).y;
-		float distFromObject = nextTileWorldYPosition - GetPosition().y;
-
-		// Checks if the amount we move this frame would put us in that object
-		if (1.0f + halfHeight + abs(verticalMovement) > abs(distFromObject))
-		{
-			// If so, moves us up against the wall
-			if (distFromObject > 0)
-			{
-				playerWorldPosition.y = nextTileWorldYPosition - (1.0f + halfHeight);
-			}
-			else if (distFromObject < 0)
-			{
-				playerWorldPosition.y = nextTileWorldYPosition + (1.0f + halfHeight);
-
-				// If we moved onto something below us, marks us as grounded
-				grounded = true;
-			}
+			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(topLeftSideTile).y - 2.015625f;
 
 			// Kills the player's velocity
 			verticalVelocity = 0;
 		}
-		// If we aren't going to collide, moves the player
-		else
+	}
+	else if (verticalMovement < 0.0f)
+	{
+		// Checks if the right side of the player has moved into an object
+		std::pair<int, int> bottomLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomLeftOut);
+		std::pair<int, int> bottomRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomRightOut);
+		if (_MapMatrix->GetTile(bottomLeftSideTile).tileStatus > MapMatrix::TileStatus::Player ||
+			_MapMatrix->GetTile(bottomRightSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.y += verticalMovement;
+			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(bottomLeftSideTile).y + 2.0;// 15625f;
+
+			grounded = true;
+
+			// Kills the player's velocity
+			verticalVelocity = 0;
 		}
 	}
+
+	//// Runs collision checks
+	//std::pair<bool, bool> collisionChecks = CollisionCheck(horizontalMovement, verticalMovement);
+	//
+	//// If we're not at risk of hitting anything horizontally
+	//if (collisionChecks.first == false)
+	//{
+	//	// Just moves the player
+	//	playerWorldPosition.x += horizontalMovement;
+	//}
+	//// If we can hit something horizontally
+	//else
+	//{
+	//	// Calculates the distance between the player and the block next to them
+	//	float nextTileWorldXPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->CalculateOffsetTile(playerMapPosition, GetIsFacingRight(), 1)).x;
+	//	float distFromObject = nextTileWorldXPosition - GetPosition().x;
+	//
+	//	// Checks if the amount we move this frame would put us in that object
+	//	if (1.0f + horizontalMovement > abs(distFromObject))
+	//	{
+	//		// If so, moves us up against the wall
+	//		if (distFromObject > 0)
+	//		{
+	//			playerWorldPosition.x = nextTileWorldXPosition - (1.0f + halfWidth);
+	//		}
+	//		else if (distFromObject < 0)
+	//		{
+	//			playerWorldPosition.x = nextTileWorldXPosition + (1.0f + halfWidth);
+	//		}
+	//
+	//		// Kills the player's velocity
+	//		horizontalVelocity = 0;
+	//	}
+	//	// If we aren't going to collide, moves the player
+	//	else
+	//	{
+	//		playerWorldPosition.x += horizontalMovement;
+	//	}
+	//}
+	//
+	//// If we're not at risk of hitting anything vertically
+	//if (collisionChecks.second == false)
+	//{
+	//	// Just moves the player
+	//	playerWorldPosition.y += verticalMovement;
+	//}
+	//// If we can hit something vertically
+	//else
+	//{
+	//	// Determines if we are going up or down
+	//	int directionModifier = 1;
+	//	if (verticalMovement < 0)
+	//	{
+	//		directionModifier = -1;
+	//	}
+	//
+	//	// Calculates the distance between the player and the block next to them
+	//	float nextTileWorldYPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->CalculateOffsetTile(playerMapPosition, GetIsFacingRight(), 0, directionModifier)).y;
+	//	float distFromObject = nextTileWorldYPosition - GetPosition().y;
+	//
+	//	// Checks if the amount we move this frame would put us in that object
+	//	if (1.0f + halfHeight + abs(verticalMovement) > abs(distFromObject))
+	//	{
+	//		// If so, moves us up against the wall
+	//		if (distFromObject > 0)
+	//		{
+	//			playerWorldPosition.y = nextTileWorldYPosition - (1.0f + halfHeight);
+	//		}
+	//		else if (distFromObject < 0)
+	//		{
+	//			playerWorldPosition.y = nextTileWorldYPosition + (1.0f + halfHeight);
+	//
+	//			// If we moved onto something below us, marks us as grounded
+	//			grounded = true;
+	//		}
+	//
+	//		// Kills the player's velocity
+	//		verticalVelocity = 0;
+	//	}
+	//	// If we aren't going to collide, moves the player
+	//	else
+	//	{
+	//		playerWorldPosition.y += verticalMovement;
+	//	}
+	//}
 
 	// Sets the player's new position
 	SetPosition(playerWorldPosition);
@@ -433,14 +494,6 @@ std::pair<bool, bool> Player::CollisionCheck(float horizontalMovement, float ver
 	// Gets the player position
 	std::pair<int, int> playerPosition = _MapMatrix->GetPlayerPosition();
 
-	// Calculates if the right side of the player is over a tile
-	std::pair<int, int> playerRightSidePosition = playerPosition;
-	if (ConvertWorldCoordToMapCoord(GetPosition().x + (halfWidth + GetScale().x)) != playerPosition.first)
-	{
-		// Marks the right side of the player in the next tile
-		playerRightSidePosition.first += 1;
-	}
-
 	// Checks if there even is anything to collide with in the space to the side
 	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(playerPosition, GetIsFacingRight(), 1)).tileStatus > MapMatrix::TileStatus::Player)
 	{
@@ -457,8 +510,8 @@ std::pair<bool, bool> Player::CollisionCheck(float horizontalMovement, float ver
 	{
 		verticalOffset = -1;
 	}
-	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(playerPosition, GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player ||
-		_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(playerRightSidePosition, GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player)
+	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomLeftIn), GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player ||
+		_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomRightIn), GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player)
 	{
 		verticalCollsion = true;
 	}
@@ -489,7 +542,8 @@ bool Player::UngroundedCheck()
 	if (grounded)
 	{
 		// Checks if there is now nothing to collide with in the space under the player
-		if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player)
+		if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player &&
+			_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomRightOut), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player)
 		{
 			// Marks the player as ungrounded
 			grounded = false;
@@ -518,7 +572,6 @@ void Player::UpdatePlayerCoords()
 	if (playerCoords != _MapMatrix->GetPlayerPosition())
 	{
 		_MapMatrix->SetPlayerPosition(playerCoords, this);
-		std::cout << playerCoords.first << ", " << playerCoords.second << std::endl;
 	}
 }
 
@@ -603,5 +656,58 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 		{
 			_MapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
 		}
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Calculates the map tile of the player
+
+	\param position
+		The given world position to calculate map positions for (can be arbitrary which is useful for collision checks before we've moved the player)
+
+	\param position
+		The enum saying what position to return
+
+	\return
+		The calculated map tile
+*/
+/*************************************************************************************************/
+std::pair<int, int> Player::CalculatePlayerMapPositions(glm::vec2 position, Player::Positions anchorPoint)
+{
+	switch (anchorPoint)
+	{
+	case Player::Positions::Center:
+		return ConvertWorldCoordsToMapCoords(position + (GetScale() * 0.5f));
+		break;
+	case Player::Positions::BottomLeftOut:
+		return ConvertWorldCoordsToMapCoords(position);
+		break;
+	case Player::Positions::BottomLeftIn:
+		return ConvertWorldCoordsToMapCoords(position.x, position.y + lowerInnerGap);
+		break;
+	case Player::Positions::BottomRightIn:
+		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y + lowerInnerGap);
+		break;
+	case Player::Positions::BottomRightOut:
+		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y);
+		break;
+	case Player::Positions::TopLeftOut:
+		return ConvertWorldCoordsToMapCoords(position.x, position.y + GetScale().y);
+		break;
+	case Player::Positions::TopLeftIn:
+		return ConvertWorldCoordsToMapCoords(position.x, position.y + GetScale().y - upperInnerGap);
+		break;
+	case Player::Positions::TopRightIn:
+		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y + GetScale().y - upperInnerGap);
+		break;
+	case Player::Positions::TopRightOut:
+		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y + GetScale().y);
+		break;
+	default:
+		// If something went wrong, returns (-1, -1)
+		return std::make_pair(-1, -1);
+		break;
 	}
 }

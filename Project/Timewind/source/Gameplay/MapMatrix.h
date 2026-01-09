@@ -72,9 +72,9 @@ public:
 
 	enum class TileStatus
 	{
-		Empty,									// The player can walk through spaces on this side ^^^
+		Empty,									
 		Key,
-		Coin,
+		Coin,									// The player can walk through spaces on this side ^^^
 		Player,
 		Enemy,									// The player cannot walk through spaces on this side vvv
 		Destructible,

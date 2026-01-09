@@ -126,4 +126,18 @@ int ConvertWorldCoordToMapCoord(double worldCoordinate);
 /*************************************************************************************************/
 std::pair<int, int> ConvertWorldCoordsToMapCoords(double worldXCoordinate, double worldYCoordinate);
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Converts the given world matrix tile coordinates to map coordinates
+
+	\param worldCoordinates
+		The given world coordinates
+
+	\return
+		The corresponding location in map coordinates
+*/
+/*************************************************************************************************/
+std::pair<int, int> ConvertWorldCoordsToMapCoords(glm::vec2 worldCoordinates);
+
 #endif // Timewind_cppShortcuts_H_

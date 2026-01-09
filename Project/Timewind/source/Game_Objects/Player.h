@@ -128,6 +128,20 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	enum class Positions
+	{
+		Center,
+		BottomLeftOut,
+		BottomLeftIn,
+		BottomRightIn,
+		BottomRightOut,
+		TopLeftOut,
+		TopLeftIn,
+		TopRightIn,
+		TopRightOut,
+		Max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -140,10 +154,10 @@ private:
 	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
 	float horizontalVelocity;					// How quickly the player is moving horizontally
 	float verticalVelocity;						// How quickly the player is moving vertically
-	bool grounded;								// Whether the player is grounded
+	bool grounded;							// Whether the player is grounded
 
-	float halfWidth;							// Half the width of the player (so it can be measured from the player's center)
-	float halfHeight;							// Half the height of the player (so it can be measured from the player's center)
+	float lowerInnerGap;						// The distance between the outer and inner hitbox on the bottom of the player
+	float upperInnerGap;						// The distance between the outer and inner hitbox on the top of the player
 
 	ActionManager actionManager;				// Keeps track of actions the player uses
 
@@ -281,6 +295,23 @@ private:
 	*/
 	/*************************************************************************************************/
 	//void ProgressBasicAction();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Calculates the map tile of the player
+	
+		\param position
+			The given world position to calculate map positions for (can be arbitrary which is useful for collision checks before we've moved the player)
+	
+		\param position
+			The enum saying what position to return
+	
+		\return
+			The calculated map tile
+	*/
+	/*************************************************************************************************/
+	std::pair<int, int> CalculatePlayerMapPositions(glm::vec2 position, Positions anchorPoint);
 };
 
 //-------------------------------------------------------------------------------------------------

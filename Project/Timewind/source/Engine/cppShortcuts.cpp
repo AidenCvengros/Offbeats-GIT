@@ -117,6 +117,10 @@ int ConvertWorldCoordToMapCoord(double worldCoordinate)
 {
 	return (int)std::floor(worldCoordinate / 2.0);
 }
+int ConvertWorldCoordToMapCoord(float worldCoordinate)
+{
+	return (int)std::floor(worldCoordinate / 2.0);
+}
 
 /*************************************************************************************************/
 /*!
@@ -136,6 +140,23 @@ int ConvertWorldCoordToMapCoord(double worldCoordinate)
 std::pair<int, int> ConvertWorldCoordsToMapCoords(double worldXCoordinate, double worldYCoordinate)
 {
 	return std::make_pair(ConvertWorldCoordToMapCoord(worldXCoordinate), ConvertWorldCoordToMapCoord(worldYCoordinate));
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Converts the given world matrix tile coordinates to map coordinates
+
+	\param worldCoordinates
+		The given world coordinates
+
+	\return
+		The corresponding location in map coordinates
+*/
+/*************************************************************************************************/
+std::pair<int, int> ConvertWorldCoordsToMapCoords(glm::vec2 worldCoordinates)
+{
+	return std::make_pair(ConvertWorldCoordToMapCoord(worldCoordinates.x), ConvertWorldCoordToMapCoord(worldCoordinates.y));
 }
 
 //-------------------------------------------------------------------------------------------------
