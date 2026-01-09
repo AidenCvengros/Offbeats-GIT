@@ -32,7 +32,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Private Constants
 //-------------------------------------------------------------------------------------------------
 
-const float zDist = -10.0f;						// How far back the camera is in the z axis
+const float zDist = -15.0f;						// How far back the camera is in the z axis
 
 //-------------------------------------------------------------------------------------------------
 // Public Declarations
@@ -134,17 +134,6 @@ glm::mat4 Camera::GetViewMatrix()
 	// If the rotation of the camera has changed since the last check
 	if (centeredObject)
 	{
-		// Calculates whether the camera is facing left or right
-		float directionModifier;
-		if (centeredObject->GetIsFacingRight())
-		{
-			directionModifier = 1;
-		}
-		else
-		{
-			directionModifier = -1;
-		}
-
 		// Update and return the view matrix
 		float distanceFromPlayer = glm::distance(centeredObject->GetPosition(), GetPosition());
 		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist + distanceFromPlayer * distanceFromPlayer / 8.0f), glm::vec3(centeredObject->GetPosition().x, centeredObject->GetPosition().y, zDist / 4.0f), upVector);

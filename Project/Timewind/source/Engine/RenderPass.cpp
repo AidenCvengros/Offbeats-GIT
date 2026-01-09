@@ -615,6 +615,8 @@ void RenderPass::DestroyTexture(VkDevice& vkDevice)
 		{
 			vkDestroyImageView(vkDevice, imageViews[i], nullptr);
 		}
+
+		imageViews.clear();
 	}
 }
 

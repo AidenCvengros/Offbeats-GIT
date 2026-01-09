@@ -363,8 +363,11 @@ void Window::CleanupDraw()
 		framebufferResized = false;
 		RecreateSwapChain();
 	}
-	// Checks if the swap chain update failed somehow
-	CheckVulkanSuccess(result, "failed to present swap chain image!");
+	else
+	{
+		// Checks if the swap chain update failed somehow
+		CheckVulkanSuccess(result, "failed to present swap chain image!");
+	}
 
 	// Increments the current frame index
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;

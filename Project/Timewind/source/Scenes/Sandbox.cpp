@@ -86,7 +86,7 @@ void Sandbox::LoadScene()
 
     // Creates essential game objects (player and camera)
     Player* player = new Player({ 4.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, playerTexture, { 2, 2 });
-    Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(60.0f));
+    Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
     _GameObjectManager->AddGameObject((GameObject*)camera);
     _GameObjectManager->AddGameObject((GameObject*)player);
     _Window->SetCamera(camera);

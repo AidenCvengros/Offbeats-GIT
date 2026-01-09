@@ -84,7 +84,9 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::F2, GLFW_KEY_F2));
 	keybinds.insert(std::pair(Inputs::F3, GLFW_KEY_F3));
 
+	// Grabs the cursor and uses it's current position as the starting for the program
 	glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwGetCursorPos(_Window->GetVulkanWindowPtr(), &mouseCoords.first, &mouseCoords.second);
 }
 
 /*************************************************************************************************/
@@ -111,7 +113,7 @@ void InputManager::Update(double dt)
 		UpdateInputStatus((Inputs)i);
 	}
 
-	auto oldMouseCoords = mouseCoords;
+	std::pair<double, double> oldMouseCoords = mouseCoords;
 	glfwGetCursorPos(_Window->GetVulkanWindowPtr(), &mouseCoords.first, &mouseCoords.second);
 	mouseDelta = { mouseCoords.first - oldMouseCoords.first, mouseCoords.second - oldMouseCoords.second };
 	if (CheckInputStatus(Inputs::F3) == InputStatus::Pressed)
