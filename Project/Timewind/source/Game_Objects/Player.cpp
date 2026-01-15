@@ -467,7 +467,7 @@ bool Player::UngroundedCheck()
 	if (grounded)
 	{
 		// Checks if there is now nothing to collide with in the space under the player
-		if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player &&
+		if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomLeftOut), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player &&
 			_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomRightOut), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player)
 		{
 			// Marks the player as ungrounded
@@ -610,7 +610,7 @@ std::pair<int, int> Player::CalculatePlayerMapPositions(glm::vec2 position, Play
 		return ConvertWorldCoordsToMapCoords(position + (GetScale() * 0.5f));
 		break;
 	case Player::Positions::BottomLeftOut:
-		return ConvertWorldCoordsToMapCoords(position);
+		return ConvertWorldCoordsToMapCoords(position.x + lowerInnerGap, position.y);
 		break;
 	case Player::Positions::BottomLeftIn:
 		return ConvertWorldCoordsToMapCoords(position.x + upperInnerGap, position.y);
@@ -619,7 +619,7 @@ std::pair<int, int> Player::CalculatePlayerMapPositions(glm::vec2 position, Play
 		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x - upperInnerGap, position.y);
 		break;
 	case Player::Positions::BottomRightOut:
-		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y);
+		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x - lowerInnerGap, position.y);
 		break;
 	case Player::Positions::TopLeftOut:
 		return ConvertWorldCoordsToMapCoords(position.x, position.y + GetScale().y);

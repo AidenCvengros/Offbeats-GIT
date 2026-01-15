@@ -93,7 +93,7 @@ void Sandbox::LoadScene()
 
     // Sets the map for the scene
     std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
-    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1.csv", specialTileList);
+    _MapMatrix->ReadMapFromFile("Assets/Maps/Sandbox.csv", specialTileList);
 
     // Adds in all special tiles
     for (auto i = specialTileList.begin(); i != specialTileList.end(); i++)
