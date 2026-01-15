@@ -94,7 +94,7 @@ Copyright (c) 2023 Aiden Cvengros
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
 	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true),
-	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.0625f), actionManager(), inventory(NULL)
+	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords, this);
 	inventory = new Inventory();
@@ -167,7 +167,7 @@ void Player::Update(double dt)
 	// Checks if the player has left the ground
 	if (UngroundedCheck())
 	{
-		AcceleratePlayerVertical(-70.0f, dt);
+		AcceleratePlayerVertical(-65.0f, dt);
 	}
 
 	// Checks for the jump input
@@ -246,19 +246,19 @@ void Player::AcceleratePlayerHorizontal(float accelerationAmount, double dt)
 	// If we are starting from a standstill, gets an extra boost
 	else if (horizontalVelocity == 0.0f)
 	{
-		horizontalVelocity += accelerationAmount * 0.1;
+		horizontalVelocity += accelerationAmount * 0.1f;
 	}
 	// If we are stopping
 	else
 	{
-		horizontalVelocity += accelerationAmount * (float)dt * 1.5f;
+		horizontalVelocity += accelerationAmount * (float)dt * 2.0f;
 	}
 
 	// Horizontal velocity deteriorates over time if not being added
 	if (accelerationAmount == 0.0f)
 	{
 		// If we've basically stopped, just stops
-		if (abs(horizontalVelocity) < 0.25f)
+		if (abs(horizontalVelocity) < 4.0f)
 		{
 			horizontalVelocity = 0.0f;
 		}
@@ -321,12 +321,12 @@ void Player::MovePlayer(double dt)
 		SetIsFacingRight(true);
 
 		// Checks if the right side of the player has moved into an object
-		std::pair<int, int> rightBottomSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomRightOut);
+		std::pair<int, int> rightBottomSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomRightIn);
 		std::pair<int, int> rightTopSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn);
 		if (_MapMatrix->GetTile(rightBottomSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(rightTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.x = ConvertMapCoordsToWorldCoords(rightBottomSideTile).x - 2.0078125f;
+			playerWorldPosition.x = ConvertMapCoordsToWorldCoords(rightBottomSideTile).x - 2.0078125f + upperInnerGap;
 
 			// Kills the player's velocity
 			horizontalVelocity = 0;
@@ -337,12 +337,12 @@ void Player::MovePlayer(double dt)
 		SetIsFacingRight(false);
 
 		// Checks if the left side of the player has moved into an object
-		std::pair<int, int> leftBottomSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomLeftOut);
+		std::pair<int, int> leftBottomSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomLeftIn);
 		std::pair<int, int> leftTopSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn);
 		if (_MapMatrix->GetTile(leftBottomSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(leftTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.x = ConvertMapCoordsToWorldCoords(leftBottomSideTile).x + 2.0078125f;
+			playerWorldPosition.x = ConvertMapCoordsToWorldCoords(leftBottomSideTile).x + 2.0078125f - upperInnerGap;
 
 			// Kills the player's velocity
 			horizontalVelocity = 0;
@@ -356,25 +356,26 @@ void Player::MovePlayer(double dt)
 	if (verticalMovement > 0.0f)
 	{
 		// Checks if the right side of the player has moved into an object
-		std::pair<int, int> topLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftOut);
-		std::pair<int, int> topRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightOut);
+		std::pair<int, int> topLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn);
+		std::pair<int, int> topRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn);
 		if (_MapMatrix->GetTile(topLeftSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(topRightSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(topLeftSideTile).y - 2.0f;
+			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(topLeftSideTile).y - 2.0078125f + upperInnerGap;
 
 			// Kills the player's velocity
-			verticalVelocity = 0;
+			verticalVelocity *= 0.25f;
 
 			// If jumping into a destructible object, destroy it
-			InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(playerWorldPosition, Positions::Center), GetIsFacingRight(), 0, 1), true, false);
+			InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn), GetIsFacingRight(), 0, 1), true, false);
+			InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn), GetIsFacingRight(), 0, 1), true, false);
 		}
 	}
 	else if (verticalMovement < 0.0f)
 	{
 		// Checks if the right side of the player has moved into an object
-		std::pair<int, int> bottomLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomLeftOut);
-		std::pair<int, int> bottomRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomRightOut);
+		std::pair<int, int> bottomLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomLeftIn);
+		std::pair<int, int> bottomRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomRightIn);
 		if (_MapMatrix->GetTile(bottomLeftSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(bottomRightSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
@@ -612,10 +613,10 @@ std::pair<int, int> Player::CalculatePlayerMapPositions(glm::vec2 position, Play
 		return ConvertWorldCoordsToMapCoords(position);
 		break;
 	case Player::Positions::BottomLeftIn:
-		return ConvertWorldCoordsToMapCoords(position.x, position.y + lowerInnerGap);
+		return ConvertWorldCoordsToMapCoords(position.x + upperInnerGap, position.y);
 		break;
 	case Player::Positions::BottomRightIn:
-		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y + lowerInnerGap);
+		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x - upperInnerGap, position.y);
 		break;
 	case Player::Positions::BottomRightOut:
 		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y);
@@ -624,10 +625,10 @@ std::pair<int, int> Player::CalculatePlayerMapPositions(glm::vec2 position, Play
 		return ConvertWorldCoordsToMapCoords(position.x, position.y + GetScale().y);
 		break;
 	case Player::Positions::TopLeftIn:
-		return ConvertWorldCoordsToMapCoords(position.x, position.y + GetScale().y - upperInnerGap);
+		return ConvertWorldCoordsToMapCoords(position.x + upperInnerGap, position.y + GetScale().y - upperInnerGap);
 		break;
 	case Player::Positions::TopRightIn:
-		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y + GetScale().y - upperInnerGap);
+		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x - upperInnerGap, position.y + GetScale().y - upperInnerGap);
 		break;
 	case Player::Positions::TopRightOut:
 		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y + GetScale().y);

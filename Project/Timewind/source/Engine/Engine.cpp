@@ -162,7 +162,7 @@ void Engine::Update()
 	{
 		// Tracks how long it has been since the previous frame
 		double newTime = glfwGetTime();
-		double dt = newTime - lastTime;
+		double dt = std::min(newTime - lastTime, 0.1);
 		lastTime = newTime;
 		fmin(dt, 0.1);
 #ifdef _DEBUG
