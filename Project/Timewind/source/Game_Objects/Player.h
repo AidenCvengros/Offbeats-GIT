@@ -156,6 +156,7 @@ private:
 	float horizontalVelocity;					// How quickly the player is moving horizontally
 	float verticalVelocity;						// How quickly the player is moving vertically
 	bool grounded;								// Whether the player is grounded
+	bool jumped;								// Boolean to keep the player from continually jumping if the button is held
 	int againstWall;							// Whether the player is up against a wall
 	bool goingMaxSpeed;							// Whether the player is going max speed
 	float maxSpeed;								// The max speed of the player

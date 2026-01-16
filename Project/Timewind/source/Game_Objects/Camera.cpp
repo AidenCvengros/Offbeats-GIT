@@ -85,6 +85,7 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	inCutscene(false),
 	upVector(glm::vec3(0.0f, 1.0f, 0.0f)),
 	centeredObject(centeredObject_),
+	cameraBoxPos(pos),
 	viewMat(glm::mat4(0.0f)),
 	perspMat(glm::mat4(0.0f)),
 	aspectRatio(aspectRatio_),
@@ -116,7 +117,7 @@ void Camera::Update(double dt)
 		// Updates camera view positioning
 		UpdateRelativePosition();
 
-		MoveTo(glm::vec2(centeredObject->GetPosition().x + 5.0f * relativePosX, centeredObject->GetPosition().y + -3.75f * relativePosY), 0.025, false);
+		MoveTo(glm::vec2(centeredObject->GetPosition().x + 5.0f * relativePosX, centeredObject->GetPosition().y + -3.75f * relativePosY), 0.0, false);
 	}
 }
 

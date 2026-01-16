@@ -184,7 +184,7 @@ void Sandbox::LoadScene()
         }
     }
 
-    ScreenCrack* glitchBox = new ScreenCrack(glm::vec2(11.0f, 10.5f), 40.0f, glm::vec2(3.0f, 3.0f), 150, true, glm::vec4(1.0f, 0.3f, 0.0f, 0.9f), 12.0f);
+    ScreenCrack* glitchBox = new ScreenCrack(glm::vec2(11.0f, 10.5f), 40.0f, glm::vec2(3.0f, 3.0f), 150, true, glm::vec4(0.0f, 0.0f, 0.0f, 0.9f), 12.0f);
     _GameObjectManager->AddGameObject(glitchBox);
 
     // Updates the player position for the map

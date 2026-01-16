@@ -203,6 +203,7 @@ private:
 
 	glm::vec3 upVector;							// The up vector for the camera
 	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
+	glm::vec2 cameraBoxPos;						// The position of the camera box
 
 	glm::mat4 viewMat;							// The view matrix for the camera
 	glm::mat4 perspMat;							// The perspective matrix for the camera
