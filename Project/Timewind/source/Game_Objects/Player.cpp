@@ -93,7 +93,7 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true),
+	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), againstWall(0), goingMaxSpeed(false), maxSpeed(20.0f),
 	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords, this);
@@ -173,13 +173,30 @@ void Player::Update(double dt)
 	// Checks for the jump input
 	if (CheckInput(InputManager::Inputs::Jump))
 	{
-		// Checks if the player is grounded
-		if (grounded)
+		// Checks if the player is grounded or cut in by a roof
+		if (grounded &&
+			_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopLeftIn), GetIsFacingRight(), 0, 1)).tileStatus < MapMatrix::TileStatus::Player &&
+			_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopRightIn), GetIsFacingRight(), 0, 1)).tileStatus < MapMatrix::TileStatus::Player)
 		{
-			// Jumps
-			AcceleratePlayerVertical(30.0f, 1.0f);
+			// Jumps higher if the player is at max speed
+			if (goingMaxSpeed)
+			{
+				AcceleratePlayerVertical(37.0f, 1.0f);
+			}
+			else
+			{
+				AcceleratePlayerVertical(30.0f, 1.0f);
+			}
+
+			// No longer grounded
 			grounded = false;
 		}
+	}
+	// Checks if the jump input was released
+	else if (_InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Released && verticalVelocity >= 15.0f)
+	{
+		// If the jump was let go, cuts the jump short
+		verticalVelocity *= 0.5f;
 	}
 
 	// Moves the player
@@ -269,8 +286,22 @@ void Player::AcceleratePlayerHorizontal(float accelerationAmount, double dt)
 		}
 	}
 
+	// Checks if the player is at max speed
+	if (abs(horizontalVelocity) > maxSpeed)
+	{
+		// Sets that we are going max speed
+		goingMaxSpeed = true;
+		SetColor({ 1.0f, 0.8f, 0.8f, 1.0f });
+	}
+	else
+	{
+		// Otherwise resets max speed
+		goingMaxSpeed = false;
+		SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+	}
+
 	// Puts a max cap to the player's velocity
-	horizontalVelocity = std::clamp(horizontalVelocity, -20.0f, 20.0f);
+	horizontalVelocity = std::clamp(horizontalVelocity, -maxSpeed, maxSpeed);
 }
 
 /*************************************************************************************************/
@@ -291,7 +322,7 @@ void Player::AcceleratePlayerVertical(float accelerationAmount, double dt)
 	verticalVelocity += accelerationAmount * dt;
 
 	// Clamps the player's max speed
-	verticalVelocity = std::clamp(verticalVelocity, -30.0f, 30.0f);
+	verticalVelocity = std::clamp(verticalVelocity, -30.0f, 37.0f);
 }
 
 /*************************************************************************************************/
@@ -313,7 +344,13 @@ void Player::MovePlayer(double dt)
 	float verticalMovement = verticalVelocity * (float)dt;
 
 	// Tries to move the player horizontally
-	playerWorldPosition.x += horizontalMovement;
+	if (!againstWall || horizontalMovement * againstWall > 0.0f)
+	{
+		playerWorldPosition.x += horizontalMovement;
+	}
+
+	// Resets against wall
+	againstWall = 0;
 
 	// Updates whether we're facing right or left
 	if (horizontalMovement > 0.0f)
@@ -326,10 +363,19 @@ void Player::MovePlayer(double dt)
 		if (_MapMatrix->GetTile(rightBottomSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(rightTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.x = ConvertMapCoordsToWorldCoords(rightBottomSideTile).x - 2.0078125f + upperInnerGap;
+			// Checks if we can move into a side wall
+			if (!(verticalMovement < 0.0f && _MapMatrix->GetTile(rightBottomSideTile).tileStatus < MapMatrix::TileStatus::Player &&
+				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::BottomRightIn)).tileStatus > MapMatrix::TileStatus::Player) &&
+				!(verticalMovement > 0.0f && _MapMatrix->GetTile(rightTopSideTile).tileStatus < MapMatrix::TileStatus::Player &&
+				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::TopRightIn)).tileStatus > MapMatrix::TileStatus::Player))
+			{
+				// If none of that is happening, we are up against a wall
+				playerWorldPosition.x = ConvertMapCoordsToWorldCoords(rightBottomSideTile).x - 2.0078125f + upperInnerGap;
 
-			// Kills the player's velocity
-			horizontalVelocity = 0;
+				// Kills the player's velocity
+				horizontalVelocity = 0;
+				againstWall = 1;
+			}
 		}
 	}
 	else if (horizontalMovement < 0.0f)
@@ -342,10 +388,18 @@ void Player::MovePlayer(double dt)
 		if (_MapMatrix->GetTile(leftBottomSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(leftTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.x = ConvertMapCoordsToWorldCoords(leftBottomSideTile).x + 2.0078125f - upperInnerGap;
+			// Checks if we can move into a side wall
+			if (!(verticalMovement < 0.0f && _MapMatrix->GetTile(leftBottomSideTile).tileStatus < MapMatrix::TileStatus::Player &&
+				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::BottomLeftIn)).tileStatus > MapMatrix::TileStatus::Player) &&
+				!(verticalMovement > 0.0f && _MapMatrix->GetTile(leftTopSideTile).tileStatus < MapMatrix::TileStatus::Player &&
+				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::TopLeftIn)).tileStatus > MapMatrix::TileStatus::Player))
+			{
+				playerWorldPosition.x = ConvertMapCoordsToWorldCoords(leftBottomSideTile).x + 2.0078125f - upperInnerGap;
 
-			// Kills the player's velocity
-			horizontalVelocity = 0;
+				// Kills the player's velocity
+				horizontalVelocity = 0;
+				againstWall = -1;
+			}
 		}
 	}
 
@@ -358,17 +412,38 @@ void Player::MovePlayer(double dt)
 		// Checks if the right side of the player has moved into an object
 		std::pair<int, int> topLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn);
 		std::pair<int, int> topRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn);
+		std::pair<int, int> topCenter = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopCenter);
 		if (_MapMatrix->GetTile(topLeftSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(topRightSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(topLeftSideTile).y - 2.0078125f + upperInnerGap;
+			// Checks if the center is clear and if so moves the player towards the opening
+			if (_MapMatrix->GetTile(topCenter).tileStatus < MapMatrix::TileStatus::Player)
+			{
+				float downYPos = ConvertMapCoordsToWorldCoords(topLeftSideTile).y - 2.0f + upperInnerGap;
+				float distInObject = playerWorldPosition.y - downYPos;
+				playerWorldPosition.y = downYPos;
+				
+				if (_MapMatrix->GetTile(topLeftSideTile).tileStatus > MapMatrix::TileStatus::Player)
+				{
+					playerWorldPosition.x += distInObject;
+				}
+				else
+				{
+					playerWorldPosition.x -= distInObject;
+				}
+			}
+			// Otherwise bumps into the ceiling
+			else
+			{
+				playerWorldPosition.y = ConvertMapCoordsToWorldCoords(topLeftSideTile).y - 2.0078125f + upperInnerGap;
 
-			// Kills the player's velocity
-			verticalVelocity *= 0.25f;
+				// Kills the player's velocity
+				verticalVelocity *= 0.25f;
 
-			// If jumping into a destructible object, destroy it
-			InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn), GetIsFacingRight(), 0, 1), true, false);
-			InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn), GetIsFacingRight(), 0, 1), true, false);
+				// If jumping into a destructible object, destroy it
+				InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn), GetIsFacingRight(), 0, 1), true, false);
+				InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn), GetIsFacingRight(), 0, 1), true, false);
+			}
 		}
 	}
 	else if (verticalMovement < 0.0f)
@@ -470,8 +545,16 @@ bool Player::UngroundedCheck()
 		if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomLeftOut), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player &&
 			_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomRightOut), GetIsFacingRight(), 0, -1)).tileStatus < MapMatrix::TileStatus::Player)
 		{
-			// Marks the player as ungrounded
-			grounded = false;
+			// If the player is going max speed, they can skip over 1 block gaps
+			if (goingMaxSpeed && _MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::Center), GetIsFacingRight(), 1, -1)).tileStatus > MapMatrix::TileStatus::Player)
+			{
+				return false;
+			}
+			else
+			{
+				// Marks the player as ungrounded
+				grounded = false;
+			}
 		}
 		else
 		{
@@ -632,6 +715,9 @@ std::pair<int, int> Player::CalculatePlayerMapPositions(glm::vec2 position, Play
 		break;
 	case Player::Positions::TopRightOut:
 		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y + GetScale().y);
+		break;
+	case Player::Positions::TopCenter:
+		return ConvertWorldCoordsToMapCoords(position.x + (GetScale().x * 0.5f), position.y + GetScale().y - upperInnerGap);
 		break;
 	default:
 		// If something went wrong, returns (-1, -1)

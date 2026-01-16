@@ -140,6 +140,7 @@ private:
 		TopLeftIn,
 		TopRightIn,
 		TopRightOut,
+		TopCenter,
 		Max
 	};
 	
@@ -154,7 +155,10 @@ private:
 	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
 	float horizontalVelocity;					// How quickly the player is moving horizontally
 	float verticalVelocity;						// How quickly the player is moving vertically
-	bool grounded;							// Whether the player is grounded
+	bool grounded;								// Whether the player is grounded
+	int againstWall;							// Whether the player is up against a wall
+	bool goingMaxSpeed;							// Whether the player is going max speed
+	float maxSpeed;								// The max speed of the player
 
 	float lowerInnerGap;						// The distance between the outer and inner hitbox on the bottom of the player
 	float upperInnerGap;						// The distance between the outer and inner hitbox on the top of the player
