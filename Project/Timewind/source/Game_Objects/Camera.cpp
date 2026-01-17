@@ -86,6 +86,7 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	upVector(glm::vec3(0.0f, 1.0f, 0.0f)),
 	centeredObject(centeredObject_),
 	cameraBoxPos(pos),
+	cameraBoxLeft(0.5f), cameraBoxRight(0.5f), cameraBoxUp(1.0f), cameraBoxDown(0.25f),
 	viewMat(glm::mat4(0.0f)),
 	perspMat(glm::mat4(0.0f)),
 	aspectRatio(aspectRatio_),
@@ -116,8 +117,9 @@ void Camera::Update(double dt)
 	{
 		// Updates camera view positioning
 		UpdateRelativePosition();
+		UpdateCameraBox();
 
-		MoveTo(glm::vec2(centeredObject->GetPosition().x + 5.0f * relativePosX, centeredObject->GetPosition().y + -3.75f * relativePosY), 0.0, false);
+		MoveTo(glm::vec2(cameraBoxPos.x + 5.0f * relativePosX, cameraBoxPos.y + -3.75f * relativePosY), 0.0, false);
 	}
 }
 
@@ -240,4 +242,39 @@ void Camera::UpdateRelativePosition()
 	{
 		relativePosY = normalizedRelativePositions.y;
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Updates the camera box position
+*/
+/*************************************************************************************************/
+void Camera::UpdateCameraBox()
+{
+	// Gets the centered object's position
+	glm::vec2 coPos = centeredObject->GetPosition();
+
+	// Checks if player has gone too far to the right
+	if (coPos.x - cameraBoxPos.x > cameraBoxRight)
+	{
+		cameraBoxPos.x = coPos.x - cameraBoxRight;
+	}
+	// Checks if the player has gone too far left
+	else if (cameraBoxPos.x - coPos.x > cameraBoxLeft)
+	{
+		cameraBoxPos.x = coPos.x + cameraBoxLeft;
+	}
+
+	// Checks if the player has gone too far up
+	if (coPos.y - cameraBoxPos.y > cameraBoxUp)
+	{
+		cameraBoxPos.y = coPos.y - cameraBoxUp;
+	}
+	// Checks if the player has gone too far down
+	else if (cameraBoxPos.y - coPos.y > cameraBoxDown)
+	{
+		cameraBoxPos.y = coPos.y + cameraBoxDown;
+	}
+
 }

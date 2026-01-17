@@ -203,7 +203,12 @@ private:
 
 	glm::vec3 upVector;							// The up vector for the camera
 	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
+
 	glm::vec2 cameraBoxPos;						// The position of the camera box
+	float cameraBoxRight;						// How far right the camera box extends
+	float cameraBoxLeft;						// How far left the camera box extends
+	float cameraBoxUp;							// How far up the camera box extends
+	float cameraBoxDown;						// How far down the camera box extends
 
 	glm::mat4 viewMat;							// The view matrix for the camera
 	glm::mat4 perspMat;							// The perspective matrix for the camera
@@ -225,6 +230,14 @@ private:
 	*/
 	/*************************************************************************************************/
 	void UpdateRelativePosition();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates the camera box position
+	*/
+	/*************************************************************************************************/
+	void UpdateCameraBox();
 };
 
 //-------------------------------------------------------------------------------------------------
