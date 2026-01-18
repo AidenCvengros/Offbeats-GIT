@@ -209,6 +209,7 @@ private:
 	float cameraBoxLeft;						// How far left the camera box extends
 	float cameraBoxUp;							// How far up the camera box extends
 	float cameraBoxDown;						// How far down the camera box extends
+	bool justGrounded;							// Whether the player object just became grounded
 
 	glm::mat4 viewMat;							// The view matrix for the camera
 	glm::mat4 perspMat;							// The perspective matrix for the camera
@@ -235,9 +236,12 @@ private:
 	/*!
 		\brief
 			Updates the camera box position
+
+		\param dt
+			The time elapsed since the previous frame
 	*/
 	/*************************************************************************************************/
-	void UpdateCameraBox();
+	void UpdateCameraBox(double dt);
 };
 
 //-------------------------------------------------------------------------------------------------

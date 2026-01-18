@@ -345,6 +345,52 @@ void GameObject::MoveToUpdate(double dt)
 	}
 }
 
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Calculates the world position of the game object at the relative position
+
+	\param position
+		The enum saying what position to return
+
+	\return
+		The calculated position
+*/
+/*************************************************************************************************/
+glm::vec2 GameObject::CalculateRelativePositions(GameObject::Positions anchorPoint)
+{
+	// Gets the game object's position
+	glm::vec2 position = GetPosition();
+
+	// Calculate the relative position
+	switch (anchorPoint)
+	{
+	case GameObject::Positions::Center:
+		return position + (GetScale() * 0.5f);
+		break;
+	case GameObject::Positions::BottomLeft:
+		return { position.x, position.y };
+		break;
+	case GameObject::Positions::BottomRight:
+		return { position.x + GetScale().x, position.y };
+		break;
+	case GameObject::Positions::TopLeft:
+		return { position.x, position.y + GetScale().y };
+		break;
+	case GameObject::Positions::TopRight:
+		return { position.x + GetScale().x, position.y + GetScale().y };
+		break;
+	case GameObject::Positions::TopCenter:
+		return { position.x + (GetScale().x * 0.5f), position.y + GetScale().y };
+		break;
+	default:
+		// If something went wrong, returns (-1, -1)
+		return { -1, -1 };
+		break;
+	}
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------

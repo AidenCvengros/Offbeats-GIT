@@ -86,7 +86,8 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	upVector(glm::vec3(0.0f, 1.0f, 0.0f)),
 	centeredObject(centeredObject_),
 	cameraBoxPos(pos),
-	cameraBoxLeft(0.5f), cameraBoxRight(0.5f), cameraBoxUp(1.0f), cameraBoxDown(0.25f),
+	cameraBoxLeft(0.5f), cameraBoxRight(0.5f), cameraBoxUp(4.0f), cameraBoxDown(1.0f),
+	justGrounded(false),
 	viewMat(glm::mat4(0.0f)),
 	perspMat(glm::mat4(0.0f)),
 	aspectRatio(aspectRatio_),
@@ -94,6 +95,12 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	relativePosX(0.0), relativePosY(0.0)
 {
 	SetPosition(centeredObject->GetPosition());
+
+	// If there is a centered object, starts the camera centered on that object
+	if (centeredObject)
+	{
+		cameraBoxPos = centeredObject->CalculateRelativePositions(GameObject::Positions::Center);
+	}
 }
 
 /*************************************************************************************************/
@@ -117,7 +124,7 @@ void Camera::Update(double dt)
 	{
 		// Updates camera view positioning
 		UpdateRelativePosition();
-		UpdateCameraBox();
+		UpdateCameraBox(dt);
 
 		MoveTo(glm::vec2(cameraBoxPos.x + 5.0f * relativePosX, cameraBoxPos.y + -3.75f * relativePosY), 0.0, false);
 	}
@@ -138,8 +145,8 @@ glm::mat4 Camera::GetViewMatrix()
 	if (centeredObject)
 	{
 		// Update and return the view matrix
-		float distanceFromPlayer = glm::distance(centeredObject->GetPosition(), GetPosition());
-		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist + distanceFromPlayer * distanceFromPlayer / 8.0f), glm::vec3(centeredObject->GetPosition().x, centeredObject->GetPosition().y, zDist / 4.0f), upVector);
+		float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
+		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist + distanceFromPlayer * distanceFromPlayer / 8.0f), glm::vec3(cameraBoxPos.x, cameraBoxPos.y, zDist / 4.0f), upVector);
 	}
 	else
 	{
@@ -185,7 +192,7 @@ glm::mat4 Camera::GetPerspectiveMatrix()
 /*************************************************************************************************/
 glm::vec4 Camera::GetLookAtVector()
 {
-	return glm::vec4(centeredObject->GetPosition() - GetPosition(), -zDist, 1.0f);
+	return glm::vec4(cameraBoxPos - GetPosition(), -zDist, 1.0f);
 }
 
 /*************************************************************************************************/
@@ -214,6 +221,7 @@ glm::vec4 Camera::Get3DPosition()
 void Camera::SetCenteredObject(Player* object)
 {
 	centeredObject = object;
+	cameraBoxPos = centeredObject->GetPosition();
 	SetPosition(centeredObject->GetPosition());
 }
 
@@ -248,22 +256,49 @@ void Camera::UpdateRelativePosition()
 /*!
 	\brief
 		Updates the camera box position
+
+	\param dt
+		The time elapsed since the previous frame
 */
 /*************************************************************************************************/
-void Camera::UpdateCameraBox()
+void Camera::UpdateCameraBox(double dt)
 {
 	// Gets the centered object's position
-	glm::vec2 coPos = centeredObject->GetPosition();
+	glm::vec2 coPos = centeredObject->CalculateRelativePositions(GameObject::Positions::Center);
+	std::pair<float, float> coVel = centeredObject->GetVelocity();
 
 	// Checks if player has gone too far to the right
 	if (coPos.x - cameraBoxPos.x > cameraBoxRight)
 	{
 		cameraBoxPos.x = coPos.x - cameraBoxRight;
 	}
+	else if (coPos.x - cameraBoxPos.x > 0.0f && coVel.first > 4.0f)
+	{
+		cameraBoxPos.x += coVel.first * dt * 0.5f;
+	}
 	// Checks if the player has gone too far left
 	else if (cameraBoxPos.x - coPos.x > cameraBoxLeft)
 	{
 		cameraBoxPos.x = coPos.x + cameraBoxLeft;
+	}
+	else if (cameraBoxPos.x - coPos.x > 0.0f && coVel.first < -4.0f)
+	{
+		cameraBoxPos.x += coVel.first * dt * 0.5f;
+	}
+
+	if (!centeredObject->GetIsGrounded())
+	{
+		justGrounded = false;
+	}
+	else if (justGrounded == false && centeredObject->GetIsGrounded())
+	{
+		cameraBoxPos.y += (coPos.y - cameraBoxPos.y) * 8.0f * dt;
+
+		if (abs(coPos.y - cameraBoxPos.y) < 0.125f)
+		{
+			justGrounded = true;
+			cameraBoxPos.y = coPos.y;
+		}
 	}
 
 	// Checks if the player has gone too far up
@@ -276,5 +311,4 @@ void Camera::UpdateCameraBox()
 	{
 		cameraBoxPos.y = coPos.y + cameraBoxDown;
 	}
-
 }

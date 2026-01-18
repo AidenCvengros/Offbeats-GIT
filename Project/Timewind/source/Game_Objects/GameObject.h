@@ -57,6 +57,17 @@ public:
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 
+	enum class Positions
+	{
+		Center,
+		BottomLeft,
+		BottomRight,
+		TopLeft,
+		TopRight,
+		TopCenter,
+		Max
+	};
+
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
@@ -639,6 +650,20 @@ public:
 	*/
 	/*************************************************************************************************/
 	void MoveToUpdate(double dt);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Calculates the world position of the game object at the relative position
+	
+		\param position
+			The enum saying what position to return
+	
+		\return
+			The calculated position
+	*/
+	/*************************************************************************************************/
+	glm::vec2 CalculateRelativePositions(GameObject::Positions anchorPoint);
 	
 private:
 	//---------------------------------------------------------------------------------------------
