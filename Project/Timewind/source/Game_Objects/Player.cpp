@@ -36,6 +36,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "LockedWall.h"
 #include "Item.h"
 #include "Key.h"
+#include "Stickers/Bumper.h"
 
 // std::clamp is used to clamp the player's speed
 #include <algorithm>
@@ -326,7 +327,7 @@ void Player::AcceleratePlayerHorizontal(float accelerationAmount, double dt)
 void Player::AcceleratePlayerVertical(float accelerationAmount, double dt)
 {
 	// Applies the acceleration amount to the vertical velocity
-	verticalVelocity += accelerationAmount * dt;
+	verticalVelocity += accelerationAmount * (float)dt;
 
 	// Clamps the player's max speed
 	verticalVelocity = std::clamp(verticalVelocity, -30.0f, 37.0f);
@@ -371,10 +372,10 @@ void Player::MovePlayer(double dt)
 			_MapMatrix->GetTile(rightTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
 			// Checks if we can move into a side wall
-			if (!(verticalMovement < 0.0f && _MapMatrix->GetTile(rightBottomSideTile).tileStatus < MapMatrix::TileStatus::Player &&
-				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::BottomRightIn)).tileStatus > MapMatrix::TileStatus::Player) &&
+			if (!(verticalMovement > 0.0f && _MapMatrix->GetTile(rightBottomSideTile).tileStatus < MapMatrix::TileStatus::Player &&
+				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::TopRightIn)).tileStatus < MapMatrix::TileStatus::Player) &&
 				!(verticalMovement > 0.0f && _MapMatrix->GetTile(rightTopSideTile).tileStatus < MapMatrix::TileStatus::Player &&
-				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::TopRightIn)).tileStatus > MapMatrix::TileStatus::Player))
+				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::BottomRightIn)).tileStatus < MapMatrix::TileStatus::Player))
 			{
 				// If none of that is happening, we are up against a wall
 				playerWorldPosition.x = ConvertMapCoordsToWorldCoords(rightBottomSideTile).x - 2.0078125f + upperInnerGap;
@@ -397,9 +398,9 @@ void Player::MovePlayer(double dt)
 		{
 			// Checks if we can move into a side wall
 			if (!(verticalMovement < 0.0f && _MapMatrix->GetTile(leftBottomSideTile).tileStatus < MapMatrix::TileStatus::Player &&
-				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::BottomLeftIn)).tileStatus > MapMatrix::TileStatus::Player) &&
+				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::TopLeftIn)).tileStatus < MapMatrix::TileStatus::Player) &&
 				!(verticalMovement > 0.0f && _MapMatrix->GetTile(leftTopSideTile).tileStatus < MapMatrix::TileStatus::Player &&
-				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::TopLeftIn)).tileStatus > MapMatrix::TileStatus::Player))
+				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::BottomLeftIn)).tileStatus < MapMatrix::TileStatus::Player))
 			{
 				playerWorldPosition.x = ConvertMapCoordsToWorldCoords(leftBottomSideTile).x + 2.0078125f - upperInnerGap;
 
@@ -461,7 +462,7 @@ void Player::MovePlayer(double dt)
 		if (_MapMatrix->GetTile(bottomLeftSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(bottomRightSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
-			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(bottomLeftSideTile).y + 2.0;// 15625f;
+			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(bottomLeftSideTile).y + 2.0f;// 15625f;
 
 			grounded = true;
 
@@ -664,6 +665,13 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 		{
 			inventory->AddCoin();
 			_MapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+		}
+		// Checks for bumper
+		else if (targetTile.tileStatus == MapMatrix::TileStatus::Bumper)
+		{
+			float bumperStrength = ((Bumper*)targetTile.tileObject)->GetBumperStrength();
+			verticalVelocity = sin(targetTile.tileObject->GetRotation()) * bumperStrength;
+			horizontalVelocity = cos(targetTile.tileObject->GetRotation()) * bumperStrength;
 		}
 	}
 

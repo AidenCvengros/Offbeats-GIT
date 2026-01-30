@@ -138,6 +138,9 @@
     <ClInclude Include="source\Engine\File.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="source\Game_Objects\Stickers\Bumper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine\Engine.cpp">
@@ -232,6 +235,9 @@
     </ClCompile>
     <ClCompile Include="source\Engine\File.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Game_Objects\Stickers\Bumper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

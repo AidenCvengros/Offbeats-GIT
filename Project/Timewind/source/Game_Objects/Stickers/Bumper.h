@@ -1,14 +1,17 @@
 /*************************************************************************************************/
 /*!
-\file Item.h
+\file Bumper.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2025.4.28
+\date 2026.1.29
 \brief
-    The base class for item game objects
+    The bumper object
 
     Public Functions:
-        + FILL
+        + Entity::Entity
+		+ Entity::~Entity
+		+ Entity::SetPosition
+		+ Entity::GetPosition
 		
 	Private Functions:
 		+ FILL
@@ -17,8 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Item_H_
-#define Syncopatience_Item_H_
+#ifndef Syncopatience_Bumper_H_
+#define Syncopatience_Bumper_H_
 
 #pragma once
 
@@ -26,11 +29,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base include
-#include "../Engine/stdafx.h"
-
-// The base game object class
-#include "GameObject.h"
+#include "../Item.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -47,29 +46,20 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The interactible game object class
+		The base entity class for objects on the map
 */
 /*************************************************************************************************/
-class Item : public GameObject
+class Bumper : public Item
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-
-	enum class ItemType
-	{
-		Null = -1,
-		Key,
-		Coin,
-		Bumper,
-		Max
-	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
 	//---------------------------------------------------------------------------------------------
@@ -77,14 +67,11 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-	
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the item game object class
-
-		\param itemType_
-			The type of the item
+			Constructor for the bumper game object class
 
 		\param pos
 			The position of the game object
@@ -94,9 +81,6 @@ public:
 
 		\param sca
 			The scale of the game object
-
-		\param drawPriority_
-			Higher draw priorities are drawn in front of objects with lower priority
 
 		\param inMap_
 			Whether this game object is in the map
@@ -108,49 +92,35 @@ public:
 			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	Item(ItemType itemType_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), itemType(itemType_) {}
-	Item(ItemType itemType_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), itemType(itemType_) {}
-	
+	Bumper(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::Key, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), bumperStrength(30.0f) {}
+	Bumper(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::Key, 40, texture_, color_, mapCoords_), bumperStrength(30.0f) {}
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Destructor for FILL class
+			Destructor for the bumper class
 	*/
 	/*************************************************************************************************/
-	virtual ~Item() {}
+	~Bumper() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the game object. Can be overwritten by derived classes
-
-		\param dt
-			The time elapsed since the previous frame
-
-		\param inputManager
-			Allows the game objects to check inputs
-	*/
-	/*************************************************************************************************/
-	virtual void Update(double dt, InputManager* inputManager) {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the type of the item
+			Returns the bumper strength of this object
 
 		\return
-			The item type
+			The bumper strength
 	*/
 	/*************************************************************************************************/
-	ItemType GetItemType() { return itemType; }
+	float GetBumperStrength() { return bumperStrength; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	ItemType itemType;							// The type of this item
-	
+	float bumperStrength;
+
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
@@ -158,7 +128,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-
+	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
@@ -172,4 +142,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Item_H_
+#endif // Syncopatience_Bumper_H_

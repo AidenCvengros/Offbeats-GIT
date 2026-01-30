@@ -287,10 +287,10 @@ bool MapMatrix::SetPlayerPosition(int xCoord, int yCoord, GameObject* playerObje
 		if (mapMatrix[xCoord][yCoord].tileStatus < TileStatus::Player)
 		{
 			// Resets the old player position tile
-			mapMatrix[playerPos.first][playerPos.second] = { TileStatus::Empty, NULL };
+			//mapMatrix[playerPos.first][playerPos.second] = { TileStatus::Empty, NULL };
 
 			// Sets the new player position
-			mapMatrix[xCoord][yCoord] = { TileStatus::Player, playerObject };
+			//mapMatrix[xCoord][yCoord] = { TileStatus::Player, playerObject };
 			playerPos = std::pair(xCoord, yCoord);
 
 			// Returns that the player was moved

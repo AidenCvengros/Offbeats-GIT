@@ -274,7 +274,7 @@ void Camera::UpdateCameraBox(double dt)
 	}
 	else if (coPos.x - cameraBoxPos.x > 0.0f && coVel.first > 4.0f)
 	{
-		cameraBoxPos.x += coVel.first * dt * 0.5f;
+		cameraBoxPos.x += coVel.first * (float)dt * 0.5f;
 	}
 	// Checks if the player has gone too far left
 	else if (cameraBoxPos.x - coPos.x > cameraBoxLeft)
@@ -283,7 +283,7 @@ void Camera::UpdateCameraBox(double dt)
 	}
 	else if (cameraBoxPos.x - coPos.x > 0.0f && coVel.first < -4.0f)
 	{
-		cameraBoxPos.x += coVel.first * dt * 0.5f;
+		cameraBoxPos.x += coVel.first * (float)dt * 0.5f;
 	}
 
 	if (!centeredObject->GetIsGrounded())
@@ -292,9 +292,9 @@ void Camera::UpdateCameraBox(double dt)
 	}
 	else if (justGrounded == false && centeredObject->GetIsGrounded())
 	{
-		cameraBoxPos.y += (coPos.y - cameraBoxPos.y) * 8.0f * dt;
+		cameraBoxPos.y += (coPos.y - cameraBoxPos.y) * 8.0f * (float)dt;
 
-		if (abs(coPos.y - cameraBoxPos.y) < 0.125f)
+		if (abs(coPos.y - cameraBoxPos.y) < 0.0625f)
 		{
 			justGrounded = true;
 			cameraBoxPos.y = coPos.y;

@@ -165,6 +165,14 @@ private:
 		TopCenter,
 		Max
 	};
+
+	enum class PlayerStates
+	{
+		Walking,
+		Running,
+		Placing,
+		Max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -182,6 +190,7 @@ private:
 	int againstWall;							// Whether the player is up against a wall
 	bool goingMaxSpeed;							// Whether the player is going max speed
 	float maxSpeed;								// The max speed of the player
+	PlayerStates currentPlayerState;			// The current player state
 
 	float lowerInnerGap;						// The distance between the outer and inner hitbox on the bottom of the player
 	float upperInnerGap;						// The distance between the outer and inner hitbox on the top of the player

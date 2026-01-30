@@ -33,6 +33,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/ScreenCrack.h"
 #include "../Game_Objects/Player.h"
 #include "../Game_Objects/Camera.h"
+#include "../Game_Objects/Stickers/Bumper.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -80,6 +81,7 @@ void Sandbox::LoadScene()
     Texture* keyTexture = _TextureManager->AddTexture("Assets/Sprites/Key.png");
     Texture* lockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LockedWall.png");
     Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
+    Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
 
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
@@ -186,6 +188,10 @@ void Sandbox::LoadScene()
 
     ScreenCrack* glitchBox = new ScreenCrack(glm::vec2(11.0f, 10.5f), 40.0f, glm::vec2(3.0f, 3.0f), 150, true, glm::vec4(0.0f, 0.0f, 0.0f, 0.9f), 12.0f);
     _GameObjectManager->AddGameObject(glitchBox);
+
+    Bumper* bumper = new Bumper(glm::vec2(8.0f, 4.0f), 180.0f, glm::vec2(2.0f, 2.0f), true, bumperTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), std::make_pair(4, 2));
+    _MapMatrix->SetTile(std::make_pair(4, 2), MapMatrix::TileStatus::Bumper, bumper);
+    _GameObjectManager->AddGameObject(bumper);
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);
