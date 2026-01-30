@@ -212,6 +212,35 @@ glm::vec4 Camera::Get3DPosition()
 /*************************************************************************************************/
 /*!
 	\brief
+		Returns the point on the map the player is looking at
+
+	\return
+		The point the player is looking at
+*/
+/*************************************************************************************************/
+glm::vec2 Camera::GetLookAtPosition()
+{
+	// Checks that there's a player
+	if (centeredObject)
+	{
+		// Calculates the vector that the camera is looking at
+		float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
+		float accurateZDist = zDist + distanceFromPlayer * distanceFromPlayer / 8.0f;
+		glm::vec3 lookAtVector = glm::normalize(glm::vec3(cameraBoxPos.x, cameraBoxPos.y, zDist / 4.0f) - glm::vec3(GetPosition(), accurateZDist));
+
+		// Calculates and returns what point in world space the camera is pointed at
+		return (-glm::vec2(lookAtVector.x, lookAtVector.y) * (accurateZDist / lookAtVector.z)) + cameraBoxPos;
+	}
+	else
+	{
+		// Otherwise returns the origin point
+		return glm::vec3(0.0f, 0.0f, 0.0f);
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Sets a game object for the camera to center on
 
 	\param object

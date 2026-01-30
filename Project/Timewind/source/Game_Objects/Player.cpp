@@ -34,9 +34,10 @@ Copyright (c) 2023 Aiden Cvengros
 // Other game object classes so the player can interact with them
 #include "Enemy.h"
 #include "LockedWall.h"
-#include "Item.h"
 #include "Key.h"
 #include "Stickers/Bumper.h"
+#include "../Engine/Window.h"
+#include "Camera.h"
 
 // std::clamp is used to clamp the player's speed
 #include <algorithm>
@@ -94,7 +95,7 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(20.0f),
+	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(20.0f), currentPlayerState(PlayerStates::Running),
 	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords, this);
@@ -123,97 +124,135 @@ Player::~Player()
 /*************************************************************************************************/
 void Player::Update(double dt)
 {
-	//// Updates movements if any are active
-	//if (GetMoving())
-	//{
-	//	MoveToUpdate(dt);
-	//}
-
-	// Checks if the player is trying to move left
-	if (CheckInput(InputManager::Inputs::Left) && !CheckInput(InputManager::Inputs::Right))
+	// Flips the player state
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::Swap) == InputManager::InputStatus::Pressed)
 	{
-		// Accelerates normally on the ground
-		if (grounded)
+		// If running set to placing
+		if (currentPlayerState == PlayerStates::Running || currentPlayerState == PlayerStates::Walking)
 		{
-			// Accelerates the player to the left
-			AcceleratePlayerHorizontal(-24.0f, dt);
+			currentPlayerState = PlayerStates::Placing;
 		}
-		else
+		// If placing set to walking
+		else if (currentPlayerState == PlayerStates::Placing)
 		{
-			// Accelerates the player to the left more slowly in the air
-			AcceleratePlayerHorizontal(-8.0f, dt);
+			currentPlayerState = PlayerStates::Running;
 		}
-	}
-	// Checks if the player is trying to move right
-	else if (CheckInput(InputManager::Inputs::Right) && !CheckInput(InputManager::Inputs::Left))
-	{
-		// Accelerates normally on the ground
-		if (grounded)
-		{
-			// Accelerates the player to the right
-			AcceleratePlayerHorizontal(24.0f, dt);
-		}
-		else
-		{
-			// Accelerates the player to the right more slowly in the air
-			AcceleratePlayerHorizontal(8.0f, dt);
-		}
-	}
-	// Otherwise doesn't accelerate the player
-	else
-	{
-		AcceleratePlayerHorizontal(0.0f, dt);
 	}
 
-	// Checks if the player has left the ground
-	if (UngroundedCheck())
+	// If the player is running
+	if (currentPlayerState == PlayerStates::Running)
 	{
-		AcceleratePlayerVertical(-65.0f, dt);
-	}
-
-	// Checks for the jump input
-	if (jumped == false && CheckInput(InputManager::Inputs::Jump))
-	{
-		// Checks if the player is grounded or cut in by a roof
-		if (grounded &&
-			_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopLeftIn), GetIsFacingRight(), 0, 1)).tileStatus < MapMatrix::TileStatus::Player &&
-			_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopRightIn), GetIsFacingRight(), 0, 1)).tileStatus < MapMatrix::TileStatus::Player)
+		// Checks if the player is trying to move left
+		if (CheckInput(InputManager::Inputs::Left) && !CheckInput(InputManager::Inputs::Right))
 		{
-			// Jumps higher if the player is at max speed
-			if (goingMaxSpeed)
+			// Accelerates normally on the ground
+			if (grounded)
 			{
-				AcceleratePlayerVertical(37.0f, 1.0f);
+				// Accelerates the player to the left
+				AcceleratePlayerHorizontal(-24.0f, dt);
 			}
 			else
 			{
-				AcceleratePlayerVertical(30.0f, 1.0f);
+				// Accelerates the player to the left more slowly in the air
+				AcceleratePlayerHorizontal(-8.0f, dt);
+			}
+		}
+		// Checks if the player is trying to move right
+		else if (CheckInput(InputManager::Inputs::Right) && !CheckInput(InputManager::Inputs::Left))
+		{
+			// Accelerates normally on the ground
+			if (grounded)
+			{
+				// Accelerates the player to the right
+				AcceleratePlayerHorizontal(24.0f, dt);
+			}
+			else
+			{
+				// Accelerates the player to the right more slowly in the air
+				AcceleratePlayerHorizontal(8.0f, dt);
+			}
+		}
+		// Otherwise doesn't accelerate the player
+		else
+		{
+			AcceleratePlayerHorizontal(0.0f, dt);
+		}
+
+		// Checks if the player has left the ground
+		if (UngroundedCheck())
+		{
+			AcceleratePlayerVertical(-65.0f, dt);
+		}
+
+		// Checks for the jump input
+		if (jumped == false && CheckInput(InputManager::Inputs::Jump))
+		{
+			// Checks if the player is grounded or cut in by a roof
+			if (grounded &&
+				_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopLeftIn), GetIsFacingRight(), 0, 1)).tileStatus < MapMatrix::TileStatus::Player &&
+				_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopRightIn), GetIsFacingRight(), 0, 1)).tileStatus < MapMatrix::TileStatus::Player)
+			{
+				// Jumps higher if the player is at max speed
+				if (goingMaxSpeed)
+				{
+					AcceleratePlayerVertical(37.0f, 1.0f);
+				}
+				else
+				{
+					AcceleratePlayerVertical(30.0f, 1.0f);
+				}
+
+				// No longer grounded
+				grounded = false;
+				jumped = true;
+			}
+		}
+		// Checks if the jump input was released
+		else if (_InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Released)
+		{
+			if (verticalVelocity >= 15.0f)
+			{
+				// If the jump was let go, cuts the jump short
+				verticalVelocity *= 0.5f;
 			}
 
-			// No longer grounded
-			grounded = false;
-			jumped = true;
+			// Resets the jumped boolean
+			jumped = false;
 		}
-	}
-	// Checks if the jump input was released
-	else if (_InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Released)
-	{
-		if (verticalVelocity >= 15.0f)
+
+		// Moves the player
+		MovePlayer(dt);
+
+		// Checks if the player pressed the interaction button
+		if (CheckInput(InputManager::Inputs::Action))
 		{
-			// If the jump was let go, cuts the jump short
-			verticalVelocity *= 0.5f;
+			InteractWithTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 1, 0), false, false);
 		}
-
-		// Resets the jumped boolean
-		jumped = false;
 	}
 
-	// Moves the player
-	MovePlayer(dt);
-
-	// Checks if the player pressed the interaction button
-	if (CheckInput(InputManager::Inputs::Action))
+	// If the player is placing
+	else if (currentPlayerState == PlayerStates::Placing)
 	{
-		InteractWithTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 1, 0), false, false);
+		// Checks if there is a bumper in inventory
+		Bumper* bumper = (Bumper*)inventory->GetSelectedSticker(0);
+		if (bumper)
+		{
+			// When the player presses the button
+			if (CheckInput(InputManager::Inputs::Action))
+			{
+				// If the space the camera is looking at is empty
+				std::pair<int, int> cursorTile = ConvertWorldCoordsToMapCoords(_Window->GetCamera()->GetLookAtPosition());
+				if (_MapMatrix->GetTile(cursorTile).tileStatus == MapMatrix::TileStatus::Empty)
+				{
+					// Puts the bumper in the empty space
+					_MapMatrix->SetTile(cursorTile, MapMatrix::TileStatus::Bumper, bumper);
+					bumper->SetStickerActive(true);
+					bumper->SetPosition(ConvertMapCoordsToWorldCoords(cursorTile));
+					bumper->SetRender(true);
+					inventory->ClearSelectedSticker(0);
+				}
+			}
+		}
 	}
 }
 
@@ -666,12 +705,19 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 			inventory->AddCoin();
 			_MapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
 		}
+		// Checks for a sticker
+		else if (targetTile.tileStatus == MapMatrix::TileStatus::Sticker)
+		{
+			inventory->AddSticker((Sticker*)targetTile.tileObject);
+			_MapMatrix->SetTile(targetTileCoords, MapMatrix::TileStatus::Empty);
+			targetTile.tileObject->SetRender(false);
+		}
 		// Checks for bumper
 		else if (targetTile.tileStatus == MapMatrix::TileStatus::Bumper)
 		{
 			float bumperStrength = ((Bumper*)targetTile.tileObject)->GetBumperStrength();
-			verticalVelocity = sin(targetTile.tileObject->GetRotation()) * bumperStrength;
-			horizontalVelocity = cos(targetTile.tileObject->GetRotation()) * bumperStrength;
+			verticalVelocity = cosf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
+			horizontalVelocity = sinf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
 		}
 	}
 

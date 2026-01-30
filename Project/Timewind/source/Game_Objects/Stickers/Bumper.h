@@ -29,7 +29,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "../Item.h"
+#include "Sticker.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -49,7 +49,7 @@ Copyright (c) 2023 Aiden Cvengros
 		The base entity class for objects on the map
 */
 /*************************************************************************************************/
-class Bumper : public Item
+class Bumper : public Sticker
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -92,8 +92,8 @@ public:
 			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	Bumper(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::Key, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), bumperStrength(30.0f) {}
-	Bumper(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::Key, 40, texture_, color_, mapCoords_), bumperStrength(30.0f) {}
+	Bumper(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Sticker(Item::ItemType::Bumper, pos, rot, sca, facingRight_, texture_, color_, mapCoords_), bumperStrength(30.0f) {}
+	Bumper(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Sticker(Item::ItemType::Bumper, texture_, color_, mapCoords_), bumperStrength(30.0f) {}
 
 	/*************************************************************************************************/
 	/*!

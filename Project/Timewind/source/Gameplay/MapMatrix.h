@@ -75,6 +75,7 @@ public:
 		Empty,									
 		Key,
 		Bumper,
+		Sticker,
 		Coin,									// The player can walk through spaces on this side ^^^
 		Player,
 		Enemy,									// The player cannot walk through spaces on this side vvv

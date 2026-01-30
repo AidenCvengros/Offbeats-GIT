@@ -1,11 +1,17 @@
 /*************************************************************************************************/
 /*!
-\file InputManager.h
+\file Sticker.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.16
+\date 2026.1.30
 \brief
-    Gathers and manages inputs from the window instance
+    The sticker object/base class
+
+    Public Functions:
+        + Entity::Entity
+		+ Entity::~Entity
+		+ Entity::SetPosition
+		+ Entity::GetPosition
 		
 	Private Functions:
 		+ FILL
@@ -14,8 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_InputManager_H_
-#define Syncopatience_InputManager_H_
+#ifndef Syncopatience_Sticker_H_
+#define Syncopatience_Sticker_H_
 
 #pragma once
 
@@ -23,14 +29,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "stdafx.h"
-
-// Includes the base system class, window class, and glfw functions
-#include "System.h"
-
-// Includes the map container for tracking input keys
-#include <vector>
-#include <map>
+#include "../Item.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -47,45 +46,20 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		InputManager
+		The base entity class for objects on the map
 */
 /*************************************************************************************************/
-class InputManager : System
+class Sticker : public Item
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 	
-	enum class Inputs
-	{
-		Escape,
-		Left,
-		Right,
-		Up,
-		Down,
-		Jump,
-		Action,
-		Swap,
-		F1,
-		F2,
-		F3,
-		Max
-	};
-
-	enum class InputStatus
-	{
-		Off,
-		Pressed,
-		Held,
-		Released,
-		Max
-	};
-
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
 	//---------------------------------------------------------------------------------------------
@@ -93,99 +67,71 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-	
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the input manager class
+			Constructor for the sticker game object class
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	InputManager() {}
-	
+	Sticker(Item::ItemType itemType, glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), stickerActive(false) {}
+	Sticker(Item::ItemType itemType, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, 40, texture_, color_, mapCoords_), stickerActive(false) {}
+
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Destructor for FILL class
+			Destructor for the sticker class
 	*/
 	/*************************************************************************************************/
-	~InputManager() {}
+	~Sticker() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Initializes the system.
-	*/
-	/*************************************************************************************************/
-	void Init();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the system.
-
-		\param
-			The time elapsed since the previous frame.
-	*/
-	/*************************************************************************************************/
-	void Update(double dt);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Draws the system to the screen.
-	*/
-	/*************************************************************************************************/
-	void Draw();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Shuts down the system.
-	*/
-	/*************************************************************************************************/
-	void Shutdown();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Check the status of the given input
-
-		\param input
-			The given input
+			Returns whether this sticker is currently active
 
 		\return
-			The status of the input
+			The bumper strength
 	*/
 	/*************************************************************************************************/
-	InputStatus CheckInputStatus(Inputs input);
+	bool GetStickerActive() { return stickerActive; }
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the coordinates of the mouse
+			Sets whether this sticker is currently active
 
-		\return
-			The mouse coordinates
+		\param newStickerActive
+			The new sticker active status
 	*/
 	/*************************************************************************************************/
-	std::pair<double, double> CheckMouseCoordinates() { return mouseCoords; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the coordinates of the mouse
-
-		\return
-			The mouse coordinates
-	*/
-	/*************************************************************************************************/
-	std::pair<double, double> CheckMouseDelta() { return mouseDelta; }
+	void SetStickerActive(bool newStickerActive) { stickerActive = newStickerActive; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
-	
+
+	bool stickerActive;							// Whether the sticker can be picked up (false) or is active (true)
+
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
@@ -194,26 +140,9 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	std::vector<InputStatus> inputTracker;						// Keeps track of the different input and they're statuses
-	std::vector<std::pair<double, bool>> timeSincePressed;		// Functions as a buffer by mapping when this button was most recently pressed (doesn't count held). The boolean limits the buffer to a single pressed input
-	std::multimap<Inputs, int> keybinds;						// Holds the different keys that map to a certain input
-	std::pair<double, double> mouseCoords;						// The position of the mouse
-	std::pair<double, double> mouseDelta;						// How the mouse position has changed since the previous frame
-
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the given input status on the tracker
-
-		\param input
-			The given input
-	*/
-	/*************************************************************************************************/
-	void UpdateInputStatus(Inputs input);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -224,4 +153,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_InputManager_H_
+#endif // Syncopatience_Sticker_H_

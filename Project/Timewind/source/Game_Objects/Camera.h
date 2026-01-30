@@ -164,13 +164,13 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the 3-dimensional position of the centered object
+			Returns the point on the map the player is looking at
 
 		\return
-			The position of the centered object
+			The point the player is looking at
 	*/
 	/*************************************************************************************************/
-	//glm::vec4 GetCenteredObject3DPosition();
+	glm::vec2 GetLookAtPosition();
 
 	/*************************************************************************************************/
 	/*!

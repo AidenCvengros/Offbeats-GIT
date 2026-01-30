@@ -189,8 +189,8 @@ void Sandbox::LoadScene()
     ScreenCrack* glitchBox = new ScreenCrack(glm::vec2(11.0f, 10.5f), 40.0f, glm::vec2(3.0f, 3.0f), 150, true, glm::vec4(0.0f, 0.0f, 0.0f, 0.9f), 12.0f);
     _GameObjectManager->AddGameObject(glitchBox);
 
-    Bumper* bumper = new Bumper(glm::vec2(8.0f, 4.0f), 180.0f, glm::vec2(2.0f, 2.0f), true, bumperTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), std::make_pair(4, 2));
-    _MapMatrix->SetTile(std::make_pair(4, 2), MapMatrix::TileStatus::Bumper, bumper);
+    Bumper* bumper = new Bumper(glm::vec2(8.0f, 4.0f), 20.0f, glm::vec2(2.0f, 2.0f), true, bumperTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), std::make_pair(4, 2));
+    _MapMatrix->SetTile(std::make_pair(4, 2), MapMatrix::TileStatus::Sticker, bumper);
     _GameObjectManager->AddGameObject(bumper);
 
     // Updates the player position for the map

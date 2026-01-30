@@ -35,6 +35,7 @@ Copyright (c) 2025 Aiden Cvengros
 
 // Dependency reference
 class Key;
+class Sticker;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -75,7 +76,7 @@ public:
 			Constructor for the inventory class
 	*/
 	/*************************************************************************************************/
-	Inventory() : keyList(), coinCount(0) {}
+	Inventory() : keyList(), coinCount(0), stickerList(), stickerInventoryCursor(0) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -113,6 +114,20 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Adds the given sticker to the inventory
+
+		\param newSticker
+			The new sticker to be added into the inventory
+
+		\return
+			Returns true if the sticker was added. False if not
+	*/
+	/*************************************************************************************************/
+	bool AddSticker(Sticker* newSticker);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Adds the given key to the inventory
 
 		\return
@@ -135,6 +150,31 @@ public:
 	/*************************************************************************************************/
 	bool HaveKey(int keyIndex) { return keyList[keyIndex] != NULL; }
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the sticker at the given index
+
+		\param index
+			The inventory index to select
+
+		\return
+			The chosen sticker
+	*/
+	/*************************************************************************************************/
+	Sticker* GetSelectedSticker(int index) { return stickerList[index]; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Clears the sticker at the given index
+
+		\param index
+			The inventory index to select
+	*/
+	/*************************************************************************************************/
+	void ClearSelectedSticker(int index) { stickerList[index] = NULL; }
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
@@ -143,6 +183,9 @@ private:
 	//std::vector<Item*> itemList;				// The list of general items the player has
 	std::array<Key*, 56> keyList;				// The list of keys the player has collected
 	int coinCount;								// The number of coins the player has collected
+
+	std::array<Sticker*, 10> stickerList;		// The list of stickers the player has currently
+	int stickerInventoryCursor;					// What sticker slot the player currently has selected
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
