@@ -182,7 +182,6 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	double timeSinceMove;						// tracks how long since a movement started (to help buffer if you pressed a button late)
 	float horizontalVelocity;					// How quickly the player is moving horizontally
 	float verticalVelocity;						// How quickly the player is moving vertically
 	bool grounded;								// Whether the player is grounded
@@ -190,6 +189,7 @@ private:
 	int againstWall;							// Whether the player is up against a wall
 	bool goingMaxSpeed;							// Whether the player is going max speed
 	float maxSpeed;								// The max speed of the player
+	float reducedGravity;						// Whether the player is in a reduced gravity state (floating, just shot out of a bumper, etc.). Ticks down every frame until it runs out
 	PlayerStates currentPlayerState;			// The current player state
 
 	float lowerInnerGap;						// The distance between the outer and inner hitbox on the bottom of the player

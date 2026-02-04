@@ -109,6 +109,14 @@ void GameObjectManager::Draw()
 			{
 				_Window->DrawGameObject((*it).second);
 				(*it).second->DrawChildObjects();
+
+				// Checks if the game object is only supposed to be drawn this frame
+				if ((*it).second->GetDrawThisFrame())
+				{
+					// Turns the game object off
+					(*it).second->SetRender(false);
+					(*it).second->DrawThisFrame(false);
+				}
 			}
 		}
 
@@ -153,6 +161,14 @@ void GameObjectManager::DrawGlitches()
 			{
 				_Window->DrawGameObject((*it).second);
 				(*it).second->DrawChildObjects();
+
+				// Checks if the game object is only supposed to be drawn this frame
+				if ((*it).second->GetDrawThisFrame())
+				{
+					// Turns the game object off
+					(*it).second->SetRender(false);
+					(*it).second->DrawThisFrame(false);
+				}
 			}
 		}
 

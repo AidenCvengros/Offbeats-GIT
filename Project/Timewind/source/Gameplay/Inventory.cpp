@@ -24,6 +24,7 @@ Copyright (c) 2025 Aiden Cvengros
 
 // Includes the key class so we can add keys
 #include "../Game_Objects/Key.h"
+#include "../Game_Objects/Stickers/Sticker.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -94,6 +95,7 @@ bool Inventory::AddSticker(Sticker* newSticker)
 		if (!stickerList[i])
 		{
 			// Puts the new sticker in the slot
+			newSticker->SetRotation(0.0f);
 			stickerList[i] = newSticker;
 			return true;
 		}

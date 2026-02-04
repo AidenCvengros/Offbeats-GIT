@@ -38,6 +38,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "Stickers/Bumper.h"
 #include "../Engine/Window.h"
 #include "Camera.h"
+#include "../Scenes/Scene.h"
 
 // std::clamp is used to clamp the player's speed
 #include <algorithm>
@@ -95,7 +96,7 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	timeSinceMove(0.0), horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(20.0f), currentPlayerState(PlayerStates::Running),
+	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(20.0f), reducedGravity(0.0f), currentPlayerState(PlayerStates::Running),
 	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords, this);
@@ -181,7 +182,15 @@ void Player::Update(double dt)
 		// Checks if the player has left the ground
 		if (UngroundedCheck())
 		{
-			AcceleratePlayerVertical(-65.0f, dt);
+			// Checks if the player is in reduced gravity or not
+			if (reducedGravity <= 0.0f)
+			{
+				AcceleratePlayerVertical(-65.0f, dt);
+			}
+			else
+			{
+				AcceleratePlayerVertical(-15.0f, dt);
+			}
 		}
 
 		// Checks for the jump input
@@ -233,22 +242,49 @@ void Player::Update(double dt)
 	// If the player is placing
 	else if (currentPlayerState == PlayerStates::Placing)
 	{
+		// Gets the point the camera is looking at
+		std::pair<int, int> cursorTile = ConvertWorldCoordsToMapCoords(_Window->GetCamera()->GetLookAtPosition());
+
 		// Checks if there is a bumper in inventory
 		Bumper* bumper = (Bumper*)inventory->GetSelectedSticker(0);
 		if (bumper)
 		{
+			// Hovers a faded bumper over the target tile
+			bumper->SetPosition(ConvertMapCoordsToWorldCoords(cursorTile));
+			bumper->DrawThisFrame(true);
+			bumper->SetColor({ 1.0f, 1.0f, 1.0f, 0.5f });
+			
+			// If the tile is empty draws it green
+			if (_MapMatrix->GetTile(cursorTile).tileStatus == MapMatrix::TileStatus::Empty)
+			{
+				_CurrentScene->DrawTile(cursorTile, { 0.0f, 1.0f, 0.0f, 0.5f });
+			}
+			else
+			{
+				_CurrentScene->DrawTile(cursorTile, { 1.0f, 0.0f, 0.0f, 0.5f });
+			}
+
+			// Checks for rotation commands
+			if (_InputManager->CheckInputStatus(InputManager::Inputs::Left) == InputManager::InputStatus::Pressed)
+			{
+				bumper->SetRotation(bumper->GetRotation() - 45.0f);
+			}
+			if (_InputManager->CheckInputStatus(InputManager::Inputs::Right) == InputManager::InputStatus::Pressed)
+			{
+				bumper->SetRotation(bumper->GetRotation() + 45.0f);
+			}
+			
 			// When the player presses the button
 			if (CheckInput(InputManager::Inputs::Action))
 			{
 				// If the space the camera is looking at is empty
-				std::pair<int, int> cursorTile = ConvertWorldCoordsToMapCoords(_Window->GetCamera()->GetLookAtPosition());
 				if (_MapMatrix->GetTile(cursorTile).tileStatus == MapMatrix::TileStatus::Empty)
 				{
 					// Puts the bumper in the empty space
 					_MapMatrix->SetTile(cursorTile, MapMatrix::TileStatus::Bumper, bumper);
 					bumper->SetStickerActive(true);
-					bumper->SetPosition(ConvertMapCoordsToWorldCoords(cursorTile));
 					bumper->SetRender(true);
+					bumper->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 					inventory->ClearSelectedSticker(0);
 				}
 			}
@@ -510,6 +546,9 @@ void Player::MovePlayer(double dt)
 		}
 	}
 
+	// Decrements the player's timers
+	if (reducedGravity > 0.0f) reducedGravity -= dt;
+
 	// Sets the player's new position
 	SetPosition(playerWorldPosition);
 
@@ -718,6 +757,7 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 			float bumperStrength = ((Bumper*)targetTile.tileObject)->GetBumperStrength();
 			verticalVelocity = cosf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
 			horizontalVelocity = sinf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
+			reducedGravity = 0.25f;
 		}
 	}
 

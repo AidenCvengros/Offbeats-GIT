@@ -101,7 +101,7 @@ public:
 		drawPriority(-100), facingRight(false),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-		render(false), texture(NULL), color(0.0f),
+		render(false), texture(NULL), color(0.0f), drawThisFrame(false),
 		inMap(false), mapCoords({-1, -1}) {}
 
 	/*************************************************************************************************/
@@ -137,7 +137,7 @@ public:
 		drawPriority(drawPriority_), facingRight(facingRight_),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-		render(true), texture(NULL), color(color_),
+		render(true), texture(NULL), color(color_), drawThisFrame(false),
 		inMap(false), mapCoords({-1, -1}) {}
 
 	/*************************************************************************************************/
@@ -164,7 +164,7 @@ public:
 		drawPriority(-100), facingRight(true),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-		render(false), texture(NULL), color(0.0f),
+		render(false), texture(NULL), color(0.0f), drawThisFrame(false),
 		inMap(true), mapCoords(mapCoords_) {}
 
 	/*************************************************************************************************/
@@ -211,7 +211,7 @@ public:
 		drawPriority(drawPriority_), facingRight(facingRight_),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-		render(false), texture(NULL), color(color_),
+		render(false), texture(NULL), color(color_), drawThisFrame(false),
 		inMap(true), mapCoords(mapCoords_) {}
 
 	/*************************************************************************************************/
@@ -267,7 +267,7 @@ public:
 		drawPriority(drawPriority_), facingRight(facingRight_),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-		render(true), texture(texture_), color(color_),
+		render(true), texture(texture_), color(color_), drawThisFrame(false),
 		inMap(false), mapCoords({-1, -1}) {}
 
 	/*************************************************************************************************/
@@ -306,7 +306,7 @@ public:
 		drawPriority(drawPriority_), facingRight(facingRight_),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-		render(true), texture(texture_), color(color_),
+		render(true), texture(texture_), color(color_), drawThisFrame(false),
 		inMap(true), mapCoords(mapCoords_) {}
 
 	/*************************************************************************************************/
@@ -505,6 +505,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns whether the object should be drawn this frame and have rendering turned off next frame
+
+		\return
+			The draw this frame variable
+	*/
+	/*************************************************************************************************/
+	bool GetDrawThisFrame() { return drawThisFrame; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the original position of the current move
 
 		\return
@@ -599,7 +610,7 @@ public:
 			The game object's new render boolean
 	*/
 	/*************************************************************************************************/
-	void SetRender(bool newRender) { render = newRender; }
+	void SetRender(bool newRender);
 
 	/*************************************************************************************************/
 	/*!
@@ -622,6 +633,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void SetMapCoords(std::pair<int, int> newMapCoords) { mapCoords = newMapCoords; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Marks this game object to be drawn this frame
+
+		\param _drawThisFrame
+			What the draw this frame variable should be set to
+	*/
+	/*************************************************************************************************/
+	void DrawThisFrame(bool _drawThisFrame);
 
 	/*************************************************************************************************/
 	/*!
@@ -697,6 +719,7 @@ private:
 	bool render;								// Says whether this game object should be rendered
 	Texture* texture;							// Pointer to the object's texture (will not be referenced if render is false)
 	glm::vec4 color;							// The color of the game object
+	bool drawThisFrame;							// If this is true, draws the game object during this frame but turns it off afterwards
 
 	bool inMap;									// Whether the game object is in the map
 	std::pair<int, int> mapCoords;				// The coordinates of the object in the map

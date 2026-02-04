@@ -22,6 +22,9 @@ Copyright (c) 2023 Aiden Cvengros
 #include "Scene.h"
 #include "../Engine/cppShortcuts.h"
 
+// Includes game object class to draw default square
+#include "../Game_Objects/GameObject.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -66,6 +69,29 @@ Scene::Scene() : inUse(false)
 Scene::~Scene()
 {
 
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Draws a square of the given color at the given tile
+
+	\param tileCoords
+		The coordinates of the tile being drawn.
+
+	\param color
+		The color of square to draw
+*/
+/*************************************************************************************************/
+void Scene::DrawTile(std::pair<int, int> coords, glm::vec4 color)
+{
+	// Checks that there is a default square to draw
+	if (defaultSquare)
+	{
+		defaultSquare->SetPosition(ConvertMapCoordsToWorldCoords(coords));
+		defaultSquare->SetColor(color);
+		defaultSquare->DrawThisFrame(true);
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

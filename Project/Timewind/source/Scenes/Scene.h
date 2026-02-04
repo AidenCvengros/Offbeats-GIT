@@ -30,6 +30,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
+class GameObject;								// Game object class reference to hold default square
+
 //-------------------------------------------------------------------------------------------------
 // Public Constants
 //-------------------------------------------------------------------------------------------------
@@ -94,6 +96,31 @@ public:
 	*/
 	/*************************************************************************************************/
 	virtual void UnloadScene() = 0;
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets the default square
+
+		\param newDefaultSquare
+			The new default quare
+	*/
+	/*************************************************************************************************/
+	void SetDefaultSquare(GameObject* newDefaultSquare) { defaultSquare = newDefaultSquare; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Draws a square of the given color at the given tile
+
+		\param tileCoords
+			The coordinates of the tile being drawn.
+
+		\param color
+			The color of square to draw
+	*/
+	/*************************************************************************************************/
+	void DrawTile(std::pair<int, int> coords, glm::vec4 color);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -108,8 +135,9 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	// Determines whether the scene is in use
-	bool inUse;
+	bool inUse;									// Determines whether the scene is in use
+
+	GameObject* defaultSquare;					// Default square used for coloring in an important tile
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

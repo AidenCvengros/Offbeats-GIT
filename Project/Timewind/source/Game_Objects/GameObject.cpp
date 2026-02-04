@@ -294,6 +294,44 @@ void GameObject::SetIsFacingRight(bool newIsFacingRight)
 /*************************************************************************************************/
 /*!
 	\brief
+		Sets whether the game object should be drawn
+
+	\param newRender
+		The game object's new render boolean
+*/
+/*************************************************************************************************/
+void GameObject::SetRender(bool newRender)
+{
+	// Sets the new render boolean and turns off draw this frame
+	render = newRender;
+	drawThisFrame = false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Marks this game object to be drawn this frame
+
+	\param _drawThisFrame
+		What the draw this frame variable should be set to
+*/
+/*************************************************************************************************/
+void GameObject::DrawThisFrame(bool _drawThisFrame)
+{
+	// If we are drawing this frame
+	if (_drawThisFrame)
+	{
+		// Sets the game object to be drawn
+		render = true;
+	}
+
+	// Sets that the game should become inactive after this frame
+	drawThisFrame = _drawThisFrame;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Sets a new movement
 
 	\param newPosition

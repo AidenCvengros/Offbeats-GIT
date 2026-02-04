@@ -86,12 +86,15 @@ void Sandbox::LoadScene()
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
 
-    // Creates essential game objects (player and camera)
+    // Creates essential game objects (player, camera, and default square)
     Player* player = new Player({ 4.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, playerTexture, { 2, 2 });
     Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
+    GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject((GameObject*)camera);
     _GameObjectManager->AddGameObject((GameObject*)player);
+    _GameObjectManager->AddGameObject(newDefaultSquare);
     _Window->SetCamera(camera);
+    SetDefaultSquare(newDefaultSquare);
 
     // Sets the map for the scene
     std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
@@ -205,6 +208,9 @@ void Sandbox::LoadScene()
 /*************************************************************************************************/
 void Sandbox::UnloadScene()
 {
+    // Resets the default square
+    SetDefaultSquare(NULL);
+
     // Shuts down those systems to refresh them
     _GameObjectManager->Shutdown();
     _TextureManager->Shutdown();

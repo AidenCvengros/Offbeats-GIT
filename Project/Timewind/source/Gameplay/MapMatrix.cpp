@@ -468,29 +468,6 @@ int MapMatrix::GetMaxMapHeight()
 /*************************************************************************************************/
 /*!
 	\brief
-		Sets the value of a given tile position
-
-	\param xCoord
-		The x coordinate of the tile to be changed
-
-	\param yCoord
-		The y coordinate of the tile to be changed
-
-	\param newStatus
-		The new state of the tile
-
-	\param gameObject
-		The game object associated with the tile. Defaults to null if there's not meant to be a game object
-*/
-/*************************************************************************************************/
-//std::pair<int, int> MapMatrix::FindTileCoords(GameObject* gameObject)
-//{
-//
-//}
-
-/*************************************************************************************************/
-/*!
-	\brief
 		Calculates tile coordinates with a left or right offset
 
 	\param xCoord
@@ -610,7 +587,6 @@ void MapMatrix::UpdatePlayerPosition(GameObject* playerObject)
 {
 	playerObject->SetMapCoords(playerPos);
 	UpdateObjectPosition(playerPos, playerObject);
-	SetTile(playerPos, TileStatus::Player, playerObject);
 }
 
 /*************************************************************************************************/
