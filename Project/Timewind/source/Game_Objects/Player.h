@@ -348,6 +348,17 @@ private:
 	*/
 	/*************************************************************************************************/
 	std::pair<int, int> CalculatePlayerMapPositions(glm::vec2 position, Positions anchorPoint);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Collects a sticker on the given tile
+
+		\param position
+			The tile coordinates of the sticker to collect
+	*/
+	/*************************************************************************************************/
+	void CollectSticker(std::pair<int, int> targetTileCoords);
 };
 
 //-------------------------------------------------------------------------------------------------

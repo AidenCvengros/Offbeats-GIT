@@ -106,6 +106,20 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Place this object in the scene at the target location
+	
+		\param tileCoords
+			The tile the player is hovering over
+	
+		\return
+			Whether the sticker was succesfully placed
+	*/
+	/*************************************************************************************************/
+	virtual bool Place(std::pair<int, int> tileCoords);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the bumper strength of this object
 
 		\return

@@ -18,6 +18,10 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
+// Base includes
+#include "Bumper.h"
+#include "../../Engine/cppShortcuts.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -41,6 +45,24 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Place this object in the scene at the target location
+
+	\param tileCoords
+		The tile the player is hovering over
+
+	\return
+		Whether the sticker was succesfully placed
+*/
+/*************************************************************************************************/
+bool Bumper::Place(std::pair<int, int> tileCoords)
+{
+	// Uses simple place
+	return SimplePlace(tileCoords, MapMatrix::TileStatus::Bumper);
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions

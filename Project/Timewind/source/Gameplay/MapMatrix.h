@@ -409,6 +409,21 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns whether the given tile status is a sticker
+
+		\param tileStatus
+			The given tile status
+
+		\return
+			Whether the tile is a sticker
+	*/
+	/*************************************************************************************************/
+	bool IsSticker(TileStatus tileStatus);
+	bool IsSticker(std::pair<int, int> coords) { return IsSticker(GetTile(coords).tileStatus); }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Calculates tile coordinates with a left or right offset
 
 		\param xCoord

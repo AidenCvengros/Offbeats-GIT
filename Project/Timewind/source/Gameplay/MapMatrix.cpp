@@ -609,6 +609,31 @@ void MapMatrix::UpdateObjectPosition(int xCoord, int yCoord, GameObject* object)
 	object->SetPosition({ xCoord * 2.0f, yCoord * 2.0f });
 }
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Returns whether the given tile status is a sticker
+
+	\param tileStatus
+		The given tile status
+
+	\return
+		Whether the tile is a sticker
+*/
+/*************************************************************************************************/
+bool MapMatrix::IsSticker(TileStatus tileStatus)
+{
+	// Checks for the relevant tile statuses
+	if (tileStatus == TileStatus::Sticker ||
+		tileStatus == TileStatus::Bumper)
+	{
+		return true;
+	}
+
+	// Otherwise returns false
+	return false;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------

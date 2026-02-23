@@ -219,7 +219,7 @@ void Player::Update(double dt)
 		// Checks if the jump input was released
 		else if (_InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Released)
 		{
-			if (verticalVelocity >= 15.0f)
+			if (verticalVelocity >= 15.0f && reducedGravity <= 0.0f)
 			{
 				// If the jump was let go, cuts the jump short
 				verticalVelocity *= 0.5f;
@@ -244,47 +244,44 @@ void Player::Update(double dt)
 	{
 		// Gets the point the camera is looking at
 		std::pair<int, int> cursorTile = ConvertWorldCoordsToMapCoords(_Window->GetCamera()->GetLookAtPosition());
+		MapMatrix::TileStatus tileStatus = _MapMatrix->GetTile(cursorTile).tileStatus;
+
+		// If the tile is empty draws it green
+		if (tileStatus == MapMatrix::TileStatus::Empty)
+		{
+			_CurrentScene->DrawTile(cursorTile, { 0.0f, 1.0f, 0.0f, 0.5f });
+		}
+		// Checks if the player is hovering over a placed sticker
+		else if (_MapMatrix->IsSticker(tileStatus))
+		{
+			// Draws stickers blue
+			_CurrentScene->DrawTile(cursorTile, { 0.0f, 0.0f, 1.0f, 0.5f });
+
+			// If the player presses the back button, collects the sticker
+			if (CheckInput(InputManager::Inputs::Back))
+			{
+				CollectSticker(cursorTile);
+			}
+		}
+		else
+		{
+			_CurrentScene->DrawTile(cursorTile, { 1.0f, 0.0f, 0.0f, 0.5f });
+		}
 
 		// Checks if there is a bumper in inventory
-		Bumper* bumper = (Bumper*)inventory->GetSelectedSticker(0);
-		if (bumper)
+		Sticker* sticker = inventory->GetSelectedSticker(0);
+		if (sticker)
 		{
 			// Hovers a faded bumper over the target tile
-			bumper->SetPosition(ConvertMapCoordsToWorldCoords(cursorTile));
-			bumper->DrawThisFrame(true);
-			bumper->SetColor({ 1.0f, 1.0f, 1.0f, 0.5f });
-			
-			// If the tile is empty draws it green
-			if (_MapMatrix->GetTile(cursorTile).tileStatus == MapMatrix::TileStatus::Empty)
-			{
-				_CurrentScene->DrawTile(cursorTile, { 0.0f, 1.0f, 0.0f, 0.5f });
-			}
-			else
-			{
-				_CurrentScene->DrawTile(cursorTile, { 1.0f, 0.0f, 0.0f, 0.5f });
-			}
-
-			// Checks for rotation commands
-			if (_InputManager->CheckInputStatus(InputManager::Inputs::Left) == InputManager::InputStatus::Pressed)
-			{
-				bumper->SetRotation(bumper->GetRotation() - 45.0f);
-			}
-			if (_InputManager->CheckInputStatus(InputManager::Inputs::Right) == InputManager::InputStatus::Pressed)
-			{
-				bumper->SetRotation(bumper->GetRotation() + 45.0f);
-			}
+			sticker->Hovering(cursorTile);
 			
 			// When the player presses the button
 			if (CheckInput(InputManager::Inputs::Action))
 			{
 				// If the space the camera is looking at is empty
-				if (_MapMatrix->GetTile(cursorTile).tileStatus == MapMatrix::TileStatus::Empty)
+				if (sticker->Place(cursorTile))
 				{
-					// Puts the bumper in the empty space
-					_MapMatrix->SetTile(cursorTile, MapMatrix::TileStatus::Bumper, bumper);
-					bumper->SetStickerActive(true);
-					bumper->SetRender(true);
-					bumper->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+					// If the sticker was placed, clears it from the inventory
 					inventory->ClearSelectedSticker(0);
 				}
 			}
@@ -747,9 +744,7 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 		// Checks for a sticker
 		else if (targetTile.tileStatus == MapMatrix::TileStatus::Sticker)
 		{
-			inventory->AddSticker((Sticker*)targetTile.tileObject);
-			_MapMatrix->SetTile(targetTileCoords, MapMatrix::TileStatus::Empty);
-			targetTile.tileObject->SetRender(false);
+			CollectSticker(targetTileCoords);
 		}
 		// Checks for bumper
 		else if (targetTile.tileStatus == MapMatrix::TileStatus::Bumper)
@@ -824,5 +819,24 @@ std::pair<int, int> Player::CalculatePlayerMapPositions(glm::vec2 position, Play
 		// If something went wrong, returns (-1, -1)
 		return std::make_pair(-1, -1);
 		break;
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Collects a sticker on the given tile
+
+	\param position
+		The tile coordinates of the sticker to collect
+*/
+/*************************************************************************************************/
+void Player::CollectSticker(std::pair<int, int> targetTileCoords)
+{
+	if (_MapMatrix->IsSticker(targetTileCoords))
+	{
+		inventory->AddSticker((Sticker*)_MapMatrix->GetTile(targetTileCoords).tileObject);
+		_MapMatrix->GetTile(targetTileCoords).tileObject->SetRender(false);
+		_MapMatrix->SetTile(targetTileCoords, MapMatrix::TileStatus::Empty);
 	}
 }

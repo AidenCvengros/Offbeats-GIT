@@ -5,7 +5,7 @@
 \par email: ajcvengros\@gmail.com
 \date 2026.1.30
 \brief
-    The sticker object/base class
+    The sticker object and base class
 
     Public Functions:
         + Entity::Entity
@@ -30,6 +30,8 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 #include "../Item.h"
+
+#include "../../Gameplay/MapMatrix.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -92,8 +94,8 @@ public:
 			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	Sticker(Item::ItemType itemType, glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), stickerActive(false) {}
-	Sticker(Item::ItemType itemType, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, 40, texture_, color_, mapCoords_), stickerActive(false) {}
+	Sticker(Item::ItemType itemType, glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), stickerActive(false), canRotate(true) {}
+	Sticker(Item::ItemType itemType, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, 40, texture_, color_, mapCoords_), stickerActive(false), canRotate(true) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -102,6 +104,56 @@ public:
 	*/
 	/*************************************************************************************************/
 	~Sticker() {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Function for when the player is hovering to place this sticker in a location
+
+		\param tileCoords
+			The tile the player is hovering over
+	*/
+	/*************************************************************************************************/
+	virtual void Hovering(std::pair<int, int> tileCoords);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Function for rotating the sticker by 45 degrees. Used during placement
+	*/
+	/*************************************************************************************************/
+	void RotateObject();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Place this object in the scene at the target location
+
+		\param tileCoords
+			The tile the player is hovering over
+
+		\return
+			Whether the sticker was successfully placed
+	*/
+	/*************************************************************************************************/
+	virtual bool Place(std::pair<int, int> tileCoords);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Place this object in the scene at the target location. Used for stickers with basic placement behavior
+
+		\param tileCoords
+			The tile the player is hovering over
+
+		\param tileStatus
+			The status of the tile being placed
+
+		\return
+			Whether the sticker was successfully placed
+	*/
+	/*************************************************************************************************/
+	bool SimplePlace(std::pair<int, int> tileCoords, MapMatrix::TileStatus tileStatus);
 
 	/*************************************************************************************************/
 	/*!
@@ -124,6 +176,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void SetStickerActive(bool newStickerActive) { stickerActive = newStickerActive; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets whether this sticker can be rotated during placement
+
+		\param newCanRotate
+			Whether this sticker can be rotated during placement
+	*/
+	/*************************************************************************************************/
+	void SetCanRotate(bool newCanRotate) { canRotate = newCanRotate; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -131,6 +194,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	bool stickerActive;							// Whether the sticker can be picked up (false) or is active (true)
+	bool canRotate;								// Whether the player can rotate the sticker while hovering
 
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
