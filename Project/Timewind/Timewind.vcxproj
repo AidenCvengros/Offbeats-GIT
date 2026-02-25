@@ -181,6 +181,7 @@
     <ClInclude Include="source\Game_Objects\Player.h" />
     <ClInclude Include="source\Game_Objects\Pool.h" />
     <ClInclude Include="source\Engine\RenderPass.h" />
+    <ClInclude Include="source\Game_Objects\Stickers\BlockSticker.h" />
     <ClInclude Include="source\Game_Objects\Stickers\Bumper.h" />
     <ClInclude Include="source\Game_Objects\Stickers\Sticker.h" />
     <ClInclude Include="source\Scenes\Scene.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="source\Game_Objects\Player.cpp" />
     <ClCompile Include="source\Game_Objects\Pool.cpp" />
     <ClCompile Include="source\Engine\RenderPass.cpp" />
+    <ClCompile Include="source\Game_Objects\Stickers\BlockSticker.cpp" />
     <ClCompile Include="source\Game_Objects\Stickers\Bumper.cpp" />
     <ClCompile Include="source\Game_Objects\Stickers\Sticker.cpp" />
     <ClCompile Include="source\Scenes\Scene.cpp" />

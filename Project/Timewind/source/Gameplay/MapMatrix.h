@@ -80,6 +80,7 @@ public:
 		Player,
 		Enemy,									// The player cannot walk through spaces on this side vvv
 		Destructible,
+		SandBlock,
 		LockedDoor,
 		Wall,
 		Max

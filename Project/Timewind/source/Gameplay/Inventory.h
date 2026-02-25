@@ -153,27 +153,37 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the sticker at the given index
+			Increments the selected sticker one to the right
+	*/
+	/*************************************************************************************************/
+	void IncrementSelectedSticker();
 
-		\param index
-			The inventory index to select
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Decrements the selected sticker one to the left
+	*/
+	/*************************************************************************************************/
+	void DecrementSelectedSticker();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the sticker at the selected index
 
 		\return
 			The chosen sticker
 	*/
 	/*************************************************************************************************/
-	Sticker* GetSelectedSticker(int index) { return stickerList[index]; }
+	Sticker* GetSelectedSticker() { return stickerList[stickerInventoryCursor]; }
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Clears the sticker at the given index
-
-		\param index
-			The inventory index to select
+			Clears the sticker at the selected index
 	*/
 	/*************************************************************************************************/
-	void ClearSelectedSticker(int index) { stickerList[index] = NULL; }
+	void ClearSelectedSticker() { stickerList[stickerInventoryCursor] = NULL; }
 
 private:
 	//---------------------------------------------------------------------------------------------

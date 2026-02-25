@@ -63,6 +63,7 @@ public:
 		Key,
 		Coin,
 		Bumper,
+		BlockSticker,
 		Max
 	};
 	

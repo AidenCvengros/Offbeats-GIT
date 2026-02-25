@@ -70,6 +70,12 @@ void InputManager::Init()
 	}
 
 	keybinds.insert(std::pair(Inputs::Escape, GLFW_KEY_ESCAPE));
+	keybinds.insert(std::pair(Inputs::Pause, GLFW_KEY_ESCAPE));
+	keybinds.insert(std::pair(Inputs::TogglePlacing, GLFW_KEY_TAB));
+	keybinds.insert(std::pair(Inputs::MenuAdvance, GLFW_KEY_E));
+	keybinds.insert(std::pair(Inputs::MenuAdvance, GLFW_KEY_ENTER));
+	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_Q));
+	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_BACKSPACE));
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_LEFT));
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_A));
 	keybinds.insert(std::pair(Inputs::Right, GLFW_KEY_RIGHT));
@@ -78,10 +84,12 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::Up, GLFW_KEY_W));
 	keybinds.insert(std::pair(Inputs::Down, GLFW_KEY_DOWN));
 	keybinds.insert(std::pair(Inputs::Down, GLFW_KEY_S));
-	keybinds.insert(std::pair(Inputs::Jump, GLFW_KEY_SPACE));
-	keybinds.insert(std::pair(Inputs::Action, GLFW_KEY_E));
-	keybinds.insert(std::pair(Inputs::Back, GLFW_KEY_Q));
-	keybinds.insert(std::pair(Inputs::Swap, GLFW_KEY_TAB));
+	keybinds.insert(std::pair(Inputs::MovementJump, GLFW_KEY_SPACE));
+	keybinds.insert(std::pair(Inputs::MovementAction, GLFW_KEY_E));
+	keybinds.insert(std::pair(Inputs::PlacementPlace, GLFW_MOUSE_BUTTON_LEFT));
+	keybinds.insert(std::pair(Inputs::PlacementPickup, GLFW_MOUSE_BUTTON_RIGHT));
+	keybinds.insert(std::pair(Inputs::PlacementRotateLeft, GLFW_KEY_Q));
+	keybinds.insert(std::pair(Inputs::PlacementRotateRight, GLFW_KEY_E));
 	keybinds.insert(std::pair(Inputs::F1, GLFW_KEY_F1));
 	keybinds.insert(std::pair(Inputs::F2, GLFW_KEY_F2));
 	keybinds.insert(std::pair(Inputs::F3, GLFW_KEY_F3));
@@ -197,8 +205,16 @@ void InputManager::UpdateInputStatus(Inputs input)
 	auto range = keybinds.equal_range(input);
 	for (auto i = range.first; i != range.second; i++)
 	{
-		// Checks a keybind
-		keyValue = glfwGetKey(_Window->GetVulkanWindowPtr(), i->second);
+		// Checks for a mouse button
+		if (i->second < 32)
+		{
+			keyValue = glfwGetMouseButton(_Window->GetVulkanWindowPtr(), i->second);
+		}
+		// Checks for a keyboard button
+		else
+		{
+			keyValue = glfwGetKey(_Window->GetVulkanWindowPtr(), i->second);
+		}
 
 		// If a valid keybind is being pressed, break the loop
 		if (keyValue)

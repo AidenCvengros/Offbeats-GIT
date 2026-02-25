@@ -126,7 +126,7 @@ Player::~Player()
 void Player::Update(double dt)
 {
 	// Flips the player state
-	if (_InputManager->CheckInputStatus(InputManager::Inputs::Swap) == InputManager::InputStatus::Pressed)
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::TogglePlacing) == InputManager::InputStatus::Pressed)
 	{
 		// If running set to placing
 		if (currentPlayerState == PlayerStates::Running || currentPlayerState == PlayerStates::Walking)
@@ -194,7 +194,7 @@ void Player::Update(double dt)
 		}
 
 		// Checks for the jump input
-		if (jumped == false && CheckInput(InputManager::Inputs::Jump))
+		if (jumped == false && CheckInput(InputManager::Inputs::MovementJump))
 		{
 			// Checks if the player is grounded or cut in by a roof
 			if (grounded &&
@@ -217,7 +217,7 @@ void Player::Update(double dt)
 			}
 		}
 		// Checks if the jump input was released
-		else if (_InputManager->CheckInputStatus(InputManager::Inputs::Jump) == InputManager::InputStatus::Released)
+		else if (_InputManager->CheckInputStatus(InputManager::Inputs::MovementJump) == InputManager::InputStatus::Released)
 		{
 			if (verticalVelocity >= 15.0f && reducedGravity <= 0.0f)
 			{
@@ -233,7 +233,7 @@ void Player::Update(double dt)
 		MovePlayer(dt);
 
 		// Checks if the player pressed the interaction button
-		if (CheckInput(InputManager::Inputs::Action))
+		if (CheckInput(InputManager::Inputs::MovementAction))
 		{
 			InteractWithTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 1, 0), false, false);
 		}
@@ -244,45 +244,25 @@ void Player::Update(double dt)
 	{
 		// Gets the point the camera is looking at
 		std::pair<int, int> cursorTile = ConvertWorldCoordsToMapCoords(_Window->GetCamera()->GetLookAtPosition());
-		MapMatrix::TileStatus tileStatus = _MapMatrix->GetTile(cursorTile).tileStatus;
+		
+		// Hovers the player's cursor
+		Hovering(cursorTile);
 
-		// If the tile is empty draws it green
-		if (tileStatus == MapMatrix::TileStatus::Empty)
-		{
-			_CurrentScene->DrawTile(cursorTile, { 0.0f, 1.0f, 0.0f, 0.5f });
-		}
-		// Checks if the player is hovering over a placed sticker
-		else if (_MapMatrix->IsSticker(tileStatus))
-		{
-			// Draws stickers blue
-			_CurrentScene->DrawTile(cursorTile, { 0.0f, 0.0f, 1.0f, 0.5f });
-
-			// If the player presses the back button, collects the sticker
-			if (CheckInput(InputManager::Inputs::Back))
-			{
-				CollectSticker(cursorTile);
-			}
-		}
-		else
-		{
-			_CurrentScene->DrawTile(cursorTile, { 1.0f, 0.0f, 0.0f, 0.5f });
-		}
-
-		// Checks if there is a bumper in inventory
-		Sticker* sticker = inventory->GetSelectedSticker(0);
+		// Checks if there is a sticker in inventory
+		Sticker* sticker = inventory->GetSelectedSticker();
 		if (sticker)
 		{
-			// Hovers a faded bumper over the target tile
+			// Hovers a faded sticker over the target tile
 			sticker->Hovering(cursorTile);
 			
 			// When the player presses the button
-			if (CheckInput(InputManager::Inputs::Action))
+			if (CheckInput(InputManager::Inputs::PlacementPlace))
 			{
 				// If the space the camera is looking at is empty
 				if (sticker->Place(cursorTile))
 				{
 					// If the sticker was placed, clears it from the inventory
-					inventory->ClearSelectedSticker(0);
+					inventory->ClearSelectedSticker();
 				}
 			}
 		}
@@ -556,63 +536,6 @@ void Player::MovePlayer(double dt)
 /*************************************************************************************************/
 /*!
 	\brief
-		Helper function to check if the player is going to run into anything this turn
-
-	\param horizontalMovement
-		How far the player plans to move horizontally this frame
-
-	\param verticalMovement
-		How far the player plans to move vertically this frame
-
-	\return
-		Returns a pair of booleans. The first one says if we hit horizontally, the second says if we hit vertically
-*/
-/*************************************************************************************************/
-std::pair<bool, bool> Player::CollisionCheck(float horizontalMovement, float verticalMovement)
-{
-	// Variables to track collision
-	bool horizontalCollision = false;
-	bool verticalCollsion = false;
-
-	// Gets the player position
-	std::pair<int, int> playerPosition = _MapMatrix->GetPlayerPosition();
-
-	// Checks if there even is anything to collide with in the space to the side
-	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(playerPosition, GetIsFacingRight(), 1)).tileStatus > MapMatrix::TileStatus::Player)
-	{
-		horizontalCollision = true;
-	}
-	
-	// Checks if there even is anything to collide with in the space vertical
-	int verticalOffset = 0;
-	if (verticalMovement > 0.0f)
-	{
-		verticalOffset = 1;
-	}
-	else if (verticalMovement < 0.0f)
-	{
-		verticalOffset = -1;
-	}
-	if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomLeftIn), GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player ||
-		_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::BottomRightIn), GetIsFacingRight(), 0, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player)
-	{
-		verticalCollsion = true;
-	}
-
-	// Checks if we have a case where we're coming directly at a corner
-	if (horizontalCollision == false && verticalCollsion == false && _MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 1, verticalOffset)).tileStatus > MapMatrix::TileStatus::Player)
-	{
-		// We turn on the horizontal collision so the player effectively hits the wall
-		horizontalCollision = true;
-	}
-
-	// Returns the collision results
-	return { horizontalCollision, verticalCollsion };
-}
-
-/*************************************************************************************************/
-/*!
-	\brief
 		Helper function to check if the player has left the ground (usually by walking off a ledge)
 
 	\return
@@ -667,32 +590,6 @@ void Player::UpdatePlayerCoords()
 		InteractWithTile(playerCoords, false, true);
 		_MapMatrix->SetPlayerPosition(playerCoords, this);
 	}
-}
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Helper function to manage moving the player
-
-	\param dt
-		The time elapsed since the previous frame
-
-	\param playerPosition
-		The current position of the player (will be modified if the player moves)
-*/
-/*************************************************************************************************/
-void Player::Interact(double dt, std::pair<int, int>& playerPosition)
-{
-	// Checks if the player is starting an action
-	//if (actionQueued == PlayerActions::INTERACT)
-	//{
-	//	// If the player isn't moving, they can start the action
-	//	if (GetIsMoving() == false)
-	//	{
-	//		std::pair<int, int> interactionCoords = _MapMatrix->CalculateOffsetTile(GetMapCoords(), GetIsFacingRight(), 1);
-	//		InteractWithTile(interactionCoords, true, true);
-	//	}
-	//}
 }
 
 /*************************************************************************************************/
@@ -838,5 +735,52 @@ void Player::CollectSticker(std::pair<int, int> targetTileCoords)
 		inventory->AddSticker((Sticker*)_MapMatrix->GetTile(targetTileCoords).tileObject);
 		_MapMatrix->GetTile(targetTileCoords).tileObject->SetRender(false);
 		_MapMatrix->SetTile(targetTileCoords, MapMatrix::TileStatus::Empty);
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Hovering behavior function
+
+	\param targetTileCoords
+		The tile coordinates the player is looking at
+*/
+/*************************************************************************************************/
+void Player::Hovering(std::pair<int, int> targetTileCoords)
+{
+	// Gets the tile status of the target
+	MapMatrix::TileStatus tileStatus = _MapMatrix->GetTile(targetTileCoords).tileStatus;
+
+	// If the tile is empty draws it green
+	if (tileStatus == MapMatrix::TileStatus::Empty)
+	{
+		_CurrentScene->DrawTile(targetTileCoords, { 0.0f, 1.0f, 0.0f, 0.5f });
+	}
+	// Checks if the player is hovering over a placed sticker
+	else if (_MapMatrix->IsSticker(tileStatus))
+	{
+		// Draws stickers blue
+		_CurrentScene->DrawTile(targetTileCoords, { 0.0f, 0.0f, 1.0f, 0.5f });
+
+		// If the player presses the back button, collects the sticker
+		if (CheckInput(InputManager::Inputs::PlacementPickup))
+		{
+			CollectSticker(targetTileCoords);
+		}
+	}
+	else
+	{
+		_CurrentScene->DrawTile(targetTileCoords, { 1.0f, 0.0f, 0.0f, 0.5f });
+	}
+
+	// Cycles through the sticker selection when the player presses left or right
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::Right) == InputManager::InputStatus::Pressed)
+	{
+		inventory->IncrementSelectedSticker();
+	}
+	else if (_InputManager->CheckInputStatus(InputManager::Inputs::Left) == InputManager::InputStatus::Pressed)
+	{
+		inventory->DecrementSelectedSticker();
 	}
 }

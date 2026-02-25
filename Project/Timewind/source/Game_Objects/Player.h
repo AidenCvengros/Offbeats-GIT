@@ -259,23 +259,6 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Helper function to check if the player is going to run into anything this turn
-
-		\param horizontalMovement
-			How far the player plans to move horizontally this frame
-
-		\param verticalMovement
-			How far the player plans to move vertically this frame
-
-		\return
-			Returns a pair of booleans. The first one says if we hit horizontally, the second says if we hit vertically
-	*/
-	/*************************************************************************************************/
-	std::pair<bool, bool> CollisionCheck(float horizontalMovement, float verticalMovement);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
 			Helper function to check if the player has left the ground (usually by walking off a ledge)
 
 		\return
@@ -291,20 +274,6 @@ private:
 	*/
 	/*************************************************************************************************/
 	void UpdatePlayerCoords();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Helper function to manage moving the player
-
-		\param dt
-			The time elapsed since the previous frame
-
-		\param playerPosition
-			The current position of the player (will be modified if the player moves)
-	*/
-	/*************************************************************************************************/
-	void Interact(double dt, std::pair<int, int>& playerPosition);
 
 	/*************************************************************************************************/
 	/*!
@@ -354,11 +323,22 @@ private:
 		\brief
 			Collects a sticker on the given tile
 
-		\param position
+		\param targetTileCoords
 			The tile coordinates of the sticker to collect
 	*/
 	/*************************************************************************************************/
 	void CollectSticker(std::pair<int, int> targetTileCoords);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Hovering behavior function
+
+		\param targetTileCoords
+			The tile coordinates the player is looking at
+	*/
+	/*************************************************************************************************/
+	void Hovering(std::pair<int, int> targetTileCoords);
 };
 
 //-------------------------------------------------------------------------------------------------

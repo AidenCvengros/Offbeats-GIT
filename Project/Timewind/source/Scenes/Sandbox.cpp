@@ -34,6 +34,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Player.h"
 #include "../Game_Objects/Camera.h"
 #include "../Game_Objects/Stickers/Bumper.h"
+#include "../Game_Objects/Stickers/BlockSticker.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -195,6 +196,10 @@ void Sandbox::LoadScene()
     Bumper* bumper = new Bumper(glm::vec2(8.0f, 4.0f), 20.0f, glm::vec2(2.0f, 2.0f), true, bumperTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), std::make_pair(4, 2));
     _MapMatrix->SetTile(std::make_pair(4, 2), MapMatrix::TileStatus::Sticker, bumper);
     _GameObjectManager->AddGameObject(bumper);
+
+    BlockSticker* blockSticker = new BlockSticker(glm::vec2(12.0f, 4.0f), 0.0f, glm::vec2(2.0f, 2.0f), true, wallTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), std::make_pair(6, 2));
+    _MapMatrix->SetTile(std::make_pair(6, 2), MapMatrix::TileStatus::Sticker, blockSticker);
+    _GameObjectManager->AddGameObject(blockSticker);
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);

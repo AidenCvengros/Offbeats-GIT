@@ -122,6 +122,42 @@ bool Inventory::AddCoin()
 	return false;
 }
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Increments the selected sticker one to the right
+*/
+/*************************************************************************************************/
+void Inventory::IncrementSelectedSticker()
+{
+	// Increments the selected sticker
+	stickerInventoryCursor++;
+
+	// Checks if we overflow
+	if (stickerInventoryCursor >= stickerList.size())
+	{
+		stickerInventoryCursor = 0;
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Decrements the selected sticker one to the left
+*/
+/*************************************************************************************************/
+void Inventory::DecrementSelectedSticker()
+{
+	// Decrements the selected sticker
+	stickerInventoryCursor--;
+
+	// Checks if we underflow
+	if (stickerInventoryCursor < 0)
+	{
+		stickerInventoryCursor = stickerList.size() - 1;
+	}
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------

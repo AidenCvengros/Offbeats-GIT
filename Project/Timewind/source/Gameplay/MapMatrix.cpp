@@ -625,7 +625,8 @@ bool MapMatrix::IsSticker(TileStatus tileStatus)
 {
 	// Checks for the relevant tile statuses
 	if (tileStatus == TileStatus::Sticker ||
-		tileStatus == TileStatus::Bumper)
+		tileStatus == TileStatus::Bumper ||
+		tileStatus == TileStatus::SandBlock)
 	{
 		return true;
 	}
