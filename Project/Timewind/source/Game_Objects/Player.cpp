@@ -219,7 +219,7 @@ void Player::Update(double dt)
 		// Checks if the jump input was released
 		else if (_InputManager->CheckInputStatus(InputManager::Inputs::MovementJump) == InputManager::InputStatus::Released)
 		{
-			if (verticalVelocity >= 15.0f && reducedGravity <= 0.0f)
+			if (verticalVelocity >= 20.0f && reducedGravity <= 0.0f)
 			{
 				// If the jump was let go, cuts the jump short
 				verticalVelocity *= 0.5f;

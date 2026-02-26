@@ -43,6 +43,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "SceneManager.h"
 #include "../Gameplay/MapMatrix.h"
 #include "EffectManager.h"
+#include "AudioManager.h"
 
 // Adds the camera class so a starting camera can be set
 #include "../Game_Objects/Camera.h"
@@ -128,6 +129,7 @@ void Engine::Init()
 
 	// Adds essential game systems to the system list
 	InputManager* inputManager = new InputManager();
+	AudioManager* audioManager = new AudioManager();
 	GameObjectManager* objectManager = new GameObjectManager();
 	TextureManager* texManager = new TextureManager();
 	SceneManager* sceneManager = new SceneManager();
@@ -136,6 +138,7 @@ void Engine::Init()
 
 	// Creates and pushes back systems
 	systemList.push_back((System*)inputManager);
+	systemList.push_back((System*)audioManager);
 	systemList.push_back((System*)objectManager);
 	systemList.push_back((System*)texManager);
 	systemList.push_back((System*)sceneManager);
@@ -164,7 +167,7 @@ void Engine::Update()
 		double newTime = glfwGetTime();
 		double dt = std::min(newTime - lastTime, 0.1);
 		lastTime = newTime;
-		fmin(dt, 0.1);
+		dt = fmin(dt, 0.1);
 #ifdef _DEBUG
 		// Prints out the framerate. Debug only
 		//std::cout << 1 / dt << std::endl;

@@ -1,29 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Engine.h
+\file Audio.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2023.9.7
+\date 2026.2.25
 \brief
-    Creates and manages the game engine
+    Audio manager class
 
-    Public Functions:
-        + Engine::createEngine
-		+ Engine::~Engine
-		+ Engine::Init
-		+ Engine::Update
-		+ Engine::Draw
-		+ Engine::Shutdown
+    Functions include:
+        + FILL
 
-	Private Functions:
-		+ Engine::Engine
-
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Engine_H_
-#define Syncopatience_Engine_H_
+#ifndef Syncopatience_AudioManager_H_
+#define Syncopatience_AudioManager_H_
 
 #pragma once
 
@@ -31,20 +23,18 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
+// Base include
 #include "stdafx.h"
 
-// Includes to make system vector
+// The base system class
 #include "System.h"
-#include <vector>
+
+// SDL audio libraries
+#include <SDL3/SDL.h>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
-
-// Forward references to reduce dependencies because engine.h is included in every cpp file
-class Window;
-class Scene;
-class MapMatrix;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -57,32 +47,19 @@ class MapMatrix;
 /*************************************************************************************************/
 /*!
 	\brief
-		Singleton class that defines and manages the game engine.
+		The audio manager class
 */
 /*************************************************************************************************/
-class Engine
+class AudioManager : public System
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-
+	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
-
-	enum SystemTypes
-	{
-		window,
-		inputManager,
-		audioManager,
-		gameObjectManager,
-		textureManager,
-		sceneManager,
-		mapMatrix,
-		effectManager,
-		max
-	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -91,93 +68,65 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+  
+	/*************************************************************************************************/
+	/*!
+	  \brief
+	    Constructor for the FILL class
+	*/
+	/*************************************************************************************************/
+	AudioManager() : stream(NULL), currentSine(0) {}
+	
+	/*************************************************************************************************/
+	/*!
+	  \brief
+	    Destructor for FILL class
+	*/
+	/*************************************************************************************************/
+	~AudioManager() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Static function that creates the singleton game engine. Also will return the game engine
-			reference
-
-		\return
-			Returns the game engine.
+			Initializes the system.
 	*/
 	/*************************************************************************************************/
-	static Engine* createEngine();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Engine destructor.
-	*/
-	/*********************************************************************************************/
-	~Engine();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Initializes the engine
-	*/
-	/*********************************************************************************************/
 	void Init();
 
-	/*********************************************************************************************/
+	/*************************************************************************************************/
 	/*!
-		\brief
-			Updates the game engine. Also defines an in-engine frame
-	*/
-	/*********************************************************************************************/
-	void Update();
+		  \brief
+			  Updates the system.
 
-	/*********************************************************************************************/
+		  \param
+			  The time elapsed since the previous frame.
+	*/
+	/*************************************************************************************************/
+	void Update(double dt);
+
+	/*************************************************************************************************/
 	/*!
-		\brief
-			Draws the engine updates to the screen.
+		  \brief
+			  Draws the system to the screen.
 	*/
 	/*************************************************************************************************/
 	void Draw();
 
-	/*********************************************************************************************/
+	/*************************************************************************************************/
 	/*!
-		\brief
-			Shuts down the game engine
+		  \brief
+			  Shuts down the system.
 	*/
-	/*********************************************************************************************/
+	/*************************************************************************************************/
 	void Shutdown();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Gets a system from the system list of the given type
-
-		\param systemType
-			The given system type
-	*/
-	/*********************************************************************************************/
-	System* GetSystem(SystemTypes systemType);
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Gets a system from the system list of the given type
-
-		\param systemType
-			The given system type
-	*/
-	/*********************************************************************************************/
-	Window* GetWindow() { return gameWindow; }
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Gets the currently running scene
-	*/
-	/*********************************************************************************************/
-	Scene* GetCurrentScene();
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	SDL_AudioStream* stream;					// The audio stream
+	int currentSine;							// The current sin wave value
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -187,24 +136,9 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	static Engine* engineInstance;			// Points to the singleton engine instance
-
-	std::vector<System *> systemList;		// Holds a list of all systems that need to be managed
-	Window* gameWindow;						// Points to the window so the engine can communicate directly with the window
-
-	double lastTime;						// Tracks the last recorded time for calculating dt
-
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Engine class initializer.
-	*/
-	/*********************************************************************************************/
-	Engine();
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -215,4 +149,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Engine_H_
+#endif // Syncopatience_AudioManager_H_

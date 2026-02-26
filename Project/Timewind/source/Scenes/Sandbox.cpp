@@ -109,6 +109,10 @@ void Sandbox::LoadScene()
         // Checks what character marked the special tile
         switch (i->first)
         {
+            // Reserves the player starting spot is reserved so stickers can't be placed on it
+        case 'p':
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Player);
+            break;
             // Key 1 is a key hidden behind a destructible wall
         case '1':
             newObject = new Key(33, keyTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
