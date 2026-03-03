@@ -25,6 +25,7 @@ Copyright (c) 2025 Aiden Cvengros
 // Includes the key class so we can add keys
 #include "../Game_Objects/Key.h"
 #include "../Game_Objects/Stickers/Sticker.h"
+#include "../Game_Objects/Stickers/Teleporter.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -49,6 +50,17 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Constructor for the inventory class
+*/
+/*************************************************************************************************/
+Inventory::Inventory() : keyList(), coinCount(0), stickerList(), stickerInventoryCursor(0)
+{
+
+}
 
 /*************************************************************************************************/
 /*!
@@ -156,6 +168,63 @@ void Inventory::DecrementSelectedSticker()
 	{
 		stickerInventoryCursor = stickerList.size() - 1;
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets a new active teleporter
+
+	\param newActiveTeleporter
+		The new active teleporter
+*/
+/*************************************************************************************************/
+void Inventory::SetActiveTeleporter(Teleporter* newActiveTeleporter)
+{
+	// Turns off the old teleporter
+	if (activeTeleporter)
+	{
+		activeTeleporter->SetTeleporterActive(false);
+	}
+
+	// Turns on the new teleporter
+	activeTeleporter = newActiveTeleporter;
+	if (activeTeleporter)
+	{
+		activeTeleporter->SetTeleporterActive(true);
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Teleports the given game object to the teleporter if one is active
+
+	\param gameObject
+		The object to be teleported
+
+	\return
+		If the object was teleported
+*/
+/*************************************************************************************************/
+bool Inventory::Teleport(GameObject* gameObject)
+{
+	// Checks that the game object is real and that there is a teleporter active
+	if (activeTeleporter && gameObject)
+	{
+		// Checks that the teleporter is in the map
+		if (_MapMatrix->ValidateCoordinates(ConvertWorldCoordsToMapCoords(activeTeleporter->GetPosition())))
+		{
+			// Teleports the object
+			gameObject->SetPosition(activeTeleporter->GetPosition());
+
+			// Success
+			return true;
+		}
+	}
+
+	// Otherwise returns false
+	return false;
 }
 
 //-------------------------------------------------------------------------------------------------

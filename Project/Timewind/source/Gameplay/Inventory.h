@@ -36,6 +36,8 @@ Copyright (c) 2025 Aiden Cvengros
 // Dependency reference
 class Key;
 class Sticker;
+class Teleporter;
+class GameObject;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -76,7 +78,7 @@ public:
 			Constructor for the inventory class
 	*/
 	/*************************************************************************************************/
-	Inventory() : keyList(), coinCount(0), stickerList(), stickerInventoryCursor(0) {}
+	Inventory();
 
 	/*************************************************************************************************/
 	/*!
@@ -85,17 +87,6 @@ public:
 	*/
 	/*************************************************************************************************/
 	~Inventory() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Adds the given item to the inventory
-
-		\param newItem
-			The new item to be added into the inventory
-	*/
-	/*************************************************************************************************/
-	//void AddItem(Item* newItem) { itemList.push_back(newItem); }
 
 	/*************************************************************************************************/
 	/*!
@@ -185,17 +176,43 @@ public:
 	/*************************************************************************************************/
 	void ClearSelectedSticker() { stickerList[stickerInventoryCursor] = NULL; }
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets a new active teleporter
+
+		\param newActiveTeleporter
+			The new active teleporter
+	*/
+	/*************************************************************************************************/
+	void SetActiveTeleporter(Teleporter* newActiveTeleporter);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Teleports the given object to the teleporter if one is active
+
+		\param gameObject
+			The object to be teleported
+
+		\return
+			If the object was teleported
+	*/
+	/*************************************************************************************************/
+	bool Teleport(GameObject* gameObject);
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	//std::vector<Item*> itemList;				// The list of general items the player has
 	std::array<Key*, 56> keyList;				// The list of keys the player has collected
 	int coinCount;								// The number of coins the player has collected
 
 	std::array<Sticker*, 10> stickerList;		// The list of stickers the player has currently
 	int stickerInventoryCursor;					// What sticker slot the player currently has selected
+
+	Teleporter* activeTeleporter;				// The most recently active teleporter to send the player to
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

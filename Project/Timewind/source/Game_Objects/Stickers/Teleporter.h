@@ -1,11 +1,17 @@
 /*************************************************************************************************/
 /*!
-\file InputManager.h
+\file Teleporter.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.16
+\date 2026.3.2
 \brief
-    Gathers and manages inputs from the window instance
+    The teleporter sticker object
+
+    Public Functions:
+        + Entity::Entity
+		+ Entity::~Entity
+		+ Entity::SetPosition
+		+ Entity::GetPosition
 		
 	Private Functions:
 		+ FILL
@@ -14,8 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_InputManager_H_
-#define Syncopatience_InputManager_H_
+#ifndef Syncopatience_Teleporter_H_
+#define Syncopatience_Teleporter_H_
 
 #pragma once
 
@@ -23,14 +29,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "stdafx.h"
-
-// Includes the base system class, window class, and glfw functions
-#include "System.h"
-
-// Includes the map container for tracking input keys
-#include <vector>
-#include <map>
+#include "Sticker.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -47,53 +46,20 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		InputManager
+		The base entity class for objects on the map
 */
 /*************************************************************************************************/
-class InputManager : System
+class Teleporter : public Sticker
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 	
-	enum class Inputs
-	{
-		Escape,
-		Pause,
-		TogglePlacing,
-		MenuAdvance,
-		MenuBack,
-		Left,
-		Right,
-		Up,
-		Down,
-		MovementJump,
-		MovementAction,
-		MovementTeleport,
-		PlacementPlace,
-		PlacementPickup,
-		PlacementRotateLeft,
-		PlacementRotateRight,
-		F1,
-		F2,
-		F3,
-		Max
-	};
-
-	enum class InputStatus
-	{
-		Off,
-		Pressed,
-		Held,
-		Released,
-		Max
-	};
-
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
-	
+
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
 	//---------------------------------------------------------------------------------------------
@@ -101,99 +67,99 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the teleporter sticker game object class
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param drawPriority
+			The draw priority of the game object
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in
+	*/
+	/*************************************************************************************************/
+	Teleporter(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Sticker(Item::ItemType::Teleporter, pos, rot, sca, drawPriority, facingRight_, texture_, color_, mapCoords_), teleporterActive(false) {}
+	Teleporter(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Sticker(Item::ItemType::Teleporter, texture_, color_, mapCoords_), teleporterActive(false) {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for the bumper class
+	*/
+	/*************************************************************************************************/
+	~Teleporter() {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates the game object. Can be overwritten by derived classes
+
+		\param dt
+			The time elapsed since the previous frame
+	*/
+	/*************************************************************************************************/
+	virtual void Update(double dt);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Function for when the player is hovering to place this sticker in a location
+
+		\param tileCoords
+			The tile the player is hovering over
+	*/
+	/*************************************************************************************************/
+	virtual void Hovering(std::pair<int, int> tileCoords);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Place this object in the scene at the target location
 	
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Constructor for the input manager class
-	*/
-	/*************************************************************************************************/
-	InputManager() {}
+		\param tileCoords
+			The tile the player is hovering over
 	
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Destructor for FILL class
-	*/
-	/*************************************************************************************************/
-	~InputManager() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Initializes the system.
-	*/
-	/*************************************************************************************************/
-	void Init();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the system.
-
-		\param
-			The time elapsed since the previous frame.
-	*/
-	/*************************************************************************************************/
-	void Update(double dt);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Draws the system to the screen.
-	*/
-	/*************************************************************************************************/
-	void Draw();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Shuts down the system.
-	*/
-	/*************************************************************************************************/
-	void Shutdown();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Check the status of the given input
-
-		\param input
-			The given input
-
 		\return
-			The status of the input
+			Whether the sticker was succesfully placed
 	*/
 	/*************************************************************************************************/
-	InputStatus CheckInputStatus(Inputs input);
+	virtual bool Place(std::pair<int, int> tileCoords);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns the coordinates of the mouse
+			Turns on or off the teleporter
 
-		\return
-			The mouse coordinates
+		\param newActiveStatus
+			The new active boolean for the teleporter to be set to
 	*/
 	/*************************************************************************************************/
-	std::pair<double, double> CheckMouseCoordinates() { return mouseCoords; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the coordinates of the mouse
-
-		\return
-			The mouse coordinates
-	*/
-	/*************************************************************************************************/
-	std::pair<double, double> CheckMouseDelta() { return mouseDelta; }
+	void SetTeleporterActive(bool newActiveStatus);
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
-	
+
+	bool teleporterActive;								// Whether the teleporter can be used
+
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
@@ -202,27 +168,9 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	std::vector<InputStatus> inputTracker;						// Keeps track of the different input and they're statuses
-	std::vector<std::pair<double, bool>> timeSincePressed;		// Functions as a buffer by mapping when this button was most recently pressed (doesn't count held). The boolean limits the buffer to a single pressed input
-	std::multimap<Inputs, int> keybinds;						// Holds the different keys that map to a certain input
-	std::pair<double, double> mouseCoords;						// The position of the mouse
-	std::pair<double, double> mouseDelta;						// How the mouse position has changed since the previous frame
-
-
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the given input status on the tracker
-
-		\param input
-			The given input
-	*/
-	/*************************************************************************************************/
-	void UpdateInputStatus(Inputs input);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -233,4 +181,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_InputManager_H_
+#endif // Syncopatience_Teleporter_H_

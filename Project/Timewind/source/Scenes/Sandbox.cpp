@@ -35,6 +35,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Camera.h"
 #include "../Game_Objects/Stickers/Bumper.h"
 #include "../Game_Objects/Stickers/BlockSticker.h"
+#include "../Game_Objects/Stickers/Teleporter.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -83,6 +84,7 @@ void Sandbox::LoadScene()
     Texture* lockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LockedWall.png");
     Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
     Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
+    Texture* teleporterTexture = _TextureManager->AddTexture("Assets/Sprites/Portal_Crack.png");
 
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
@@ -204,6 +206,14 @@ void Sandbox::LoadScene()
     BlockSticker* blockSticker = new BlockSticker(glm::vec2(12.0f, 4.0f), 0.0f, glm::vec2(2.0f, 2.0f), true, wallTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), std::make_pair(6, 2));
     _MapMatrix->SetTile(std::make_pair(6, 2), MapMatrix::TileStatus::Sticker, blockSticker);
     _GameObjectManager->AddGameObject(blockSticker);
+
+    Teleporter* teleporter = new Teleporter(glm::vec2(10.0f, 4.0f), 0.0f, glm::vec2(2.0f, 2.0f), 150, true, teleporterTexture, glm::vec4(1.0f, 1.0f, 1.0f, 0.5f), std::make_pair(5, 2));
+    _MapMatrix->SetTile(std::make_pair(5, 2), MapMatrix::TileStatus::Sticker, teleporter);
+    _GameObjectManager->AddGameObject(teleporter);
+
+    Teleporter* teleporter2 = new Teleporter(glm::vec2(14.0f, 4.0f), 0.0f, glm::vec2(2.0f, 2.0f), 150, true, teleporterTexture, glm::vec4(1.0f, 1.0f, 1.0f, 0.5f), std::make_pair(7, 2));
+    _MapMatrix->SetTile(std::make_pair(7, 2), MapMatrix::TileStatus::Sticker, teleporter2);
+    _GameObjectManager->AddGameObject(teleporter2);
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);

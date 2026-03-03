@@ -86,6 +86,7 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::Down, GLFW_KEY_S));
 	keybinds.insert(std::pair(Inputs::MovementJump, GLFW_KEY_SPACE));
 	keybinds.insert(std::pair(Inputs::MovementAction, GLFW_KEY_E));
+	keybinds.insert(std::pair(Inputs::MovementTeleport, GLFW_KEY_Q));
 	keybinds.insert(std::pair(Inputs::PlacementPlace, GLFW_MOUSE_BUTTON_LEFT));
 	keybinds.insert(std::pair(Inputs::PlacementPickup, GLFW_MOUSE_BUTTON_RIGHT));
 	keybinds.insert(std::pair(Inputs::PlacementRotateLeft, GLFW_KEY_Q));

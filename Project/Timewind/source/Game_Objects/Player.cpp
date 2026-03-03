@@ -141,8 +141,14 @@ void Player::Update(double dt)
 	}
 
 	// If the player is running
-	if (currentPlayerState == PlayerStates::Running)
+	if (currentPlayerState == PlayerStates::Running || currentPlayerState == PlayerStates::Walking)
 	{
+		// Checks if the player input a teleport
+		if (_InputManager->CheckInputStatus(InputManager::Inputs::MovementTeleport) == InputManager::InputStatus::Pressed)
+		{
+			inventory->Teleport(this);
+		}
+
 		// Checks if the player is trying to move left
 		if (CheckInput(InputManager::Inputs::Left) && !CheckInput(InputManager::Inputs::Right))
 		{
@@ -650,6 +656,12 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 			verticalVelocity = cosf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
 			horizontalVelocity = sinf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
 			reducedGravity = 0.25f;
+		}
+		// Checks for a teleporter
+		else if (targetTile.tileStatus == MapMatrix::TileStatus::Teleporter)
+		{
+			// Sets the teleporter as the new active teleporter
+			inventory->SetActiveTeleporter((Teleporter*)targetTile.tileObject);
 		}
 	}
 

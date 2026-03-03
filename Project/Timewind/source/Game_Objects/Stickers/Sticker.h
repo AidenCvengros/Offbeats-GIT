@@ -95,6 +95,7 @@ public:
 	*/
 	/*************************************************************************************************/
 	Sticker(Item::ItemType itemType, glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_), stickerActive(false), canRotate(true) {}
+	Sticker(Item::ItemType itemType, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, pos, rot, sca, drawPriority, facingRight_, texture_, color_, mapCoords_), stickerActive(false), canRotate(true) {}
 	Sticker(Item::ItemType itemType, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(itemType, 40, texture_, color_, mapCoords_), stickerActive(false), canRotate(true) {}
 
 	/*************************************************************************************************/

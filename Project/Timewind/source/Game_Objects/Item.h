@@ -64,6 +64,7 @@ public:
 		Coin,
 		Bumper,
 		BlockSticker,
+		Teleporter,
 		Max
 	};
 	

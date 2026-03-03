@@ -72,9 +72,10 @@ public:
 
 	enum class TileStatus
 	{
-		Empty,									
+		Empty,
 		Key,
 		Bumper,
+		Teleporter,
 		Sticker,
 		Coin,									// The player can walk through spaces on this side ^^^
 		Player,
@@ -492,6 +493,24 @@ public:
 	void UpdateObjectPosition(int xCoord, int yCoord, GameObject* object);
 	void UpdateObjectPosition(std::pair<int, int> coords, GameObject* object) { UpdateObjectPosition(coords.first, coords.second, object); }
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Checks if the given coordinates are within the map
+
+		\param xCoord
+			The x coordinate
+
+		\param yCoord
+			The y coordinate
+
+		\return
+			True if the coordinates are within the map, false otherwise
+	*/
+	/*************************************************************************************************/
+	bool ValidateCoordinates(int xCoord, int yCoord);
+	bool ValidateCoordinates(std::pair<int, int> coords) { return ValidateCoordinates(coords.first, coords.second); }
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
@@ -520,23 +539,6 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Checks if the given coordinates are within the map
-
-		\param xCoord
-			The x coordinate
-
-		\param yCoord
-			The y coordinate
-
-		\return
-			True if the coordinates are within the map, false otherwise
-	*/
-	/*************************************************************************************************/
-	bool ValidateCoordinates(int xCoord, int yCoord);
 };
 
 //-------------------------------------------------------------------------------------------------
