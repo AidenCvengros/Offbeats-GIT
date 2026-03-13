@@ -238,6 +238,28 @@ bool GameObject::GetIsFacingRight()
 /*************************************************************************************************/
 /*!
 	\brief
+		Returns -1 if the object is facing left and 1 if the object is facing right
+
+	\return
+		-1 for left, 1 for right
+*/
+/*************************************************************************************************/
+int GameObject::GetDirectionModifier()
+{
+	// Checks if the object is facing left
+	if (GetIsFacingRight() == false)
+	{
+		return -1;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Sets the position of the game object
 
 	\param newPosition

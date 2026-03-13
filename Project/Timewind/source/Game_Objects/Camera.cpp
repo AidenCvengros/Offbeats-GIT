@@ -27,12 +27,11 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Includes the input manager to collect camera control inputs
 #include "../Engine/InputManager.h"
+#include "../Engine/Window.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
-
-const float zDist = -15.0f;						// How far back the camera is in the z axis
 
 //-------------------------------------------------------------------------------------------------
 // Public Declarations
@@ -85,6 +84,7 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	inCutscene(false),
 	upVector(glm::vec3(0.0f, 1.0f, 0.0f)),
 	centeredObject(centeredObject_),
+	zDist(15.0f),
 	cameraBoxPos(pos),
 	cameraBoxLeft(0.5f), cameraBoxRight(0.5f), cameraBoxUp(4.0f), cameraBoxDown(1.0f),
 	justGrounded(false),
@@ -92,13 +92,12 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	perspMat(glm::mat4(0.0f)),
 	aspectRatio(aspectRatio_),
 	fov(fieldOfView),
-	relativePosX(0.0), relativePosY(0.0)
+	lookAtOffset(0.0f, 0.0f), maxOffsetDistance(6.0f)
 {
-	SetPosition(centeredObject->GetPosition());
-
 	// If there is a centered object, starts the camera centered on that object
 	if (centeredObject)
 	{
+		SetPosition(centeredObject->GetPosition());
 		cameraBoxPos = centeredObject->CalculateRelativePositions(GameObject::Positions::Center);
 	}
 }
@@ -120,13 +119,26 @@ void Camera::Update(double dt)
 		MoveToUpdate(dt);
 	}
 
-	if (inCutscene == false)
+	// Checks if the player can move the camera
+	if (centeredObject->GetPlayerState() == Player::PlayerStates::Walking || centeredObject->GetPlayerState() == Player::PlayerStates::Placing)
 	{
 		// Updates camera view positioning
 		UpdateRelativePosition();
 		UpdateCameraBox(dt);
 
-		MoveTo(glm::vec2(cameraBoxPos.x + 5.0f * relativePosX, cameraBoxPos.y + -3.75f * relativePosY), 0.0, false);
+		// Updates the camera's position
+		SetPosition(glm::vec2(cameraBoxPos.x, cameraBoxPos.y));
+		zDist = 12.0f;
+	}
+	// Checks if the player is using the running camera
+	else if (centeredObject->GetPlayerState() == Player::PlayerStates::Running)
+	{
+		// Updates the Camera Box
+		UpdateCameraBox(dt);
+
+		// Sets the camera behind the player
+		SetPosition(glm::vec2(cameraBoxPos.x - (centeredObject->GetVelocity().first / 2.0f), cameraBoxPos.y));
+		zDist = 15.0f - (abs(centeredObject->GetVelocity().first) / 4.0f);
 	}
 }
 
@@ -145,13 +157,14 @@ glm::mat4 Camera::GetViewMatrix()
 	if (centeredObject)
 	{
 		// Update and return the view matrix
-		float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
-		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist + distanceFromPlayer * distanceFromPlayer / 8.0f), glm::vec3(cameraBoxPos.x, cameraBoxPos.y, zDist / 4.0f), upVector);
+		//float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
+		//float zCoord = -sqrt(abs(zDist * zDist - distanceFromPlayer * distanceFromPlayer));
+		viewMat = glm::lookAt(glm::vec3(GetPosition(), -zDist), glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, 0.0), upVector);
 	}
 	else
 	{
 		// If there's not a centered object, default to (0, 0, 0)
-		viewMat = glm::lookAt(glm::vec3(GetPosition(), zDist), glm::vec3(0.0f, 0.0f, 0.0f), upVector);
+		viewMat = glm::lookAt(glm::vec3(GetPosition(), -zDist), glm::vec3(0.0f, 0.0f, 0.0f), upVector);
 	}
 	
 	// Then return the view matrix
@@ -172,8 +185,18 @@ glm::mat4 Camera::GetPerspectiveMatrix()
 	// Checks that the perspective matrix has been adjusted
 	if (perspectiveChanged)
 	{
-		// Calculates the new perspective matrix
-		perspMat = glm::perspective(fov, aspectRatio, 0.1f, 100.0f);
+		if (centeredObject->GetPlayerState() == Player::PlayerStates::Running)
+		{
+			// Calculates the new perspective matrix
+			perspMat = glm::perspective(fov, aspectRatio, 0.1f, 100.0f);
+		}
+		else
+		{
+			// Calculates the orthogonal matrix
+			perspMat = glm::ortho(-20.0f, 20.0f, -12.0f, 12.0f, -1000.0f, 1000.0f);
+		}
+
+		// Flips the screen upside down
 		perspMat[1][1] *= -1.25;
 	}
 
@@ -224,12 +247,12 @@ glm::vec2 Camera::GetLookAtPosition()
 	if (centeredObject)
 	{
 		// Calculates the vector that the camera is looking at
-		float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
-		float accurateZDist = zDist + distanceFromPlayer * distanceFromPlayer / 8.0f;
-		glm::vec3 lookAtVector = glm::normalize(glm::vec3(cameraBoxPos.x, cameraBoxPos.y, zDist / 4.0f) - glm::vec3(GetPosition(), accurateZDist));
+		//float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
+		//float zCoord = -sqrt(abs(zDist * zDist - distanceFromPlayer * distanceFromPlayer));
+		glm::vec3 lookAtVector = glm::normalize(glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, 0.0f) - glm::vec3(GetPosition(), -zDist));
 
 		// Calculates and returns what point in world space the camera is pointed at
-		return (-glm::vec2(lookAtVector.x, lookAtVector.y) * (accurateZDist / lookAtVector.z)) + cameraBoxPos;
+		return (-glm::vec2(lookAtVector.x, lookAtVector.y) * (-zDist / lookAtVector.z)) + GetPosition();
 	}
 	else
 	{
@@ -266,19 +289,26 @@ void Camera::SetCenteredObject(Player* object)
 /*************************************************************************************************/
 void Camera::UpdateRelativePosition()
 {
-	relativePosX = std::clamp(relativePosX + (_InputManager->CheckMouseDelta().first / 1000.0), -1.0, 1.0);
-	relativePosY = std::clamp(relativePosY + (_InputManager->CheckMouseDelta().second / 1000.0), -1.0, 1.0);
-
-	glm::vec2 normalizedRelativePositions = glm::normalize(glm::vec2{ relativePosX, relativePosY });
-
-	if (std::abs(relativePosX) > std::abs(normalizedRelativePositions.x))
+	// Centers the camera when asked
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::CenterCamera) == InputManager::InputStatus::Pressed)
 	{
-		relativePosX = normalizedRelativePositions.x;
+		lookAtOffset = { 0.0f, 0.0f };
 	}
-	if (std::abs(relativePosY) > std::abs(normalizedRelativePositions.y))
+
+	// Gets the mouse inputs and adds in current mouse positioning
+	glm::vec2 mouseDelta;
+	mouseDelta.x = lookAtOffset.x - (_InputManager->CheckMouseDelta().first / _Window->GetWindowSize().x);
+	mouseDelta.y = lookAtOffset.y + (_InputManager->CheckMouseDelta().second / _Window->GetWindowSize().y);
+
+	// Checks if the delta is past the range
+	if (glm::length(mouseDelta) > maxOffsetDistance)
 	{
-		relativePosY = normalizedRelativePositions.y;
+		// Caps the delta at the max distance
+		mouseDelta = glm::normalize(mouseDelta) * maxOffsetDistance;
 	}
+
+	// Sets the look at offset
+	lookAtOffset = mouseDelta;
 }
 
 /*************************************************************************************************/

@@ -29,9 +29,9 @@ void main()
   
   vec3 screenCenter = vec3(ubo.camPos.x + ubo.lookAt.x, ubo.camPos.y + ubo.lookAt.y, 0.0);
   vec3 camVec = vertWorldPosition.xyz - screenCenter;
-  float distanceToCamera = sqrt(camVec.x * camVec.x) / 2.0f;
+  camVec /= 4.0f;
   
-  vertWorldPosition.z += 10.0f - (distanceToCamera * distanceToCamera) / 16.0f;
+  //vertWorldPosition.z += -(camVec.x * camVec.x) / 4.0f;
   gl_Position = ubo.proj * ubo.view * vertWorldPosition;
   fragColor = ps.color;
   fragTexCoord = vec2(inTexCoord.x, 1.0f - inTexCoord.y);

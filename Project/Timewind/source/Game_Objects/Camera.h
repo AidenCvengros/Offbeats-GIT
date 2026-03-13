@@ -203,6 +203,7 @@ private:
 
 	glm::vec3 upVector;							// The up vector for the camera
 	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
+	float zDist;								// How far in the z direction the camera is
 
 	glm::vec2 cameraBoxPos;						// The position of the camera box
 	float cameraBoxRight;						// How far right the camera box extends
@@ -217,8 +218,8 @@ private:
 	float aspectRatio;							// The aspect ratio of the camera view
 	float fov;									// The field of view of the camera view
 
-	double relativePosX;						// Tracks horizontal mouse movement for camera movement
-	double relativePosY;						// Tracks vertical mouse movement for camera movement
+	glm::vec2 lookAtOffset;						// How far to the side/up the camera is looking
+	float maxOffsetDistance;					// How far to the side/up the camera can look
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
