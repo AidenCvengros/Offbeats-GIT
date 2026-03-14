@@ -92,7 +92,7 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	perspMat(glm::mat4(0.0f)),
 	aspectRatio(aspectRatio_),
 	fov(fieldOfView),
-	lookAtOffset(0.0f, 0.0f), maxOffsetDistance(6.0f)
+	lookAtOffset(0.0f, 0.0f), maxOffsetDistance(6.0f), useOffset(true), cameraSensitivity(4.0f)
 {
 	// If there is a centered object, starts the camera centered on that object
 	if (centeredObject)
@@ -113,12 +113,6 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 /*************************************************************************************************/
 void Camera::Update(double dt)
 {
-	// Updates movements if any are active
-	if (GetMoving())
-	{
-		MoveToUpdate(dt);
-	}
-
 	// Checks if the player can move the camera
 	if (centeredObject->GetPlayerState() == Player::PlayerStates::Walking || centeredObject->GetPlayerState() == Player::PlayerStates::Placing)
 	{
@@ -128,7 +122,7 @@ void Camera::Update(double dt)
 
 		// Updates the camera's position
 		SetPosition(glm::vec2(cameraBoxPos.x, cameraBoxPos.y));
-		zDist = 12.0f;
+		zDist = 15.5f;
 	}
 	// Checks if the player is using the running camera
 	else if (centeredObject->GetPlayerState() == Player::PlayerStates::Running)
@@ -137,9 +131,40 @@ void Camera::Update(double dt)
 		UpdateCameraBox(dt);
 
 		// Sets the camera behind the player
-		SetPosition(glm::vec2(cameraBoxPos.x - (centeredObject->GetVelocity().first / 2.0f), cameraBoxPos.y));
-		zDist = 15.0f - (abs(centeredObject->GetVelocity().first) / 4.0f);
+		float velocityOffset = centeredObject->GetVelocity().first;
+		if (abs(velocityOffset) > 0.5f)
+		{
+			SetPosition(glm::vec2(cameraBoxPos.x - (velocityOffset / 2.0f), cameraBoxPos.y - (abs(velocityOffset) / 10.0f)));
+			zDist = 15.5f - (velocityOffset * velocityOffset / 100.0f);
+			lookAtOffset.x = (cameraBoxPos.x - GetPosition().x) / 5.0f;
+		}
+		// If the player is almost stopped, smooths the camera back to start
+		else
+		{
+			MoveTo(cameraBoxPos, 0.5f, 0.0f);
+
+			// Updates movements if any are active
+			if (GetMoving())
+			{
+				MoveToUpdate(dt);
+			}
+
+			// Calculates the distance from cameraboxpos
+			zDist = 15.5f - (15.5f - zDist) / (1.0f + dt);
+			lookAtOffset.x = lookAtOffset.x * (1.0f - 0.9 * dt);
+		}
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Resets the camera offset to (0, 0)
+*/
+/*************************************************************************************************/
+void Camera::ResetCameraOffset()
+{
+	lookAtOffset = { 0.0f, 0.0f };
 }
 
 /*************************************************************************************************/
@@ -193,11 +218,11 @@ glm::mat4 Camera::GetPerspectiveMatrix()
 		else
 		{
 			// Calculates the orthogonal matrix
-			perspMat = glm::ortho(-20.0f, 20.0f, -12.0f, 12.0f, -1000.0f, 1000.0f);
+			perspMat = glm::ortho(-10.0f, 10.0f, -10.0f / aspectRatio, 10.0f / aspectRatio, -1000.0f, 1000.0f);
 		}
 
 		// Flips the screen upside down
-		perspMat[1][1] *= -1.25;
+		perspMat[1][1] *= -1.0;
 	}
 
 	// Then return the perspective matrix
@@ -292,13 +317,13 @@ void Camera::UpdateRelativePosition()
 	// Centers the camera when asked
 	if (_InputManager->CheckInputStatus(InputManager::Inputs::CenterCamera) == InputManager::InputStatus::Pressed)
 	{
-		lookAtOffset = { 0.0f, 0.0f };
+		ResetCameraOffset();
 	}
 
 	// Gets the mouse inputs and adds in current mouse positioning
 	glm::vec2 mouseDelta;
-	mouseDelta.x = lookAtOffset.x - (_InputManager->CheckMouseDelta().first / _Window->GetWindowSize().x);
-	mouseDelta.y = lookAtOffset.y + (_InputManager->CheckMouseDelta().second / _Window->GetWindowSize().y);
+	mouseDelta.x = lookAtOffset.x - (cameraSensitivity * _InputManager->CheckMouseDelta().first / _Window->GetWindowSize().x);
+	mouseDelta.y = lookAtOffset.y + (cameraSensitivity * _InputManager->CheckMouseDelta().second / _Window->GetWindowSize().y);
 
 	// Checks if the delta is past the range
 	if (glm::length(mouseDelta) > maxOffsetDistance)

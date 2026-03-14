@@ -120,6 +120,14 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Resets the camera offset to (0, 0)
+	*/
+	/*************************************************************************************************/
+	void ResetCameraOffset();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the view matrix of the camera
 
 		\return
@@ -220,6 +228,8 @@ private:
 
 	glm::vec2 lookAtOffset;						// How far to the side/up the camera is looking
 	float maxOffsetDistance;					// How far to the side/up the camera can look
+	bool useOffset;								// Whether to use the offset
+	float cameraSensitivity;					// Multiplier for the mouse
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

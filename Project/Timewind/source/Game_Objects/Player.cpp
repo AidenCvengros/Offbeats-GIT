@@ -152,6 +152,8 @@ void Player::Update(double dt)
 		{
 			currentPlayerState = PlayerStates::Walking;
 		}
+
+		_Window->GetCamera()->ResetCameraOffset();
 	}
 
 	// If the player is running
