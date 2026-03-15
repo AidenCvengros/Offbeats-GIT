@@ -218,20 +218,6 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Returns whether the given input was either pressed or held
-
-		\param input
-			The given input
-
-		\return
-			Whether the input was pressed or held
-	*/
-	/*************************************************************************************************/
-	bool CheckInput(InputManager::Inputs input);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
 			Helper function to accelerate the player horizontally
 	
 		\param accelerationAmount

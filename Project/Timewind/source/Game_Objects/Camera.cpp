@@ -92,7 +92,8 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	perspMat(glm::mat4(0.0f)),
 	aspectRatio(aspectRatio_),
 	fov(fieldOfView),
-	lookAtOffset(0.0f, 0.0f), maxOffsetDistance(6.0f), useOffset(true), cameraSensitivity(4.0f)
+	lookAtOffset(0.0f, 0.0f), maxOffsetDistance(6.0f), useOffset(true), cameraSensitivity(4.0f),
+	cameraOffset({ 0.0f, 0.0f })
 {
 	// If there is a centered object, starts the camera centered on that object
 	if (centeredObject)
@@ -130,29 +131,70 @@ void Camera::Update(double dt)
 		// Updates the Camera Box
 		UpdateCameraBox(dt);
 
-		// Sets the camera behind the player
-		float velocityOffset = centeredObject->GetVelocity().first;
-		if (abs(velocityOffset) > 0.5f)
+		// Sets the camera based on what direction the player is holding
+		if (_InputManager->ReadInput(InputManager::Inputs::Right))
 		{
-			SetPosition(glm::vec2(cameraBoxPos.x - (velocityOffset / 2.0f), cameraBoxPos.y - (abs(velocityOffset) / 10.0f)));
-			zDist = 15.5f - (velocityOffset * velocityOffset / 100.0f);
-			lookAtOffset.x = (cameraBoxPos.x - GetPosition().x) / 5.0f;
+			if (cameraOffset.x > 0.0f)
+			{
+				cameraOffset.x = cameraOffset.x - 16.0f * dt;
+				lookAtOffset.x = lookAtOffset.x + 4.0f * dt;
+			}
+			else
+			{
+				cameraOffset.x = max(cameraOffset.x - (16.0f + cameraOffset.x * 1.5f) * dt, -8.0f);
+				lookAtOffset.x = min(lookAtOffset.x + (4.0f - lookAtOffset.x * 1.5f) * dt, 2.0f);
+			}
 		}
-		// If the player is almost stopped, smooths the camera back to start
+		else if (_InputManager->ReadInput(InputManager::Inputs::Left))
+		{
+			if (cameraOffset.x < 0.0f)
+			{
+				cameraOffset.x = cameraOffset.x + 16.0f * dt;
+				lookAtOffset.x = lookAtOffset.x - 4.0f * dt;
+			}
+			else
+			{
+				cameraOffset.x = min(cameraOffset.x + (16.0f - cameraOffset.x * 1.5f) * dt, 8.0f);
+				lookAtOffset.x = max(lookAtOffset.x - (4.0f + lookAtOffset.x * 1.5f) * dt, -2.0f);
+			}
+		}
 		else
 		{
-			MoveTo(cameraBoxPos, 0.5f, 0.0f);
-
-			// Updates movements if any are active
-			if (GetMoving())
-			{
-				MoveToUpdate(dt);
-			}
-
-			// Calculates the distance from cameraboxpos
-			zDist = 15.5f - (15.5f - zDist) / (1.0f + dt);
-			lookAtOffset.x = lookAtOffset.x * (1.0f - 0.9 * dt);
+			cameraOffset /= 1.0f + 0.5f * dt;
 		}
+
+		SetPosition(cameraBoxPos + cameraOffset);
+		zDist = 15.5f - (cameraOffset.x * cameraOffset.x / 12.0f);
+
+		// Updates movements if any are active
+		if (GetMoving())
+		{
+			MoveToUpdate(dt);
+		}
+
+		//// Sets the camera behind the player
+		//float velocityOffset = centeredObject->GetVelocity().first;
+		//if (abs(velocityOffset) > 0.5f)
+		//{
+		//	SetPosition(glm::vec2(cameraBoxPos.x - (velocityOffset / 2.0f), cameraBoxPos.y - (abs(velocityOffset) / 10.0f)));
+		//	zDist = 15.5f - (velocityOffset * velocityOffset / 100.0f);
+		//	lookAtOffset.x = (cameraBoxPos.x - GetPosition().x) / 5.0f;
+		//}
+		//// If the player is almost stopped, smooths the camera back to start
+		//else
+		//{
+		//	MoveTo(cameraBoxPos, 0.5f, 0.0f);
+		//
+		//	// Updates movements if any are active
+		//	if (GetMoving())
+		//	{
+		//		MoveToUpdate(dt);
+		//	}
+		//
+		//	// Calculates the distance from cameraboxpos
+		//	zDist = 15.5f - (15.5f - zDist) / (1.0f + dt);
+		//	lookAtOffset.x = lookAtOffset.x * (1.0f - 0.9 * dt);
+		//}
 	}
 }
 

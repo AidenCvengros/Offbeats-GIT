@@ -261,3 +261,21 @@ void InputManager::UpdateInputStatus(Inputs input)
 		}
 	}
 }
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Returns whether the given input was either pressed or held
+
+	\param input
+		The given input
+
+	\return
+		Whether the input was pressed or held
+*/
+/*************************************************************************************************/
+bool InputManager::ReadInput(InputManager::Inputs input)
+{
+	return CheckInputStatus(input) == InputManager::InputStatus::Pressed
+		|| CheckInputStatus(input) == InputManager::InputStatus::Held;
+}

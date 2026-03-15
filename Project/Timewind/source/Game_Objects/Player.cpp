@@ -166,7 +166,7 @@ void Player::Update(double dt)
 		}
 
 		// Checks if the player is trying to move left
-		if (CheckInput(InputManager::Inputs::Left) && !CheckInput(InputManager::Inputs::Right))
+		if (_InputManager->ReadInput(InputManager::Inputs::Left) && !_InputManager->ReadInput(InputManager::Inputs::Right))
 		{
 			// Accelerates normally on the ground
 			if (grounded)
@@ -181,7 +181,7 @@ void Player::Update(double dt)
 			}
 		}
 		// Checks if the player is trying to move right
-		else if (CheckInput(InputManager::Inputs::Right) && !CheckInput(InputManager::Inputs::Left))
+		else if (_InputManager->ReadInput(InputManager::Inputs::Right) && !_InputManager->ReadInput(InputManager::Inputs::Left))
 		{
 			// Accelerates normally on the ground
 			if (grounded)
@@ -216,7 +216,7 @@ void Player::Update(double dt)
 		}
 
 		// Checks for the jump input
-		if (jumped == false && CheckInput(InputManager::Inputs::MovementJump))
+		if (jumped == false && _InputManager->ReadInput(InputManager::Inputs::MovementJump))
 		{
 			// Checks if the player is grounded or cut in by a roof
 			if (grounded &&
@@ -255,7 +255,7 @@ void Player::Update(double dt)
 		MovePlayer(dt);
 
 		// Checks if the player pressed the interaction button
-		if (CheckInput(InputManager::Inputs::MovementAction))
+		if (_InputManager->ReadInput(InputManager::Inputs::MovementAction))
 		{
 			InteractWithTile(_MapMatrix->CalculateOffsetTile(_MapMatrix->GetPlayerPosition(), GetIsFacingRight(), 1, 0), false, false);
 		}
@@ -278,7 +278,7 @@ void Player::Update(double dt)
 			sticker->Hovering(cursorTile);
 			
 			// When the player presses the button
-			if (CheckInput(InputManager::Inputs::PlacementPlace))
+			if (_InputManager->ReadInput(InputManager::Inputs::PlacementPlace))
 			{
 				// If the space the camera is looking at is empty
 				if (sticker->Place(cursorTile))
@@ -294,24 +294,6 @@ void Player::Update(double dt)
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Returns whether the given input was either pressed or held
-
-	\param input
-		The given input
-
-	\return
-		Whether the input was pressed or held
-*/
-/*************************************************************************************************/
-bool Player::CheckInput(InputManager::Inputs input)
-{
-	return _InputManager->CheckInputStatus(input) == InputManager::InputStatus::Pressed
-		|| _InputManager->CheckInputStatus(input) == InputManager::InputStatus::Held;
-}
 
 /*************************************************************************************************/
 /*!
@@ -792,7 +774,7 @@ void Player::Hovering(std::pair<int, int> targetTileCoords)
 		_CurrentScene->DrawTile(targetTileCoords, { 0.0f, 0.0f, 1.0f, 0.5f });
 
 		// If the player presses the back button, collects the sticker
-		if (CheckInput(InputManager::Inputs::PlacementPickup))
+		if (_InputManager->ReadInput(InputManager::Inputs::PlacementPickup))
 		{
 			CollectSticker(targetTileCoords);
 		}

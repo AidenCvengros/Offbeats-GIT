@@ -22,6 +22,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // List of scenes
 #include "../Scenes/Sandbox.h"
+#include "../Scenes/Level1.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -59,11 +60,13 @@ Copyright (c) 2023 Aiden Cvengros
 SceneManager::SceneManager()
 {
 	// Adds the list of scenes
+	sceneList.push_back(new Level1());
 	sceneList.push_back(new Sandbox());
 
 	// Sets the scene indices
 	currentSceneIndex = 0;
 	nextSceneIndex = 0;
+	changeScene = false;
 }
 
 /*************************************************************************************************/

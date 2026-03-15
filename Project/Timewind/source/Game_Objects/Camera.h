@@ -231,6 +231,8 @@ private:
 	bool useOffset;								// Whether to use the offset
 	float cameraSensitivity;					// Multiplier for the mouse
 
+	glm::vec2 cameraOffset;						// How far to the side/up from the camera box position that camera is
+
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------

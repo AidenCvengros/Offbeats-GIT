@@ -190,6 +190,7 @@
     <ClInclude Include="source\Game_Objects\Stickers\Bumper.h" />
     <ClInclude Include="source\Game_Objects\Stickers\Sticker.h" />
     <ClInclude Include="source\Game_Objects\Stickers\Teleporter.h" />
+    <ClInclude Include="source\Scenes\Level1.h" />
     <ClInclude Include="source\Scenes\Scene.h" />
     <ClInclude Include="source\Engine\SceneManager.h" />
     <ClInclude Include="source\Scenes\Sandbox.h" />
@@ -229,6 +230,7 @@
     <ClCompile Include="source\Game_Objects\Stickers\Bumper.cpp" />
     <ClCompile Include="source\Game_Objects\Stickers\Sticker.cpp" />
     <ClCompile Include="source\Game_Objects\Stickers\Teleporter.cpp" />
+    <ClCompile Include="source\Scenes\Level1.cpp" />
     <ClCompile Include="source\Scenes\Scene.cpp" />
     <ClCompile Include="source\Engine\SceneManager.cpp" />
     <ClCompile Include="source\Scenes\Sandbox.cpp" />

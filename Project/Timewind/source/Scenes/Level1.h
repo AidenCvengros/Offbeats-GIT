@@ -1,21 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file InputManager.h
+\file Level1.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.2.16
+\date 2026.3.14
 \brief
-    Gathers and manages inputs from the window instance
-		
-	Private Functions:
-		+ FILL
+    Level 1 scene file
+
+    Functions include:
+        + [FILL]
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_InputManager_H_
-#define Syncopatience_InputManager_H_
+#ifndef Syncopatience_Level1_H_
+#define Syncopatience_Level1_H_
 
 #pragma once
 
@@ -23,14 +23,11 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "stdafx.h"
+// Base reference
+#include "../Engine/stdafx.h"
 
-// Includes the base system class, window class, and glfw functions
-#include "System.h"
-
-// Includes the map container for tracking input keys
-#include <vector>
-#include <map>
+// The base scene class
+#include "Scene.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -47,51 +44,16 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		InputManager
+		The first level scene
 */
 /*************************************************************************************************/
-class InputManager : System
+class Level1 : public Scene
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 	
-	enum class Inputs
-	{
-		Escape,
-		Pause,
-		TogglePlacing,
-		StartRun,
-		MenuAdvance,
-		MenuBack,
-		Left,
-		Right,
-		Up,
-		Down,
-		CenterCamera,
-		MovementJump,
-		MovementAction,
-		MovementTeleport,
-		PlacementPlace,
-		PlacementPickup,
-		PlacementRotateLeft,
-		PlacementRotateRight,
-		F1,
-		F2,
-		F3,
-		Max
-	};
-
-	enum class InputStatus
-	{
-		Off,
-		Pressed,
-		Held,
-		Released,
-		Max
-	};
-
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
@@ -103,107 +65,41 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-	
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Constructor for the input manager class
-	*/
-	/*************************************************************************************************/
-	InputManager() {}
-	
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Destructor for FILL class
-	*/
-	/*************************************************************************************************/
-	~InputManager() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Initializes the system.
+			Constructor for the base scene class
+
+		\param engine_
+			The engine the scene is loaded into
 	*/
 	/*************************************************************************************************/
-	void Init();
+	Level1() : Scene() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the system.
-
-		\param
-			The time elapsed since the previous frame.
+			Deconstructor for the base scene class
 	*/
 	/*************************************************************************************************/
-	void Update(double dt);
+	~Level1() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Draws the system to the screen.
+			Loads in all the objects of the scene
 	*/
 	/*************************************************************************************************/
-	void Draw();
+	void LoadScene();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Shuts down the system.
+			Loads in all the objects of the scene
 	*/
 	/*************************************************************************************************/
-	void Shutdown();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Check the status of the given input
-
-		\param input
-			The given input
-
-		\return
-			The status of the input
-	*/
-	/*************************************************************************************************/
-	InputStatus CheckInputStatus(Inputs input);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the coordinates of the mouse
-
-		\return
-			The mouse coordinates
-	*/
-	/*************************************************************************************************/
-	std::pair<double, double> CheckMouseCoordinates() { return mouseCoords; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the coordinates of the mouse
-
-		\return
-			The mouse coordinates
-	*/
-	/*************************************************************************************************/
-	std::pair<double, double> CheckMouseDelta() { return mouseDelta; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns whether the given input was either pressed or held
-
-		\param input
-			The given input
-
-		\return
-			Whether the input was pressed or held
-	*/
-	/*************************************************************************************************/
-	bool ReadInput(InputManager::Inputs input);
+	void UnloadScene();
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -217,28 +113,11 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-	
-	std::vector<InputStatus> inputTracker;						// Keeps track of the different input and they're statuses
-	std::vector<std::pair<double, bool>> timeSincePressed;		// Functions as a buffer by mapping when this button was most recently pressed (doesn't count held). The boolean limits the buffer to a single pressed input
-	std::multimap<Inputs, int> keybinds;						// Holds the different keys that map to a certain input
-	std::pair<double, double> mouseCoords;						// The position of the mouse
-	std::pair<double, double> mouseDelta;						// How the mouse position has changed since the previous frame
-
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
 
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the given input status on the tracker
-
-		\param input
-			The given input
-	*/
-	/*************************************************************************************************/
-	void UpdateInputStatus(Inputs input);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -249,4 +128,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_InputManager_H_
+#endif // Syncopatience_Level1_H_

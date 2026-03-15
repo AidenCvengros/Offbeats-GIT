@@ -549,11 +549,13 @@ void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< ch
 
 			for (int j = 0; j < mapWidth; j++)
 			{
-				// Checks what the next character is
+				// Checks what the next character is, and populates generic tiles (walls, coins, etc.)
+				// Sets the walls
 				if (bufferInput[j * 2] == 'w')
 				{
 					SetTile(j, i, TileStatus::Wall);
 				}
+				// Sets the player starting location
 				else if (bufferInput[j * 2] == 'p')
 				{
 					SetTile(j, i, TileStatus::Player);
