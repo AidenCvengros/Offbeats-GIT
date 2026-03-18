@@ -99,7 +99,7 @@ Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Textu
 	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(20.0f), reducedGravity(0.0f), currentPlayerState(PlayerStates::Walking),
 	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
-	_MapMatrix->SetPlayerPosition(mapCoords, this);
+	_MapMatrix->SetPlayerPosition(mapCoords);
 	inventory = new Inventory();
 }
 
@@ -592,7 +592,7 @@ void Player::UpdatePlayerCoords()
 	if (playerCoords != _MapMatrix->GetPlayerPosition())
 	{
 		InteractWithTile(playerCoords, false, true);
-		_MapMatrix->SetPlayerPosition(playerCoords, this);
+		_MapMatrix->SetPlayerPosition(playerCoords);
 	}
 }
 

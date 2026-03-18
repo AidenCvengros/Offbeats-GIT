@@ -225,7 +225,7 @@ public:
 			Whether the player was moved successfully
 	*/
 	/*************************************************************************************************/
-	bool SetPlayerPosition(int xCoord, int yCoord, GameObject* playerObject);
+	bool SetPlayerPosition(int xCoord, int yCoord);
 
 	/*************************************************************************************************/
 	/*!
@@ -242,7 +242,7 @@ public:
 			Whether the player was moved successfully
 	*/
 	/*************************************************************************************************/
-	bool SetPlayerPosition(std::pair<int, int> posCoords, GameObject* playerObject) { return SetPlayerPosition(posCoords.first, posCoords.second, playerObject); }
+	bool SetPlayerPosition(std::pair<int, int> posCoords) { return SetPlayerPosition(posCoords.first, posCoords.second); }
 
 	/*************************************************************************************************/
 	/*!

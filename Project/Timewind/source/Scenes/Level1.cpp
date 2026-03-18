@@ -87,19 +87,19 @@ void Level1::LoadScene()
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
 
+    // Sets the map for the scene
+    std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
+    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1.csv", specialTileList);
+
     // Creates essential game objects (player, camera, and default square)
-    Player* player = new Player({ 4.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, playerTexture, { 2, 2 });
-    Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
+    Player* player = new Player(ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition()), 0.0f, {2.0f, 2.0f}, 50, playerTexture, {2, 2});
+    Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject((GameObject*)camera);
     _GameObjectManager->AddGameObject((GameObject*)player);
     _GameObjectManager->AddGameObject(newDefaultSquare);
     _Window->SetCamera(camera);
     SetDefaultSquare(newDefaultSquare);
-
-    // Sets the map for the scene
-    std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
-    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1.csv", specialTileList);
 
     // Adds in all special tiles
     for (auto i = specialTileList.begin(); i != specialTileList.end(); i++)
@@ -109,27 +109,6 @@ void Level1::LoadScene()
         // Checks what character marked the special tile
         switch (i->first)
         {
-            // Key 1 is a key hidden behind a destructible wall
-        case '1':
-            newObject = new Key(33, keyTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
-            break;
-            // Key 2 is a free key
-        case '2':
-            newObject = new Key(18, keyTexture, { 0.604f, 0.922f, 0.0f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
-            break;
-            // Door ! is the lock for key 1
-        case '!':
-            newObject = new LockedWall(33, 40, lockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
-            break;
-            // Door @ is the lock for key 2
-        case '@':
-            newObject = new LockedWall(18, 40, lockedWallTexture, { 0.604f, 0.922f, 0.0f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
-            break;
-            // Generic destructible block
         case 'd':
             newObject = new DestructibleWall(NULL, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
@@ -140,9 +119,6 @@ void Level1::LoadScene()
             newObject->SetScale(glm::vec2(1.25, 1.25));
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Coin, newObject);
             break;
-        case 'b':
-            newObject = new Bumper(bumperTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Sticker, newObject);
         default:
             std::cout << "Extra special tile found. Char: " << i->first << std::endl;
             break;

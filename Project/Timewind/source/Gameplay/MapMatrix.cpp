@@ -271,31 +271,20 @@ void MapMatrix::SetTile(int xCoord, int yCoord, TileStatus newStatus, GameObject
 	\param yCoord
 		The y coordinate of the tile to be changed
 
-	\param playerObject
-		The player game object
-
 	\return
 		Whether the player was moved successfully
 */
 /*************************************************************************************************/
-bool MapMatrix::SetPlayerPosition(int xCoord, int yCoord, GameObject* playerObject)
+bool MapMatrix::SetPlayerPosition(int xCoord, int yCoord)
 {
 	// Checks that the coordinates are within the map
 	if (ValidateCoordinates(xCoord, yCoord))
 	{
-		// Checks that the target location is a valid place to move to
-		if (mapMatrix[xCoord][yCoord].tileStatus < TileStatus::Player)
-		{
-			// Resets the old player position tile
-			//mapMatrix[playerPos.first][playerPos.second] = { TileStatus::Empty, NULL };
+		// Sets the new player position
+		playerPos = { xCoord, yCoord };
 
-			// Sets the new player position
-			//mapMatrix[xCoord][yCoord] = { TileStatus::Player, playerObject };
-			playerPos = std::pair(xCoord, yCoord);
-
-			// Returns that the player was moved
-			return true;
-		}
+		// Returns that the player position was set
+		return true;
 	}
 
 	// Otherwise returns that the player wasn't moved
@@ -558,8 +547,8 @@ void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< ch
 				// Sets the player starting location
 				else if (bufferInput[j * 2] == 'p')
 				{
-					SetTile(j, i, TileStatus::Player);
-					playerPos = { j, i };
+					SetPlayerPosition(j, i);
+					SetTile(j, i, MapMatrix::TileStatus::Player);
 				}
 				else if (bufferInput[j * 2] != '0')
 				{
