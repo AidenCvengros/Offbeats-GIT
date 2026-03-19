@@ -539,18 +539,19 @@ void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< ch
 			for (int j = 0; j < mapWidth; j++)
 			{
 				// Checks what the next character is, and populates generic tiles (walls, coins, etc.)
+				char newChar = bufferInput[j * 2];
 				// Sets the walls
-				if (bufferInput[j * 2] == 'w')
+				if (newChar == 'w')
 				{
 					SetTile(j, i, TileStatus::Wall);
 				}
 				// Sets the player starting location
-				else if (bufferInput[j * 2] == 'p')
+				else if (newChar == 'p')
 				{
 					SetPlayerPosition(j, i);
 					SetTile(j, i, MapMatrix::TileStatus::Player);
 				}
-				else if (bufferInput[j * 2] != '0')
+				else if (newChar != '0' && newChar != '/')
 				{
 					// If the space isn't empty or something simple, notes it so the scene can populate these objects
 					specialTileList.push_back({ bufferInput[j * 2], {j, i} });

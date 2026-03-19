@@ -165,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="source\Engine\AudioManager.h" />
     <ClInclude Include="source\Gameplay\ActionManager.h" />
+    <ClInclude Include="source\Game_Objects\BigCoin.h" />
     <ClInclude Include="source\Game_Objects\Camera.h" />
     <ClInclude Include="source\Game_Objects\ChildObject.h" />
     <ClInclude Include="source\Engine\cppShortcuts.h" />
@@ -204,6 +205,7 @@
   <ItemGroup>
     <ClCompile Include="source\Engine\AudioManager.cpp" />
     <ClCompile Include="source\Gameplay\ActionManager.cpp" />
+    <ClCompile Include="source\Game_Objects\BigCoin.cpp" />
     <ClCompile Include="source\Game_Objects\Camera.cpp" />
     <ClCompile Include="source\Game_Objects\ChildObject.cpp" />
     <ClCompile Include="source\Engine\cppShortcuts.cpp" />

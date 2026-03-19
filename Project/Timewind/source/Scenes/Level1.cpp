@@ -36,6 +36,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Stickers/Bumper.h"
 #include "../Game_Objects/Stickers/BlockSticker.h"
 #include "../Game_Objects/Stickers/Teleporter.h"
+#include "../Game_Objects/BigCoin.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -119,6 +120,13 @@ void Level1::LoadScene()
             newObject->SetScale(glm::vec2(1.25, 1.25));
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Coin, newObject);
             break;
+        case 'C':
+            newObject = new BigCoin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+            newObject->SetScale({ 3.5f, 3.5f });
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::BigCoin, newObject);
+            _MapMatrix->SetTile(i->second.first + 1, i->second.second, MapMatrix::TileStatus::BigCoin, newObject);
+            _MapMatrix->SetTile(i->second.first + 1, i->second.second + 1, MapMatrix::TileStatus::BigCoin, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second + 1, MapMatrix::TileStatus::BigCoin, newObject);
         default:
             std::cout << "Extra special tile found. Char: " << i->first << std::endl;
             break;

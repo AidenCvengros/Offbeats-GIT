@@ -121,17 +121,24 @@ bool Inventory::AddSticker(Sticker* newSticker)
 /*!
 	\brief
 		Adds the given key to the inventory
-
-	\return
-		Returns true if coin count hit 100.
 */
 /*************************************************************************************************/
-bool Inventory::AddCoin()
+void Inventory::AddCoin()
 {
 	// Adds a coin to the count
 	coinCount++;
+}
 
-	return false;
+/*************************************************************************************************/
+/*!
+	\brief
+		Adds a big coin to the inventory
+*/
+/*************************************************************************************************/
+void Inventory::AddBigCoin()
+{
+	// Increments the big coin count
+	bigCoinCount++;
 }
 
 /*************************************************************************************************/

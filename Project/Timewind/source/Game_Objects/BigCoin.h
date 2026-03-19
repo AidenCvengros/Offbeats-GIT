@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Item.h
+\file BigCoin.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2025.4.28
+\date 2026.3.18
 \brief
-    The base class for item game objects
+    The base class for coin game objects
 
     Public Functions:
         + FILL
@@ -17,8 +17,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Item_H_
-#define Syncopatience_Item_H_
+#ifndef Syncopatience_BigCoin_H_
+#define Syncopatience_BigCoin_H_
 
 #pragma once
 
@@ -29,8 +29,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Base include
 #include "../Engine/stdafx.h"
 
-// The base game object class
-#include "GameObject.h"
+// The base item class
+#include "Item.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -50,24 +50,12 @@ Copyright (c) 2023 Aiden Cvengros
 		The interactible game object class
 */
 /*************************************************************************************************/
-class Item : public GameObject
+class BigCoin : public Item
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-
-	enum class ItemType
-	{
-		Null = -1,
-		Key,
-		Coin,
-		BigCoin,
-		Bumper,
-		BlockSticker,
-		Teleporter,
-		Max
-	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
@@ -84,10 +72,7 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the item game object class
-
-		\param itemType_
-			The type of the item
+			Constructor for the interactible game object class
 
 		\param pos
 			The position of the game object
@@ -97,9 +82,6 @@ public:
 
 		\param sca
 			The scale of the game object
-
-		\param drawPriority_
-			Higher draw priorities are drawn in front of objects with lower priority
 
 		\param inMap_
 			Whether this game object is in the map
@@ -111,8 +93,8 @@ public:
 			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	Item(ItemType itemType_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), itemType(itemType_) {}
-	Item(ItemType itemType_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), itemType(itemType_) {}
+	BigCoin(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::BigCoin, pos, rot, sca, 40, facingRight_, texture_, color_, mapCoords_) {}
+	BigCoin(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Item(Item::ItemType::BigCoin, 40, texture_, color_, mapCoords_) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -120,39 +102,20 @@ public:
 			Destructor for FILL class
 	*/
 	/*************************************************************************************************/
-	virtual ~Item() {}
+	virtual ~BigCoin() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the game object. Can be overwritten by derived classes
-
-		\param dt
-			The time elapsed since the previous frame
-
-		\param inputManager
-			Allows the game objects to check inputs
+			Clears the tiles that the big coin is occupying
 	*/
 	/*************************************************************************************************/
-	virtual void Update(double dt, InputManager* inputManager) {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the type of the item
-
-		\return
-			The item type
-	*/
-	/*************************************************************************************************/
-	ItemType GetItemType() { return itemType; }
+	void ClearTiles();
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
-
-	ItemType itemType;							// The type of this item
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -175,4 +138,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Item_H_
+#endif // Syncopatience_BigCoin_H_

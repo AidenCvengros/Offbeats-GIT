@@ -39,6 +39,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Engine/Window.h"
 #include "Camera.h"
 #include "../Scenes/Scene.h"
+#include "../Game_Objects/BigCoin.h"
 
 // std::clamp is used to clamp the player's speed
 #include <algorithm>
@@ -640,7 +641,14 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 		else if (targetTile.tileStatus == MapMatrix::TileStatus::Coin)
 		{
 			inventory->AddCoin();
+			targetTile.tileObject->SetToBeDestroyed(true);
 			_MapMatrix->ClearTile(targetTileCoords.first, targetTileCoords.second);
+		}
+		else if (targetTile.tileStatus == MapMatrix::TileStatus::BigCoin)
+		{
+			// This function handles clearing the tile
+			inventory->AddBigCoin();
+			((BigCoin*)targetTile.tileObject)->ClearTiles();
 		}
 		// Checks for a sticker
 		else if (targetTile.tileStatus == MapMatrix::TileStatus::Sticker)

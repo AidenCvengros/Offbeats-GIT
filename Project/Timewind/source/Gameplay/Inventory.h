@@ -38,6 +38,7 @@ class Key;
 class Sticker;
 class Teleporter;
 class GameObject;
+class BigCoin;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -120,12 +121,17 @@ public:
 	/*!
 		\brief
 			Adds the given key to the inventory
-
-		\return
-			Returns true if coin count hit 100.
 	*/
 	/*************************************************************************************************/
-	bool AddCoin();
+	void AddCoin();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Adds a big coin to the inventory
+	*/
+	/*************************************************************************************************/
+	void AddBigCoin();
 
 	/*************************************************************************************************/
 	/*!
@@ -208,6 +214,7 @@ private:
 
 	std::array<Key*, 56> keyList;				// The list of keys the player has collected
 	int coinCount;								// The number of coins the player has collected
+	int bigCoinCount;							// The number of big coins the player has collected
 
 	std::array<Sticker*, 10> stickerList;		// The list of stickers the player has currently
 	int stickerInventoryCursor;					// What sticker slot the player currently has selected
