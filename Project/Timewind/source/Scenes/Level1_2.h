@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Level1.h
+\file Level1_2.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.3.14
+\date 2026.3.20
 \brief
-    Level 1 scene file
+    Level 1-2 scene file
 
     Functions include:
         + [FILL]
@@ -14,8 +14,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Level1_H_
-#define Syncopatience_Level1_H_
+#ifndef Syncopatience_Level1_2_H_
+#define Syncopatience_Level1_2_H_
 
 #pragma once
 
@@ -47,7 +47,7 @@ Copyright (c) 2023 Aiden Cvengros
 		The first level scene
 */
 /*************************************************************************************************/
-class Level1 : public Scene
+class Level1_2 : public Scene
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ public:
 			The engine the scene is loaded into
 	*/
 	/*************************************************************************************************/
-	Level1() : Scene(101) {}
+	Level1_2() : Scene(102) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -83,7 +83,7 @@ public:
 			Deconstructor for the base scene class
 	*/
 	/*************************************************************************************************/
-	~Level1() {}
+	~Level1_2() {}
 
 	/*************************************************************************************************/
 	/*!
@@ -128,4 +128,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Level1_H_
+#endif // Syncopatience_Level1_2_H_

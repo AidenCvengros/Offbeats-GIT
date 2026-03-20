@@ -69,9 +69,12 @@ public:
 	/*!
 		\brief
 			Constructor for the base scene class
+
+		\param _sceneID
+			The id for this scene
 	*/
 	/*************************************************************************************************/
-	Scene();
+	Scene(int _sceneID);
 
 	/*************************************************************************************************/
 	/*!
@@ -121,6 +124,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void DrawTile(std::pair<int, int> coords, glm::vec4 color);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets the scene id
+
+		\return
+			The scene's id
+	*/
+	/*************************************************************************************************/
+	int GetSceneID() { return sceneID; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -136,6 +150,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	
 	bool inUse;									// Determines whether the scene is in use
+	int sceneID;								// The id for the scene
 
 	GameObject* defaultSquare;					// Default square used for coloring in an important tile
 	

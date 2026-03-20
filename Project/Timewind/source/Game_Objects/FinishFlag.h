@@ -1,21 +1,24 @@
 /*************************************************************************************************/
 /*!
-\file Level1.h
+\file FinishFlag.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.3.14
+\date 2026.3.19
 \brief
-    Level 1 scene file
+    The base class for flag game objects
 
-    Functions include:
-        + [FILL]
+    Public Functions:
+        + FILL
+		
+	Private Functions:
+		+ FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Level1_H_
-#define Syncopatience_Level1_H_
+#ifndef Syncopatience_FinishFlag_H_
+#define Syncopatience_FinishFlag_H_
 
 #pragma once
 
@@ -23,11 +26,9 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base reference
+// Base include
 #include "../Engine/stdafx.h"
-
-// The base scene class
-#include "Scene.h"
+#include "../Game_Objects/GameObject.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,10 +45,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The first level scene
+		The interactible game object class
 */
 /*************************************************************************************************/
-class Level1 : public Scene
+class FinishFlag : public GameObject
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -65,41 +66,52 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the interactible game object class
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in
+
+		\param _targetScene
+			The scene the player will be sent to
+	*/
+	/*************************************************************************************************/
+	FinishFlag(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(pos, rot, sca, 99, facingRight_, texture_, color_, mapCoords_), targetScene(_targetScene) {}
+	FinishFlag(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(99, texture_, color_, mapCoords_), targetScene(_targetScene) {}
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for FILL class
+	*/
+	/*************************************************************************************************/
+	virtual ~FinishFlag() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
-
-		\param engine_
-			The engine the scene is loaded into
+			Activates the flag to go to the next scene
 	*/
 	/*************************************************************************************************/
-	Level1() : Scene(101) {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Deconstructor for the base scene class
-	*/
-	/*************************************************************************************************/
-	~Level1() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Loads in all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	void LoadScene();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Loads in all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	void UnloadScene();
+	void JumpToTargetScene();
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -114,10 +126,11 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 
+	int targetScene;							// The scene that this flag sends the player to
+
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -128,4 +141,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Level1_H_
+#endif // Syncopatience_FinishFlag_H_

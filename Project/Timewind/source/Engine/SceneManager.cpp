@@ -23,6 +23,7 @@ Copyright (c) 2023 Aiden Cvengros
 // List of scenes
 #include "../Scenes/Sandbox.h"
 #include "../Scenes/Level1.h"
+#include "../Scenes/Level1_2.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -61,6 +62,7 @@ SceneManager::SceneManager()
 {
 	// Adds the list of scenes
 	sceneList.push_back(new Level1());
+	sceneList.push_back(new Level1_2());
 	sceneList.push_back(new Sandbox());
 
 	// Sets the scene indices
@@ -142,6 +144,83 @@ void SceneManager::Shutdown()
 	sceneList.clear();
 }
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets this scene to be changed to
+
+	\param sceneID
+		The id of the new scene
+*/
+/*************************************************************************************************/
+void SceneManager::ChangeScene(int sceneID)
+{
+	// Checks that the scene is valid
+	int newSceneIndex = FindSceneIndex(sceneID);
+	if (newSceneIndex >= 0)
+	{
+		// Sets as the new scene
+		nextSceneIndex = newSceneIndex;
+		changeScene = true;
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Finds the first listed scene with the given id
+
+	\param sceneID
+		The id of the scene
+
+	\return
+		The requested scene. Returns NULL if no matching id is found
+*/
+/*************************************************************************************************/
+Scene* SceneManager::FindScene(int sceneID)
+{
+	// Walks through the scene list
+	for (int i = 0; i < sceneList.size(); i++)
+	{
+		// Checks if the scene id matches
+		if (sceneList[i]->GetSceneID() == sceneID)
+		{
+			return sceneList[i];
+		}
+	}
+
+	// Otherwise returns NULL
+	return NULL;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Finds the first listed scene index with the given id
+
+	\param sceneID
+		The id of the scene
+
+	\return
+		The requested scene index. Returns -1 if no matching id was found.
+*/
+/*************************************************************************************************/
+int SceneManager::FindSceneIndex(int sceneID)
+{
+	// Walks through the scene list
+	for (int i = 0; i < sceneList.size(); i++)
+	{
+		// Checks if the scene id matches
+		if (sceneList[i]->GetSceneID() == sceneID)
+		{
+			return i;
+		}
+	}
+
+	// Otherwise returns NULL
+	return -1;
+}

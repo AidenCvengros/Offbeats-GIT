@@ -1,14 +1,14 @@
 /*************************************************************************************************/
 /*!
-\file Scene.cpp
+\file FinishFlag.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2026.3.19
 \brief
-    The base scene class to facilitate scene functionality
+    The finish flag object
 
     Functions include:
-        + [FILL]
+        + FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
@@ -19,11 +19,11 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "Scene.h"
+#include "FinishFlag.h"
 #include "../Engine/cppShortcuts.h"
 
-// Includes game object class to draw default square
-#include "../Game_Objects/GameObject.h"
+// Includes the scene manager
+#include "../Engine/SceneManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -41,62 +41,18 @@ Copyright (c) 2023 Aiden Cvengros
 // Public Function Declarations
 //-------------------------------------------------------------------------------------------------
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Activates the flag to go to the next scene
+*/
+/*************************************************************************************************/
+void FinishFlag::JumpToTargetScene()
+{
+    // Tells the scene manager to switch scenes
+    _SceneManager->ChangeScene(targetScene);
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Declarations
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-// Public Function Definitions
-//-------------------------------------------------------------------------------------------------
-
-/*************************************************************************************************/
-/*!
-	\brief
-		The Scene constructor
-
-	\param _sceneID
-		The id for this scene
-*/
-/*************************************************************************************************/
-Scene::Scene(int _sceneID) : inUse(false), sceneID(_sceneID), defaultSquare(NULL)
-{
-	
-}
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Deconstructor for the base scene class
-*/
-/*************************************************************************************************/
-Scene::~Scene()
-{
-
-}
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Draws a square of the given color at the given tile
-
-	\param tileCoords
-		The coordinates of the tile being drawn.
-
-	\param color
-		The color of square to draw
-*/
-/*************************************************************************************************/
-void Scene::DrawTile(std::pair<int, int> coords, glm::vec4 color)
-{
-	// Checks that there is a default square to draw
-	if (defaultSquare)
-	{
-		defaultSquare->SetPosition(ConvertMapCoordsToWorldCoords(coords));
-		defaultSquare->SetColor(color);
-		defaultSquare->DrawThisFrame(true);
-	}
-}
-
-//-------------------------------------------------------------------------------------------------
-// Private Function Definitions
 //-------------------------------------------------------------------------------------------------

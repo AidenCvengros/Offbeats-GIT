@@ -172,6 +172,7 @@
     <ClInclude Include="source\Engine\EffectManager.h" />
     <ClInclude Include="source\Engine\Engine.h" />
     <ClInclude Include="source\Engine\File.h" />
+    <ClInclude Include="source\Game_Objects\FinishFlag.h" />
     <ClInclude Include="source\Game_Objects\GameObject.h" />
     <ClInclude Include="source\Engine\GameObjectManager.h" />
     <ClInclude Include="source\Game_Objects\Coin.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="source\Game_Objects\Stickers\Bumper.h" />
     <ClInclude Include="source\Game_Objects\Stickers\Sticker.h" />
     <ClInclude Include="source\Game_Objects\Stickers\Teleporter.h" />
+    <ClInclude Include="source\Scenes\Level1_2.h" />
     <ClInclude Include="source\Scenes\Level1.h" />
     <ClInclude Include="source\Scenes\Scene.h" />
     <ClInclude Include="source\Engine\SceneManager.h" />
@@ -212,6 +214,7 @@
     <ClCompile Include="source\Engine\EffectManager.cpp" />
     <ClCompile Include="source\Engine\Engine.cpp" />
     <ClCompile Include="source\Engine\File.cpp" />
+    <ClCompile Include="source\Game_Objects\FinishFlag.cpp" />
     <ClCompile Include="source\Game_Objects\GameObject.cpp" />
     <ClCompile Include="source\Engine\GameObjectManager.cpp" />
     <ClCompile Include="source\Game_Objects\Coin.cpp" />
@@ -232,6 +235,7 @@
     <ClCompile Include="source\Game_Objects\Stickers\Bumper.cpp" />
     <ClCompile Include="source\Game_Objects\Stickers\Sticker.cpp" />
     <ClCompile Include="source\Game_Objects\Stickers\Teleporter.cpp" />
+    <ClCompile Include="source\Scenes\Level1_2.cpp" />
     <ClCompile Include="source\Scenes\Level1.cpp" />
     <ClCompile Include="source\Scenes\Scene.cpp" />
     <ClCompile Include="source\Engine\SceneManager.cpp" />

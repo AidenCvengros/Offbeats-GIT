@@ -25,11 +25,10 @@ Copyright (c) 2023 Aiden Cvengros
 // The inventory class
 #include "../Gameplay/Inventory.h"
 
-// The input manager class so the player can use inputs
+// The systems the player interacts with
 #include "../Engine/InputManager.h"
-
-// The map matrix class so the player can exist within the map
 #include "../Gameplay/MapMatrix.h"
+#include "../Engine/SceneManager.h"
 
 // Other game object classes so the player can interact with them
 #include "Enemy.h"
@@ -40,6 +39,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "Camera.h"
 #include "../Scenes/Scene.h"
 #include "../Game_Objects/BigCoin.h"
+#include "../Game_Objects/FinishFlag.h"
 
 // std::clamp is used to clamp the player's speed
 #include <algorithm>
@@ -669,6 +669,11 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 			// Sets the teleporter as the new active teleporter
 			inventory->SetActiveTeleporter((Teleporter*)targetTile.tileObject);
 		}
+		// Checks for final flag
+		else if (targetTile.tileStatus == MapMatrix::TileStatus::FinishFlag)
+		{
+			((FinishFlag*)targetTile.tileObject)->JumpToTargetScene();
+		}
 	}
 
 	// Opens doors
@@ -773,13 +778,13 @@ void Player::Hovering(std::pair<int, int> targetTileCoords)
 	// If the tile is empty draws it green
 	if (tileStatus == MapMatrix::TileStatus::Empty)
 	{
-		_CurrentScene->DrawTile(targetTileCoords, { 0.0f, 1.0f, 0.0f, 0.5f });
+		_SceneManager->GetCurrentScene()->DrawTile(targetTileCoords, {0.0f, 1.0f, 0.0f, 0.5f});
 	}
 	// Checks if the player is hovering over a placed sticker
 	else if (_MapMatrix->IsSticker(tileStatus))
 	{
 		// Draws stickers blue
-		_CurrentScene->DrawTile(targetTileCoords, { 0.0f, 0.0f, 1.0f, 0.5f });
+		_SceneManager->GetCurrentScene()->DrawTile(targetTileCoords, {0.0f, 0.0f, 1.0f, 0.5f});
 
 		// If the player presses the back button, collects the sticker
 		if (_InputManager->ReadInput(InputManager::Inputs::PlacementPickup))
@@ -789,7 +794,7 @@ void Player::Hovering(std::pair<int, int> targetTileCoords)
 	}
 	else
 	{
-		_CurrentScene->DrawTile(targetTileCoords, { 1.0f, 0.0f, 0.0f, 0.5f });
+		_SceneManager->GetCurrentScene()->DrawTile(targetTileCoords, {1.0f, 0.0f, 0.0f, 0.5f});
 	}
 
 	// Cycles through the sticker selection when the player presses left or right

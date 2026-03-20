@@ -73,6 +73,7 @@ public:
 	enum class TileStatus
 	{
 		Empty,
+		FinishFlag,
 		Key,
 		Bumper,
 		Teleporter,

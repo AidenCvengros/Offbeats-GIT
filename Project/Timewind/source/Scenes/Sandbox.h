@@ -70,12 +70,9 @@ public:
 	/*!
 		\brief
 			Constructor for the base scene class
-
-		\param engine_
-			The engine the scene is loaded into
 	*/
 	/*************************************************************************************************/
-	Sandbox() : Scene() {}
+	Sandbox() : Scene(-1) {}
 
 	/*************************************************************************************************/
 	/*!
