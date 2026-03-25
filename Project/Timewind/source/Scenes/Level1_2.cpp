@@ -37,6 +37,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Stickers/BlockSticker.h"
 #include "../Game_Objects/Stickers/Teleporter.h"
 #include "../Game_Objects/BigCoin.h"
+#include "../Game_Objects/FinishFlag.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -90,14 +91,16 @@ void Level1_2::LoadScene()
 
     // Sets the map for the scene
     std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
-    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1.csv", specialTileList);
+    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1-2.csv", specialTileList);
 
     // Creates essential game objects (player, camera, and default square)
     Player* player = new Player(ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition()), 0.0f, {2.0f, 2.0f}, 50, playerTexture, {2, 2});
     Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
+    FinishFlag* finishFlag = new FinishFlag(NULL, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, -1);
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
-    _GameObjectManager->AddGameObject((GameObject*)camera);
-    _GameObjectManager->AddGameObject((GameObject*)player);
+    _GameObjectManager->AddGameObject(camera);
+    _GameObjectManager->AddGameObject(player);
+    _GameObjectManager->AddGameObject(finishFlag);
     _GameObjectManager->AddGameObject(newDefaultSquare);
     _Window->SetCamera(camera);
     SetDefaultSquare(newDefaultSquare);
@@ -158,6 +161,14 @@ void Level1_2::LoadScene()
         case '#':
             newObject = new LockedWall(13, 40, lockedWallTexture, { 0.286f, 0.667f, 0.063f, 1.0f }, i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            break;
+        case 'F':
+            finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second));
+            finishFlag->SetMapCoords(i->second);
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
+            break;
+        case 'f':
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
             break;
         default:
             std::cout << "Extra special tile found. Char: " << i->first << std::endl;

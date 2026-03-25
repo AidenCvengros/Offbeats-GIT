@@ -97,7 +97,7 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(20.0f), reducedGravity(0.0f), currentPlayerState(PlayerStates::Walking),
+	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(15.0f), reducedGravity(0.0f), currentPlayerState(PlayerStates::Walking),
 	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords);
@@ -224,19 +224,18 @@ void Player::Update(double dt)
 				_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopLeftIn), GetIsFacingRight(), 0, 1)).tileStatus < MapMatrix::TileStatus::Player &&
 				_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopRightIn), GetIsFacingRight(), 0, 1)).tileStatus < MapMatrix::TileStatus::Player)
 			{
-				// Jumps higher if the player is at max speed
-				if (goingMaxSpeed)
-				{
-					AcceleratePlayerVertical(37.0f, 1.0f);
-				}
-				else
-				{
-					AcceleratePlayerVertical(30.0f, 1.0f);
-				}
+				// Jump
+				AcceleratePlayerVertical(30.0f, 1.0f);
 
 				// No longer grounded
 				grounded = false;
 				jumped = true;
+			}
+			// If we are grounded, we still try to bonk with destructibles above us
+			else if (grounded)
+			{
+				InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopLeftIn), GetIsFacingRight(), 0, 1), true, false);
+				InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopRightIn), GetIsFacingRight(), 0, 1), true, false);
 			}
 		}
 		// Checks if the jump input was released
