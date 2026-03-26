@@ -97,7 +97,7 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(15.0f), reducedGravity(0.0f), currentPlayerState(PlayerStates::Walking),
+	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(15.0f), reducedGravity(0.0f), currentPlayerState(PlayerStates::Walking), wallJumpTimer(0.0f),
 	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords);
@@ -214,6 +214,12 @@ void Player::Update(double dt)
 			{
 				AcceleratePlayerVertical(-15.0f, dt);
 			}
+
+			// If the player can wall jump but would be falling otherwise, hangs on the wall during the wall jump window
+			if (wallJumpTimer > 0.0f && verticalVelocity <= 0.0f)
+			{
+				verticalVelocity = 0.0f;
+			}
 		}
 
 		// Checks for the jump input
@@ -236,6 +242,28 @@ void Player::Update(double dt)
 			{
 				InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopLeftIn), GetIsFacingRight(), 0, 1), true, false);
 				InteractWithTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::TopRightIn), GetIsFacingRight(), 0, 1), true, false);
+
+				// Also sets the jumped variable so the player doesn't immediately rejump
+				jumped = true;
+			}
+			// If we can wall jump wall jump
+			else if (wallJumpTimer > 0.0f)
+			{
+				// Jumps and reverses momentum (horizontal velocity could only be max)
+				AcceleratePlayerVertical(24.0f, 1.0f);
+				if (wallJumpRight)
+				{
+					horizontalVelocity = maxSpeed;
+				}
+				else
+				{
+					horizontalVelocity = -maxSpeed;
+				}
+
+				// Sets the jumping variables
+				grounded = false;
+				jumped = true;
+				wallJumpTimer = 0.0f;
 			}
 		}
 		// Checks if the jump input was released
@@ -436,6 +464,13 @@ void Player::MovePlayer(double dt)
 				// If none of that is happening, we are up against a wall
 				playerWorldPosition.x = ConvertMapCoordsToWorldCoords(rightBottomSideTile).x - 2.0078125f + upperInnerGap;
 
+				// If the player was going max speed, they can wall jump
+				if (goingMaxSpeed)
+				{
+					wallJumpRight = false;
+					wallJumpTimer = 0.25f;
+				}
+
 				// Kills the player's velocity
 				horizontalVelocity = 0;
 				againstWall = 1;
@@ -459,6 +494,13 @@ void Player::MovePlayer(double dt)
 				_MapMatrix->GetTile(CalculatePlayerMapPositions({ playerWorldPosition.x, playerWorldPosition.y + verticalMovement }, Positions::BottomLeftIn)).tileStatus < MapMatrix::TileStatus::Player))
 			{
 				playerWorldPosition.x = ConvertMapCoordsToWorldCoords(leftBottomSideTile).x + 2.0078125f - upperInnerGap;
+
+				// If the player was going max speed, they can wall jump
+				if (goingMaxSpeed)
+				{
+					wallJumpRight = true;
+					wallJumpTimer = 0.25f;
+				}
 
 				// Kills the player's velocity
 				horizontalVelocity = 0;
@@ -529,6 +571,7 @@ void Player::MovePlayer(double dt)
 
 	// Decrements the player's timers
 	if (reducedGravity > 0.0f) reducedGravity -= dt;
+	if (wallJumpTimer > 0.0f && verticalVelocity <= 0.0f) wallJumpTimer -= dt;
 
 	// Sets the player's new position
 	SetPosition(playerWorldPosition);

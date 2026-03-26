@@ -203,6 +203,8 @@ private:
 	float maxSpeed;								// The max speed of the player
 	float reducedGravity;						// Whether the player is in a reduced gravity state (floating, just shot out of a bumper, etc.). Ticks down every frame until it runs out
 	PlayerStates currentPlayerState;			// The current player state
+	float wallJumpTimer;						// Timer that determines whether the player can wall jump
+	bool wallJumpRight;							// Whether the wall jump is going left or right
 
 	float lowerInnerGap;						// The distance between the outer and inner hitbox on the bottom of the player
 	float upperInnerGap;						// The distance between the outer and inner hitbox on the top of the player
