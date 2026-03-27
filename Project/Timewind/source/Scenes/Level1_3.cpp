@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Level1.cpp
+\file Level1_3.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.3.14
+\date 2026.3.27
 \brief
-    The first level scene
+    The level 1-3 scene
 
     Functions include:
         + [FILL]
@@ -19,7 +19,7 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "Level1_2.h"
+#include "Level1_3.h"
 #include "../Engine/cppShortcuts.h"
 
 // Includes game object manager and texture manager for creating new game objects in the scene
@@ -75,7 +75,7 @@ Copyright (c) 2023 Aiden Cvengros
         Loads in all the objects of the scene
 */
 /*************************************************************************************************/
-void Level1_2::LoadScene()
+void Level1_3::LoadScene()
 {
     // Creates textures
     Texture* playerTexture = _TextureManager->AddTexture("Assets/Sprites/Alice_Neutral.png");
@@ -91,12 +91,12 @@ void Level1_2::LoadScene()
 
     // Sets the map for the scene
     std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
-    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1-2.csv", specialTileList);
+    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1-3.csv", specialTileList);
 
     // Creates essential game objects (player, camera, and default square)
     Player* player = new Player(ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition()), 0.0f, {2.0f, 2.0f}, 50, playerTexture, {2, 2});
     Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
-    FinishFlag* finishFlag = new FinishFlag(NULL, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, 103);
+    FinishFlag* finishFlag = new FinishFlag(NULL, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, -1);
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject(camera);
     _GameObjectManager->AddGameObject(player);
@@ -132,35 +132,9 @@ void Level1_2::LoadScene()
             _MapMatrix->SetTile(i->second.first + 1, i->second.second + 1, MapMatrix::TileStatus::BigCoin, newObject);
             _MapMatrix->SetTile(i->second.first, i->second.second + 1, MapMatrix::TileStatus::BigCoin, newObject);
             break;
-            // Key 1 is a key hidden behind a destructible wall
-        case '1':
-            newObject = new Key(33, keyTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
-            break;
-            // Key 2 is a free key
-        case '2':
-            newObject = new Key(18, keyTexture, { 0.604f, 0.922f, 0.0f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
-            break;
-            // Key 3 is a free key
-        case '3':
-            newObject = new Key(13, keyTexture, { 0.286f, 0.667f, 0.063f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
-            break;
-            // Door ! is the lock for key 1
-        case '!':
-            newObject = new LockedWall(33, 40, lockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
-            break;
-            // Door @ is the lock for key 2
-        case '@':
-            newObject = new LockedWall(18, 40, lockedWallTexture, { 0.604f, 0.922f, 0.0f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
-            break;
-            // Door # is the lock for key 3
-        case '#':
-            newObject = new LockedWall(13, 40, lockedWallTexture, { 0.286f, 0.667f, 0.063f, 1.0f }, i->second);
-            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+        case 'b':
+            newObject = new Bumper(bumperTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), i->second);
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Sticker, newObject);
             break;
         case 'F':
             finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second));
@@ -192,7 +166,7 @@ void Level1_2::LoadScene()
         Loads in all the objects of the scene
 */
 /*************************************************************************************************/
-void Level1_2::UnloadScene()
+void Level1_3::UnloadScene()
 {
     // Resets the default square
     SetDefaultSquare(NULL);
