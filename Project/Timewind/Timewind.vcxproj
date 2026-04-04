@@ -195,6 +195,7 @@
     <ClInclude Include="source\Scenes\Level1_2.h" />
     <ClInclude Include="source\Scenes\Level1.h" />
     <ClInclude Include="source\Scenes\Level1_3.h" />
+    <ClInclude Include="source\Scenes\Level1_4.h" />
     <ClInclude Include="source\Scenes\Scene.h" />
     <ClInclude Include="source\Engine\SceneManager.h" />
     <ClInclude Include="source\Scenes\Sandbox.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="source\Scenes\Level1_2.cpp" />
     <ClCompile Include="source\Scenes\Level1.cpp" />
     <ClCompile Include="source\Scenes\Level1_3.cpp" />
+    <ClCompile Include="source\Scenes\Level1_4.cpp" />
     <ClCompile Include="source\Scenes\Scene.cpp" />
     <ClCompile Include="source\Engine\SceneManager.cpp" />
     <ClCompile Include="source\Scenes\Sandbox.cpp" />

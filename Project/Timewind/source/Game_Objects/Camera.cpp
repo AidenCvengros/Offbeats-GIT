@@ -260,7 +260,7 @@ glm::mat4 Camera::GetPerspectiveMatrix()
 		else
 		{
 			// Calculates the orthogonal matrix
-			perspMat = glm::ortho(-10.0f, 10.0f, -10.0f / aspectRatio, 10.0f / aspectRatio, -1000.0f, 1000.0f);
+			perspMat = glm::ortho(-16.0f, 16.0f, -16.0f / aspectRatio, 16.0f / aspectRatio, -1000.0f, 1000.0f);
 		}
 
 		// Flips the screen upside down

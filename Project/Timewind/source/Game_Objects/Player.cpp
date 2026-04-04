@@ -127,7 +127,7 @@ Player::~Player()
 void Player::Update(double dt)
 {
 	// Flips the player state
-	if (_InputManager->CheckInputStatus(InputManager::Inputs::TogglePlacing) == InputManager::InputStatus::Pressed)
+	if (grounded && _InputManager->CheckInputStatus(InputManager::Inputs::TogglePlacing) == InputManager::InputStatus::Pressed)
 	{
 		// If running set to placing
 		if (currentPlayerState == PlayerStates::Walking)

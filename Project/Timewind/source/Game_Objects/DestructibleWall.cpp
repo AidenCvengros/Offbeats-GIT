@@ -27,6 +27,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Includes the map matrix to be updated when destroyed
 #include "../Gameplay/MapMatrix.h"
+#include "../Game_Objects/Item.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -58,7 +59,20 @@ DestructibleWall::~DestructibleWall()
         insideObject->SetPosition(GetPosition());
         insideObject->SetMapCoords(GetMapCoords());
         _GameObjectManager->AddGameObject(insideObject);
-        _MapMatrix->SetTile(GetMapCoords(), MapMatrix::TileStatus::Key, insideObject);
+
+        // Sets the map tile status based off what item is in the wall
+        if (insideObject->GetItemType() == Item::ItemType::Key)
+        {
+            _MapMatrix->SetTile(GetMapCoords(), MapMatrix::TileStatus::Key, insideObject);
+        }
+        else if (insideObject->GetItemType() == Item::ItemType::Coin)
+        {
+            _MapMatrix->SetTile(GetMapCoords(), MapMatrix::TileStatus::Coin, insideObject);
+        }
+        else if (insideObject->GetItemType() >= Item::ItemType::Bumper)
+        {
+            _MapMatrix->SetTile(GetMapCoords(), MapMatrix::TileStatus::Sticker, insideObject);
+        }
     }
 }
 

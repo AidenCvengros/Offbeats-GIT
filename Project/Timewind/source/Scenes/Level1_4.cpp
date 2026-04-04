@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Level1_3.cpp
+\file Level1_4.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.3.27
+\date 2026.4.03
 \brief
-    The level 1-3 scene
+    The level 1-4 scene
 
     Functions include:
         + [FILL]
@@ -19,7 +19,7 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "Level1_3.h"
+#include "Level1_4.h"
 #include "../Engine/cppShortcuts.h"
 
 // Includes game object manager and texture manager for creating new game objects in the scene
@@ -75,7 +75,7 @@ Copyright (c) 2023 Aiden Cvengros
         Loads in all the objects of the scene
 */
 /*************************************************************************************************/
-void Level1_3::LoadScene()
+void Level1_4::LoadScene()
 {
     // Creates textures
     Texture* playerTexture = _TextureManager->AddTexture("Assets/Sprites/Alice_Neutral.png");
@@ -91,12 +91,12 @@ void Level1_3::LoadScene()
 
     // Sets the map for the scene
     std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
-    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1-3.csv", specialTileList);
+    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1-4.csv", specialTileList);
 
     // Creates essential game objects (player, camera, and default square)
-    Player* player = new Player(ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition()), 0.0f, {2.0f, 2.0f}, 50, playerTexture, {2, 2});
+    Player* player = new Player(ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition()), 0.0f, {2.0f, 2.0f}, 50, playerTexture, _MapMatrix->GetPlayerPosition());
     Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
-    FinishFlag* finishFlag = new FinishFlag(NULL, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, 104);
+    FinishFlag* finishFlag = new FinishFlag(NULL, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, -1);
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject(camera);
     _GameObjectManager->AddGameObject(player);
@@ -144,6 +144,28 @@ void Level1_3::LoadScene()
         case 'f':
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
             break;
+            // Key 1 is a key hidden behind a destructible wall
+        case '1':
+            newObject = new Key(33, keyTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
+            break;
+            // Door ! is the lock for key 1
+        case '!':
+            newObject = new LockedWall(33, 40, lockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            break;
+            // This is a bumper hidden in a block
+        case 'B':
+            newObject = new Bumper(bumperTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+            newObject = new DestructibleWall((Item*)newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
+            break;
+            // This is a coin hidden in a block
+        case 'D':
+            newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+            newObject = new DestructibleWall((Item*)newObject, 0, destructibleWallTexture, {0.4f, 0.075f, 0.0f, 1.0f}, i->second);
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
+            break;
         default:
             std::cout << "Extra special tile found. Char: " << i->first << std::endl;
             break;
@@ -166,7 +188,7 @@ void Level1_3::LoadScene()
         Loads in all the objects of the scene
 */
 /*************************************************************************************************/
-void Level1_3::UnloadScene()
+void Level1_4::UnloadScene()
 {
     // Resets the default square
     SetDefaultSquare(NULL);

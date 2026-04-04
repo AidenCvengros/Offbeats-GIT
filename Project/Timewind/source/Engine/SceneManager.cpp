@@ -25,6 +25,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Scenes/Level1.h"
 #include "../Scenes/Level1_2.h"
 #include "../Scenes/Level1_3.h"
+#include "../Scenes/Level1_4.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -65,11 +66,12 @@ SceneManager::SceneManager()
 	sceneList.push_back(new Level1());
 	sceneList.push_back(new Level1_2());
 	sceneList.push_back(new Level1_3());
+	sceneList.push_back(new Level1_4());
 	sceneList.push_back(new Sandbox());
 
 	// Sets the scene indices
-	currentSceneIndex = 0;
-	nextSceneIndex = 0;
+	currentSceneIndex = 3;
+	nextSceneIndex = currentSceneIndex;
 	changeScene = false;
 }
 

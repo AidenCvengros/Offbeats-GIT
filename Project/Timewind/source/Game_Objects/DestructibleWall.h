@@ -36,6 +36,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
+class Item;
+
 //-------------------------------------------------------------------------------------------------
 // Public Constants
 //-------------------------------------------------------------------------------------------------
@@ -99,8 +101,8 @@ public:
 			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	DestructibleWall(GameObject* insideObject_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), insideObject(insideObject_) {}
-	DestructibleWall(GameObject* insideObject_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), insideObject(insideObject_) {}
+	DestructibleWall(Item* insideObject_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), insideObject(insideObject_) {}
+	DestructibleWall(Item* insideObject_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), insideObject(insideObject_) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -129,7 +131,7 @@ private:
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	GameObject* insideObject;							// The type of this item
+	Item* insideObject;							// The type of this item
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

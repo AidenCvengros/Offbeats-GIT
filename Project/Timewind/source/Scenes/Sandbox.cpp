@@ -132,14 +132,14 @@ void Sandbox::LoadScene()
             // Key 4 is hidden behind a destructible wall
         case '4':
             newObject = new Key(55, keyTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
-            newObject = new DestructibleWall(newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+            newObject = new DestructibleWall((Item*)newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
             _GameObjectManager->AddGameObject(newObject);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
             break;
             // Key 5 is hidden behind a destructible wall
         case '5':
             newObject = new Key(6, keyTexture, { 0.380f, 0.827f, 0.890f, 1.0f }, i->second);
-            newObject = new DestructibleWall(newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+            newObject = new DestructibleWall((Item*)newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
             _GameObjectManager->AddGameObject(newObject);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
             break;
