@@ -36,6 +36,8 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Stickers/Bumper.h"
 #include "../Game_Objects/Stickers/BlockSticker.h"
 #include "../Game_Objects/Stickers/Teleporter.h"
+#include "../Engine/Font.h"
+#include "../Game_Objects/Text.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -85,6 +87,9 @@ void Sandbox::LoadScene()
     Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
     Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
     Texture* teleporterTexture = _TextureManager->AddTexture("Assets/Sprites/Portal_Crack.png");
+
+    Font* retrofitFont = new Font("Assets/Fonts/SwanseaBold-D0ox.ttf");
+    _TextureManager->SetDefaultFont(retrofitFont);
 
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
@@ -210,6 +215,9 @@ void Sandbox::LoadScene()
     Teleporter* teleporter2 = new Teleporter(glm::vec2(14.0f, 4.0f), 0.0f, glm::vec2(2.0f, 2.0f), 150, true, teleporterTexture, glm::vec4(1.0f, 1.0f, 1.0f, 0.5f), std::make_pair(7, 2));
     _MapMatrix->SetTile(std::make_pair(7, 2), MapMatrix::TileStatus::Sticker, teleporter2);
     _GameObjectManager->AddGameObject(teleporter2);
+
+    Text* text = new Text("hiya!", retrofitFont, 72, { 10.0f, 6.0f }, 0.0f, { 10.0f, 10.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
+    _GameObjectManager->AddGameObject(text);
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);

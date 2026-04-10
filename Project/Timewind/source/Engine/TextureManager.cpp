@@ -25,6 +25,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Includes the texture class to be managed
 #include "Texture.h"
+#include "Font.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -56,7 +57,7 @@ Copyright (c) 2023 Aiden Cvengros
 		Constructor for the texture manager class
 */
 /*************************************************************************************************/
-TextureManager::TextureManager()
+TextureManager::TextureManager() : textureList(), defaultFont(NULL)
 {
 	
 }
@@ -101,6 +102,12 @@ void TextureManager::Shutdown()
 
 	// Clears the texture list
 	textureList.clear();
+
+	// If there is a default font, delete it
+	if (defaultFont)
+	{
+		defaultFont->Free();
+	}
 }
 
 /*************************************************************************************************/

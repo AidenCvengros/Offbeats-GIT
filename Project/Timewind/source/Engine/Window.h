@@ -42,6 +42,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // The render pass class needs to be included because the render passes are flat members of the window class
 #include "RenderPass.h"
+#include "Vertex.h"
 
 // Includes glfw libraries for callback functions
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -181,6 +182,17 @@ public:
 	*/
 	/*********************************************************************************************/
 	void DrawGameObject(GameObject* gameObject);
+
+	/*********************************************************************************************/
+/*!
+	\brief
+		Draws the given game object
+
+	\param transform
+		The given object to be drawn
+*/
+/*********************************************************************************************/
+	void DrawTextObject(GameObject* gameObject);
 
 	/*********************************************************************************************/
 	/*!
@@ -438,6 +450,29 @@ public:
 	*/
 	/*********************************************************************************************/
 	VkResult CheckVulkanSuccess(VkResult functionResult, std::string errorMessage);
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Creates the vertex buffer
+
+		\param buffer
+			The buffer to be created
+
+		\param bufferMemory
+			The pointer to the buffer
+
+		\param bufferFlags
+			The properties of the buffer
+
+		\param bufferSize
+			The size of the buffer
+
+		\param rawData
+			The data to be written to the new buffer
+	*/
+	/*********************************************************************************************/
+	void CreateVulkanBuffer(VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferUsageFlags bufferFlags, VkDeviceSize bufferSize, void* rawData);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -908,29 +943,6 @@ private:
 	*/
 	/*********************************************************************************************/
 	void CreateSyncObjects();
-
-	/*********************************************************************************************/
-	/*!
-		\brief
-			Creates the vertex buffer
-	
-		\param buffer
-			The buffer to be created
-	
-		\param bufferMemory
-			The pointer to the buffer
-
-		\param bufferFlags
-			The properties of the buffer
-	
-		\param bufferSize
-			The size of the buffer
-	
-		\param rawData
-			The data to be written to the new buffer
-	*/
-	/*********************************************************************************************/
-	void CreateVulkanBuffer(VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferUsageFlags bufferFlags, VkDeviceSize bufferSize, void* rawData);
 
 	/*********************************************************************************************/
 	/*!

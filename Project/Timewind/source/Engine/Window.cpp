@@ -39,6 +39,8 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Game Object object to keep track of things to draw to the screen
 #include "../Game_Objects/GameObject.h"
+#include "../Game_Objects/Text.h"
+#include "../Engine/Font.h"
 
 // Includes the texture class for the default blank texture
 #include "Texture.h"
@@ -306,6 +308,46 @@ void Window::DrawGameObject(GameObject* gameObject)
 /*********************************************************************************************/
 /*!
 	\brief
+		Draws the given game object
+
+	\param transform
+		The given object to be drawn
+*/
+/*********************************************************************************************/
+void Window::DrawTextObject(GameObject* gameObject)
+{
+	// Gets the text object
+	Text* textObject = (Text*)gameObject;
+	
+	// If the game object is supposed to be rendered
+	if (textObject->GetRender() && textObject->GetText().length() > 0)
+	{
+		// Sets the dynamic offset and draws the first object
+		glm::mat4 tempMat = textObject->GetTranformationMatrix();
+		glm::vec4 tempColor = textObject->GetColor();
+		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 64, sizeof(glm::vec4), &tempColor);
+		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &tempMat);
+		
+		// Binds the texture descriptor set and color
+		vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, baseScenePass.GetGraphicsPipelineLayout(), 1, 1, textObject->GetFont()->GetTexture()->GetDescriptorSet(), 0, NULL);
+
+		// Records the draw command to the command buffer
+		// Sets the vertex buffers
+		VkBuffer vertexBuffers[] = { textObject->GetVertexBuffer() };
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffer[currentFrame], 0, 1, vertexBuffers, offsets);
+
+		// Sets the index buffer
+		vkCmdBindIndexBuffer(commandBuffer[currentFrame], textObject->GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
+
+		// THE MOTHAFUCKIN' DRAW CALL
+		vkCmdDrawIndexed(commandBuffer[currentFrame], textObject->GetIndexCount(), 1, 0, 0, 0);
+	}
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
 		Ends the drawing sequence
 */
 /*********************************************************************************************/
@@ -403,10 +445,12 @@ void Window::Shutdown()
 	vkDestroyDescriptorSetLayout(logicalDevice, textureDescriptorSetLayout, NULL);
 
 	// Destroys the index buffer
+	vkUnmapMemory(logicalDevice, indexBufferMemory);
 	vkDestroyBuffer(logicalDevice, indexBuffer, NULL);
 	vkFreeMemory(logicalDevice, indexBufferMemory, NULL);
 
 	// Destroys the vertex buffer
+	vkUnmapMemory(logicalDevice, vertexBufferMemory);
 	vkDestroyBuffer(logicalDevice, vertexBuffer, NULL);
 	vkFreeMemory(logicalDevice, vertexBufferMemory, NULL);
 
@@ -596,6 +640,51 @@ VkResult Window::CheckVulkanSuccess(VkResult functionResult, std::string errorMe
 
 	// Otherwise passes along the function result
 	return functionResult;
+}
+
+/*********************************************************************************************/
+/*!
+	\brief
+		Creates the vertex buffer
+
+	\param buffer
+		The buffer to be created
+
+	\param bufferMemory
+		The pointer to the buffer
+
+	\param bufferFlags
+		The properties of the buffer
+
+	\param bufferSize
+		The size of the buffer
+
+	\param rawData
+		The data to be written to the new buffer
+*/
+/*********************************************************************************************/
+void Window::CreateVulkanBuffer(VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferUsageFlags bufferFlags, VkDeviceSize bufferSize, void* rawData)
+{
+	//// Creates a staging buffer
+	//VkBuffer stagingBuffer;
+	//VkDeviceMemory stagingBufferMemory;
+	//CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	// Creates the vertex buffer
+	CreateBuffer(bufferSize, bufferFlags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, buffer, bufferMemory);
+
+	// Writes the vertex data into the staging buffer
+	void* data;
+	vkMapMemory(logicalDevice, bufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, rawData, (size_t)bufferSize);
+	//vkUnmapMemory(logicalDevice, stagingBufferMemory);
+
+	// Copies the staging buffer data to the vertex buffer
+	//CopyBuffer(buffer, buffer, bufferSize);
+
+	// Cleans up the staging buffer
+	//vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
+	//vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1534,51 +1623,6 @@ void Window::CreateSyncObjects()
 		CheckVulkanSuccess(vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &finishedSemaphore[i]), "Failed to create synchronization objects for a frame!");
 		CheckVulkanSuccess(vkCreateFence(logicalDevice, &fenceInfo, nullptr, &inFlightFence[i]), "Failed to create synchronization objects for a frame!");
 	}
-}
-
-/*********************************************************************************************/
-/*!
-	\brief
-		Creates the vertex buffer
-
-	\param buffer
-		The buffer to be created
-
-	\param bufferMemory
-		The pointer to the buffer
-
-	\param bufferFlags
-		The properties of the buffer
-
-	\param bufferSize
-		The size of the buffer
-
-	\param rawData
-		The data to be written to the new buffer
-*/
-/*********************************************************************************************/
-void Window::CreateVulkanBuffer(VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferUsageFlags bufferFlags, VkDeviceSize bufferSize, void* rawData)
-{
-	// Creates a staging buffer
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	// Writes the vertex data into the staging buffer
-	void* data;
-	vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, rawData, (size_t)bufferSize);
-	vkUnmapMemory(logicalDevice, stagingBufferMemory);
-
-	// Creates the vertex buffer
-	CreateBuffer(bufferSize, bufferFlags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, bufferMemory);
-
-	// Copies the staging buffer data to the vertex buffer
-	CopyBuffer(stagingBuffer, buffer, bufferSize);
-
-	// Cleans up the staging buffer
-	vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
-	vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
 }
 
 /*********************************************************************************************/

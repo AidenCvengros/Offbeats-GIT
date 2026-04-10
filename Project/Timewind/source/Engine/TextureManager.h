@@ -44,6 +44,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Dependency Reference
 class Texture;
+class Font;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -143,6 +144,28 @@ public:
 	/*************************************************************************************************/
 	Texture* AddTexture(std::string filename_);
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets the default font
+
+		\return
+			The current default font
+	*/
+	/*************************************************************************************************/
+	Font* GetDefaultFont() { return defaultFont; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets the given font as the default
+
+		\param newFont
+			The new default font
+	*/
+	/*************************************************************************************************/
+	void SetDefaultFont(Font* newFont) { defaultFont = newFont; }
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
@@ -157,6 +180,8 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	std::list<Texture*> textureList;			// The list of game objects being managed
+
+	Font* defaultFont;							// The default font to be used
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

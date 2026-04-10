@@ -120,6 +120,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets new texture coordinates for this vertex
+
+		\return
+			The new texture coordinates
+	*/
+	/*************************************************************************************************/
+	void SetTexCoords(glm::vec2 newTexCoords) { texCoord = newTexCoords; }
 	
 private:
 	//---------------------------------------------------------------------------------------------

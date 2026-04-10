@@ -64,7 +64,7 @@ GameObject::GameObject(std::pair<int, int> mapCoords_) :
 	drawPriority(-100), facingRight(true),
 	moving(false),
 	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-	render(false), texture(NULL), color(0.0f),
+	render(0), texture(NULL), color(0.0f),
 	inMap(true), mapCoords(mapCoords_)
 {
 	_MapMatrix->UpdateObjectPosition(mapCoords_, this);
@@ -93,7 +93,7 @@ GameObject::GameObject(int drawPriority_, glm::vec4 color_, std::pair<int, int> 
 	drawPriority(drawPriority_), facingRight(true),
 	moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-	render(false), texture(NULL), color(color_),
+	render(0), texture(NULL), color(color_),
 	inMap(true), mapCoords(mapCoords_)
 {
 	_MapMatrix->UpdateObjectPosition(mapCoords_, this);
@@ -125,7 +125,7 @@ GameObject::GameObject(int drawPriority_, Texture* texture_, glm::vec4 color_, s
 	drawPriority(drawPriority_), facingRight(true),
 	moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
-	render(true), texture(texture_), color(color_),
+	render(1), texture(texture_), color(color_),
 	inMap(true), mapCoords(mapCoords_)
 {
 	_MapMatrix->UpdateObjectPosition(mapCoords_, this);
@@ -322,7 +322,7 @@ void GameObject::SetIsFacingRight(bool newIsFacingRight)
 		The game object's new render boolean
 */
 /*************************************************************************************************/
-void GameObject::SetRender(bool newRender)
+void GameObject::SetRender(int newRender)
 {
 	// Sets the new render boolean and turns off draw this frame
 	render = newRender;
@@ -338,14 +338,10 @@ void GameObject::SetRender(bool newRender)
 		What the draw this frame variable should be set to
 */
 /*************************************************************************************************/
-void GameObject::DrawThisFrame(bool _drawThisFrame)
+void GameObject::DrawThisFrame(int _drawThisFrame)
 {
-	// If we are drawing this frame
-	if (_drawThisFrame)
-	{
-		// Sets the game object to be drawn
-		render = true;
-	}
+	// Updates the object's render status
+	render = _drawThisFrame;
 
 	// Sets that the game should become inactive after this frame
 	drawThisFrame = _drawThisFrame;

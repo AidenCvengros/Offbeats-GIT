@@ -107,8 +107,16 @@ void GameObjectManager::Draw()
 		{
 			if ((*it).second->GetActive())
 			{
-				_Window->DrawGameObject((*it).second);
-				(*it).second->DrawChildObjects();
+				// Checks if the object is text that should be drawn
+				if (it->second->GetRender() == 2)
+				{
+					_Window->DrawTextObject((*it).second);
+				}
+				else
+				{
+					_Window->DrawGameObject((*it).second);
+					(*it).second->DrawChildObjects();
+				}
 
 				// Checks if the game object is only supposed to be drawn this frame
 				if ((*it).second->GetDrawThisFrame())

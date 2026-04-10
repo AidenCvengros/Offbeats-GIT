@@ -103,6 +103,26 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Constructor for the texture class
+	
+		\param textureWidth
+			The width of the new texture
+	
+		\param textureHeight
+			The height of the new texture
+	
+		\param imageFormat
+			The format for the new texture
+	
+		\param buffer
+			The texture data to be applied
+	*/
+	/*************************************************************************************************/
+	Texture(int textureWidth, int textureHeight, uint8_t* buffer);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Destructor for the camera class
 	*/
 	/*************************************************************************************************/
