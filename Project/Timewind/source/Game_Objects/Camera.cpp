@@ -141,8 +141,8 @@ void Camera::Update(double dt)
 			}
 			else
 			{
-				cameraOffset.x = max(cameraOffset.x - (16.0f + cameraOffset.x * 1.5f) * dt, -8.0f);
-				lookAtOffset.x = min(lookAtOffset.x + (4.0f - lookAtOffset.x * 1.5f) * dt, 2.0f);
+				cameraOffset.x = std::max(cameraOffset.x - (16.0f + cameraOffset.x * 1.5f) * dt, -8.0);
+				lookAtOffset.x = std::min(lookAtOffset.x + (4.0f - lookAtOffset.x * 1.5f) * dt, 2.0);
 			}
 		}
 		else if (_InputManager->ReadInput(InputManager::Inputs::Left))
@@ -154,8 +154,8 @@ void Camera::Update(double dt)
 			}
 			else
 			{
-				cameraOffset.x = min(cameraOffset.x + (16.0f - cameraOffset.x * 1.5f) * dt, 8.0f);
-				lookAtOffset.x = max(lookAtOffset.x - (4.0f + lookAtOffset.x * 1.5f) * dt, -2.0f);
+				cameraOffset.x = std::min(cameraOffset.x + (16.0f - cameraOffset.x * 1.5f) * dt, 8.0);
+				lookAtOffset.x = std::max(lookAtOffset.x - (4.0f + lookAtOffset.x * 1.5f) * dt, -2.0);
 			}
 		}
 		else
@@ -164,7 +164,7 @@ void Camera::Update(double dt)
 		}
 
 		SetPosition(cameraBoxPos + cameraOffset);
-		zDist = 15.5f - (cameraOffset.x * cameraOffset.x / 12.0f);
+		zDist = 15.5f - (cameraOffset.x * cameraOffset.x / 1.0f);
 
 		// Updates movements if any are active
 		if (GetMoving())

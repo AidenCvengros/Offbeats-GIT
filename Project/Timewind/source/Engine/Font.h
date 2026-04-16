@@ -175,7 +175,7 @@ private:
 
 	std::map<char, Character> characters;		// The list of character structs
 
-	float bmpHeight;							// The max height to allow the font
+	unsigned int bmpHeight;						// The max height to allow the font
 	float invertedBmpWidth;						// The inverse of the max height aka 
 
 	//---------------------------------------------------------------------------------------------

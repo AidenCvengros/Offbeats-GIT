@@ -285,8 +285,10 @@ void Window::DrawGameObject(GameObject* gameObject)
 		// Sets the dynamic offset and draws the first object
 		glm::mat4 tempMat = gameObject->GetTranformationMatrix();
 		glm::vec4 tempColor = gameObject->GetColor();
+		VkBool32 simpleTexture = false;
 		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &tempMat);
 		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 64, sizeof(glm::vec4), &tempColor);
+		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 80, sizeof(VkBool32), &simpleTexture);
 
 		// Checks if the game object has a texture
 		if (gameObject->GetTexture())
@@ -325,8 +327,10 @@ void Window::DrawTextObject(GameObject* gameObject)
 		// Sets the dynamic offset and draws the first object
 		glm::mat4 tempMat = textObject->GetTranformationMatrix();
 		glm::vec4 tempColor = textObject->GetColor();
-		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 64, sizeof(glm::vec4), &tempColor);
+		VkBool32 simpleTexture = true;
 		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &tempMat);
+		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 64, sizeof(glm::vec4), &tempColor);
+		vkCmdPushConstants(commandBuffer[currentFrame], baseScenePass.GetGraphicsPipelineLayout(), VK_SHADER_STAGE_VERTEX_BIT, 80, sizeof(VkBool32), &simpleTexture);
 		
 		// Binds the texture descriptor set and color
 		vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, baseScenePass.GetGraphicsPipelineLayout(), 1, 1, textObject->GetFont()->GetTexture()->GetDescriptorSet(), 0, NULL);
@@ -1380,7 +1384,7 @@ void Window::CreateGraphicsPipeline()
 	// Sets the push constants for the pipeline
 	VkPushConstantRange psRange;
 	psRange.offset = 0;
-	psRange.size = sizeof(glm::mat4) + sizeof(glm::vec4);
+	psRange.size = sizeof(glm::mat4) + sizeof(glm::vec4) + 4;
 	psRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
 	// Creates the graphics pipelines

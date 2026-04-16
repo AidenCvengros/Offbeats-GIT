@@ -33,6 +33,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Extra includes
 #include <unordered_map>
 #include "../Engine/Texture.h"
+#include <algorithm>
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -67,7 +68,7 @@ Copyright (c) 2023 Aiden Cvengros
 		The name and location of the font file
 */
 /*************************************************************************************************/
-Font::Font(std::string filename_)
+Font::Font(std::string filename_) : bmpHeight(0), invertedBmpWidth(0.0f), texture(NULL)
 {
 	// Sets the given variables
 	filename = filename_;
@@ -104,7 +105,7 @@ Font::Font(std::string filename_)
 			continue;
 		}
 
-		bmpHeight = max(bmpHeight, face->glyph->bitmap.rows);
+		bmpHeight = std::max(bmpHeight, face->glyph->bitmap.rows);
 
 		unsigned int pitch = face->glyph->bitmap.pitch;
 		Character character =
@@ -120,7 +121,7 @@ Font::Font(std::string filename_)
 		{
 			void* ptr = face->glyph->bitmap.buffer;
 
-			std::vector<uint8_t> charData(face->glyph->bitmap.width * face->glyph->bitmap.rows * 4);
+			std::vector<uint8_t> charData(face->glyph->bitmap.width * face->glyph->bitmap.rows);
 
 			int rows = face->glyph->bitmap.rows;
 			int width = face->glyph->bitmap.width;
@@ -129,7 +130,7 @@ Font::Font(std::string filename_)
 				for (int j = 0; j < width; j++)
 				{
 					uint8_t byte = face->glyph->bitmap.buffer[i * pitch + j];
-					charData[(i * pitch + j) * 4] = byte;
+					charData[(i * pitch + j)] = byte;
 				}
 			}
 			data.insert(std::pair<char, std::vector<uint8_t>>(c, charData));
@@ -143,7 +144,7 @@ Font::Font(std::string filename_)
 
 	invertedBmpWidth = 1.0f / (float)bmpWidth;
 
-	uint8_t* buffer = new uint8_t[bmpHeight * bmpWidth * 4];
+	uint8_t* buffer = new uint8_t[bmpHeight * bmpWidth];
 	memset(buffer, 0, bmpHeight * bmpWidth);
 
 	uint32_t xpos = 0;
@@ -157,16 +158,17 @@ Font::Font(std::string filename_)
 		for (uint32_t i = 0; i < height; i++) {
 			for (uint32_t j = 0; j < width; j++) {
 				uint8_t byte = charData[i * width + j];
-				buffer[(i * bmpWidth + xpos + j) * 4] = 1;
-				buffer[(i * bmpWidth + xpos + j) * 4 + 1] = 1;
-				buffer[(i * bmpWidth + xpos + j) * 4 + 2] = 1;
-				buffer[(i * bmpWidth + xpos + j) * 4 + 3] = byte;
+				buffer[(i * bmpWidth + xpos + j)] = byte;
+				//buffer[(i * bmpWidth + xpos + j) * 4 + 1] = 1;
+				//buffer[(i * bmpWidth + xpos + j) * 4 + 2] = 1;
+				//buffer[(i * bmpWidth + xpos + j) * 4 + 3] = byte;
 			}
 		}
 		xpos += width;
 	}
 
 	texture = new Texture(bmpWidth, bmpHeight, buffer);
+	delete buffer;
 
 	FT_Done_FreeType(ft);
 }

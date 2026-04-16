@@ -14,6 +14,7 @@ layout(push_constant) uniform pushConstant
 {
   layout(offset = 0) mat4 model;
   layout(offset = 64) vec4 color;
+  layout(offset = 80) bool simpleTexture;
 } ps;
 
 layout(location = 0) in vec2 inPosition;
@@ -33,6 +34,14 @@ void main()
   
   //vertWorldPosition.z += -(camVec.x * camVec.x) / 4.0f;
   gl_Position = ubo.proj * ubo.view * vertWorldPosition;
-  fragColor = ps.color;
+  
+  if (ps.simpleTexture)
+  {
+    fragColor = vec4(ps.color.rgb, ps.color.a * -1.0f);
+  }
+  else
+  {
+    fragColor = ps.color;
+  }
   fragTexCoord = vec2(inTexCoord.x, 1.0f - inTexCoord.y);
 }

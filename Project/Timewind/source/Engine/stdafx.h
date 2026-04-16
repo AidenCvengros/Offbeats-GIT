@@ -20,6 +20,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
+#define NOMINMAX
+
 // Allows for debug text (cout) and error calls (runtime_error)
 #include <stdexcept>
 #include <iostream>

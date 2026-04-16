@@ -179,7 +179,7 @@ Texture::Texture(int textureWidth, int textureHeight, VkFormat imageFormat)
 Texture::Texture(int textureWidth, int textureHeight, uint8_t* buffer)
 {
 	// Creates a buffer in memory for the texture buffer
-	VkDeviceSize imageSize = textureWidth * textureHeight * 4;
+	VkDeviceSize imageSize = textureWidth * textureHeight;
 	_Window->CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, textureBuffer, textureBufferMemory);
 
 	// Copies the image data over to the buffer
@@ -189,19 +189,19 @@ Texture::Texture(int textureWidth, int textureHeight, uint8_t* buffer)
 	vkUnmapMemory(_Window->GetLogicalDevice(), textureBufferMemory);
 
 	// Creates the image object
-	CreateImage(textureWidth, textureHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+	CreateImage(textureWidth, textureHeight, VK_FORMAT_R8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
 
 	// Transitions the texture buffer data to the image
-	TransitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	TransitionImageLayout(textureImage, VK_FORMAT_R8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(textureBuffer, textureImage, static_cast<uint32_t>(textureWidth), static_cast<uint32_t>(textureHeight));
-	TransitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	TransitionImageLayout(textureImage, VK_FORMAT_R8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// Cleans up the texture buffer
 	vkDestroyBuffer(_Window->GetLogicalDevice(), textureBuffer, NULL);
 	vkFreeMemory(_Window->GetLogicalDevice(), textureBufferMemory, NULL);
 
 	// Constructs the image view object
-	textureImageView = _Window->CreateImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+	textureImageView = _Window->CreateImageView(textureImage, VK_FORMAT_R8_UNORM);
 
 	// Creates the texture sampler
 	CreateTextureSampler();

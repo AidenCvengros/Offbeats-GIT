@@ -72,23 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.\Includes;D:\bin\SDL\SDL3-3.4.2\include;C:\VulkanSDK\1.3.296.0\Include;D:\bin\stb-master;D:\bin\glfw-3.3.8\include;D:\bin\glm;$(IncludePath)$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>D:\bin\SDL\SDL3-3.4.2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Bin\SDL\SDL3-3.4.2\include;.\Includes;D:\bin\SDL\SDL3-3.4.2\include;C:\VulkanSDK\1.3.296.0\Include;D:\bin\stb-master;D:\bin\glfw-3.3.8\include;D:\bin\glm;$(IncludePath)$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>C:\Bin\SDL\SDL3-3.4.2\lib\x64;D:\bin\SDL\SDL3-3.4.2\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\Includes;D:\bin\SDL\SDL3-3.4.2\include;C:\VulkanSDK\1.3.296.0\Include;D:\bin\stb-master;D:\bin\glfw-3.3.8\include;D:\bin\glm;$(IncludePath)$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>D:\bin\SDL\SDL3-3.4.2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Bin\SDL\SDL3-3.4.2\include;.\Includes;D:\bin\SDL\SDL3-3.4.2\include;C:\VulkanSDK\1.3.296.0\Include;D:\bin\stb-master;D:\bin\glfw-3.3.8\include;D:\bin\glm;$(IncludePath)$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>C:\Bin\SDL\SDL3-3.4.2\lib\x64;D:\bin\SDL\SDL3-3.4.2\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.\Includes;D:\bin\SDL\SDL3-3.4.2\include;C:\VulkanSDK\1.3.296.0\Include;D:\bin\stb-master;D:\bin\glfw-3.3.8\include;D:\bin\glm;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\bin\SDL\SDL3-3.4.2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Bin\SDL\SDL3-3.4.2\include;.\Includes;D:\bin\SDL\SDL3-3.4.2\include;C:\VulkanSDK\1.3.296.0\Include;D:\bin\stb-master;D:\bin\glfw-3.3.8\include;D:\bin\glm;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Bin\SDL\SDL3-3.4.2\lib\x64;D:\bin\SDL\SDL3-3.4.2\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\Includes;D:\bin\SDL\SDL3-3.4.2\include;C:\VulkanSDK\1.3.296.0\Include;D:\bin\stb-master;D:\bin\glfw-3.3.8\include;D:\bin\glm;$(IncludePath)$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>D:\bin\SDL\SDL3-3.4.2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Bin\SDL\SDL3-3.4.2\include;.\Includes;C:\Bin\SDL\SDL3-3.4.2\include;D:\bin\SDL\SDL3-3.4.2\include;C:\VulkanSDK\1.3.296.0\Include;D:\bin\stb-master;D:\bin\glfw-3.3.8\include;D:\bin\glm;$(IncludePath)$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Bin\SDL\SDL3-3.4.2\lib\x64;D:\bin\SDL\SDL3-3.4.2\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

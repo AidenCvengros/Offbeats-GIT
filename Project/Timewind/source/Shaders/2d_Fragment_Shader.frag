@@ -22,5 +22,12 @@ vec2 curve(vec2 uv)
 
 void main()
 {
-  outColor = texture(texSampler, fragTexCoord) * fragColor;
+  if (fragColor.a < 0.0f)
+  {
+    outColor = vec4(1.0f, 1.0f, 1.0f, texture(texSampler, fragTexCoord).r) * vec4(fragColor.rgb, fragColor.a * -1.0f);
+  }
+  else
+  {
+    outColor = texture(texSampler, fragTexCoord) * fragColor;
+  }
 }

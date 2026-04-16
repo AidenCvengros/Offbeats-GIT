@@ -114,28 +114,30 @@ void Text::SetText(const std::string& newText)
 
 	// Variables for the loop
 	int indexOffset = 0;
-	float xPos = GetPosition().x;
-	float yPos = GetPosition().y;
+	float xPos = 0.0f;
+	float yPos = 0.0f;
 
 	// Loops through the string
 	for (size_t i = 0; i < text.length(); i++)
 	{
 		char c = text[i];
 		Font::Character fontData = font->GetCharacter(c);
-		float localXPos = xPos + fontData.bearing.x * fontSize;
-		float localYPos = yPos + (fontData.size.y - fontData.bearing.y) * fontSize;// (character.Size.y - character.Bearing.y)* scale;
+		float localXPos = xPos + fontData.bearing.x * fontSize / font->GetBmpHeight();
+		float localYPos = yPos + (fontData.bearing.y - fontData.size.y) * fontSize / font->GetBmpHeight();// (character.Size.y - character.Bearing.y)* scale;
+		//localXPos *= -1;
+		//localYPos *= -1;
 
-		float w = (float)fontData.size.x * fontSize;
+		float w = (float)fontData.size.x * fontSize / font->GetBmpHeight();
 		float hraw = (float)fontData.size.y;
-		float h = hraw * fontSize;
+		float h = hraw * fontSize / font->GetBmpHeight();
 		float u0 = (float)fontData.offset * font->GetInvertedBmpWidth();
 		float v = (hraw) / font->GetBmpHeight();
 		float u1 = (float)(fontData.offset + fontData.size.x) * font->GetInvertedBmpWidth();
 
-		Vertex bottomRight({ localXPos + w, localYPos }, GetColor(), { u1, 0.f });
-		Vertex bottomLeft({ localXPos, localYPos }, GetColor(), { u0, 0.f });
-		Vertex topLeft({ localXPos, localYPos + h }, GetColor(), { u0, v });
-		Vertex topRight = { {localXPos + w, localYPos + h }, GetColor(), { u1, v } };
+		Vertex bottomRight({ localXPos - w, localYPos }, GetColor(), { u1, 1.0f-v });
+		Vertex bottomLeft({ localXPos, localYPos }, GetColor(), { u0, 1.f-v });
+		Vertex topLeft({ localXPos, localYPos + h }, GetColor(), { u0, 1.0f });
+		Vertex topRight = { {localXPos - w, localYPos + h }, GetColor(), { u1, 1.0f } };
 		vertices.push_back(bottomRight);
 		vertices.push_back(bottomLeft);
 		vertices.push_back(topLeft);
@@ -147,7 +149,7 @@ void Text::SetText(const std::string& newText)
 		indices.push_back(indexOffset + 3);
 		indices.push_back(indexOffset + 0);
 		indexOffset += 4;
-		xPos += (fontData.advance >> 6) * fontSize;
+		xPos -= (fontData.advance >> 6) * fontSize / font->GetBmpHeight();
 	}
 
 	// Creates the vertex and indices buffers
@@ -168,19 +170,24 @@ void Text::SetText(const std::string& newText)
 /*************************************************************************************************/
 void Text::FreeBuffers()
 {
-	if (indexBuffer)
+	if (indexBuffer || vertexBuffer)
 	{
-		// Destroys the old index buffer
-		vkUnmapMemory(_Window->GetLogicalDevice(), indexBufferMemory);
-		vkDestroyBuffer(_Window->GetLogicalDevice(), indexBuffer, NULL);
-		vkFreeMemory(_Window->GetLogicalDevice(), indexBufferMemory, NULL);
-	}
+		_Window->WaitForDrawFinished();
 
-	if (vertexBuffer)
-	{
-		// Destroys the old vertex buffer
-		vkUnmapMemory(_Window->GetLogicalDevice(), vertexBufferMemory);
-		vkDestroyBuffer(_Window->GetLogicalDevice(), vertexBuffer, NULL);
-		vkFreeMemory(_Window->GetLogicalDevice(), vertexBufferMemory, NULL);
+		if (indexBuffer)
+		{
+			// Destroys the old index buffer
+			vkUnmapMemory(_Window->GetLogicalDevice(), indexBufferMemory);
+			vkDestroyBuffer(_Window->GetLogicalDevice(), indexBuffer, NULL);
+			vkFreeMemory(_Window->GetLogicalDevice(), indexBufferMemory, NULL);
+		}
+
+		if (vertexBuffer)
+		{
+			// Destroys the old vertex buffer
+			vkUnmapMemory(_Window->GetLogicalDevice(), vertexBufferMemory);
+			vkDestroyBuffer(_Window->GetLogicalDevice(), vertexBuffer, NULL);
+			vkFreeMemory(_Window->GetLogicalDevice(), vertexBufferMemory, NULL);
+		}
 	}
 }
