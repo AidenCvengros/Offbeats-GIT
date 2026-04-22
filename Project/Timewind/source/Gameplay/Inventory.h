@@ -39,6 +39,7 @@ class Sticker;
 class Teleporter;
 class GameObject;
 class BigCoin;
+class Text;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -220,6 +221,8 @@ private:
 	int stickerInventoryCursor;					// What sticker slot the player currently has selected
 
 	Teleporter* activeTeleporter;				// The most recently active teleporter to send the player to
+
+	Text* coinText;								// Text object showing the player how many coins they have collected
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

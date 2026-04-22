@@ -216,9 +216,6 @@ void Sandbox::LoadScene()
     _MapMatrix->SetTile(std::make_pair(7, 2), MapMatrix::TileStatus::Sticker, teleporter2);
     _GameObjectManager->AddGameObject(teleporter2);
 
-    Text* text = new Text("Hiya!", retrofitFont, 2, { 10.0f, 8.0f }, 0.0f, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
-    _GameObjectManager->AddGameObject(text);
-
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);
 }

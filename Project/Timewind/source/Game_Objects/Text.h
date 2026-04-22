@@ -94,7 +94,7 @@ public:
 			The scale of the game object
 	*/
 	/*************************************************************************************************/
-	Text(const std::string& _text, Font* _font, int _fontSize, glm::vec2 pos, float rot, glm::vec2 sca, glm::vec4 color_);
+	Text(const std::string& _text, Font* _font, int _fontSize, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority, glm::vec4 color_);
 	
 	/*************************************************************************************************/
 	/*!

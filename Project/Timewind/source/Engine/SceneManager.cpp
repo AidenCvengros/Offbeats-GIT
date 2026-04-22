@@ -70,7 +70,7 @@ SceneManager::SceneManager()
 	sceneList.push_back(new Sandbox());
 
 	// Sets the scene indices
-	currentSceneIndex = 4;
+	currentSceneIndex = 0;
 	nextSceneIndex = currentSceneIndex;
 	changeScene = false;
 }

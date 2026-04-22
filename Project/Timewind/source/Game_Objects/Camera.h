@@ -183,6 +183,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the point the camera is orientated around
+
+		\return
+			The point the player is looking at
+	*/
+	/*************************************************************************************************/
+	glm::vec2 GetCameraBoxPosition() { return cameraBoxPos; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets a game object for the camera to center on
 
 		\param object

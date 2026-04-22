@@ -27,6 +27,13 @@ Copyright (c) 2025 Aiden Cvengros
 #include "../Game_Objects/Stickers/Sticker.h"
 #include "../Game_Objects/Stickers/Teleporter.h"
 
+// Extra includes
+#include "../Game_Objects/Text.h"
+#include "../Engine/TextureManager.h"
+#include "../Engine/GameObjectManager.h"
+#include <sstream>
+#include <iomanip>
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -59,7 +66,9 @@ Copyright (c) 2025 Aiden Cvengros
 /*************************************************************************************************/
 Inventory::Inventory() : keyList(), coinCount(0), stickerList(), stickerInventoryCursor(0)
 {
-
+	coinText = new Text("x00", _TextureManager->GetDefaultFont(), 12, {12.0f, 10.0f}, 0.0f, {0.1f, 0.1f}, 90, {1.0f, 1.0f, 1.0f, 1.0f});
+	_GameObjectManager->AddGameObject(coinText);
+	coinText->SetFollowingCamera(true);
 }
 
 /*************************************************************************************************/
@@ -127,6 +136,11 @@ void Inventory::AddCoin()
 {
 	// Adds a coin to the count
 	coinCount++;
+
+	// Updates the coin text
+	std::stringstream newString;
+	newString << "x" << std::setw(2) << coinCount;
+	coinText->SetText(newString.str());
 }
 
 /*************************************************************************************************/

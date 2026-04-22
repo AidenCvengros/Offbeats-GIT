@@ -139,10 +139,10 @@ void Engine::Init()
 	// Creates and pushes back systems
 	systemList.push_back((System*)inputManager);
 	systemList.push_back((System*)audioManager);
+	systemList.push_back((System*)mapMatrix);
 	systemList.push_back((System*)objectManager);
 	systemList.push_back((System*)texManager);
 	systemList.push_back((System*)sceneManager);
-	systemList.push_back((System*)mapMatrix);
 	systemList.push_back((System*)effectManager);
 
 	// Loops through, initializing each system

@@ -25,6 +25,10 @@ Copyright (c) 2023 Aiden Cvengros
 // Includes the map matrix so the game object can move within the map
 #include "../Gameplay/MapMatrix.h"
 
+// Extra includes
+#include "../Engine/Window.h"
+#include "../Game_Objects/Camera.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -61,7 +65,7 @@ Copyright (c) 2023 Aiden Cvengros
 GameObject::GameObject(std::pair<int, int> mapCoords_) :
 	active(true), toBeDestroyed(false),
 	rotation(0.0f), scale({ 2.0f, 2.0f }),
-	drawPriority(-100), facingRight(true),
+	drawPriority(-100), facingRight(true), followingCamera(false),
 	moving(false),
 	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 	render(0), texture(NULL), color(0.0f),
@@ -90,7 +94,7 @@ GameObject::GameObject(std::pair<int, int> mapCoords_) :
 GameObject::GameObject(int drawPriority_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
 	active(true), toBeDestroyed(false),
 	rotation(0.0f), scale({ 2.0f, 2.0f }),
-	drawPriority(drawPriority_), facingRight(true),
+	drawPriority(drawPriority_), facingRight(true), followingCamera(false),
 	moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 	render(0), texture(NULL), color(color_),
@@ -122,7 +126,7 @@ GameObject::GameObject(int drawPriority_, glm::vec4 color_, std::pair<int, int> 
 GameObject::GameObject(int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
 	active(true), toBeDestroyed(false),
 	rotation(0.0f), scale({ 2.0f, 2.0f }),
-	drawPriority(drawPriority_), facingRight(true),
+	drawPriority(drawPriority_), facingRight(true), followingCamera(false),
 	moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 	render(1), texture(texture_), color(color_),
@@ -173,8 +177,17 @@ glm::mat4x4 GameObject::GetTranformationMatrix()
 		directionModifier = 1;
 	}
 
+	// Fetches the objects position
+	glm::vec2 tempPosition = position;
+
+	// If the object is tracking the camera, adjusts position accordingly
+	if (followingCamera)
+	{
+		tempPosition += _Window->GetCamera()->GetCameraBoxPosition();
+	}
+
 	// Calculates and returns the transformation matrix
-	return glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 0.0f))
+	return glm::translate(glm::mat4(1.0f), glm::vec3(tempPosition.x, tempPosition.y, 0.0f))
 		* glm::rotate(glm::mat4(1.0f), glm::radians(rotation * directionModifier), glm::vec3(0.0f, 0.0f, 1.0f))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(scale.x * directionModifier, scale.y, 1.0f));
 }

@@ -164,7 +164,7 @@ void Camera::Update(double dt)
 		}
 
 		SetPosition(cameraBoxPos + cameraOffset);
-		zDist = 15.5f - (cameraOffset.x * cameraOffset.x / 1.0f);
+		zDist = 15.5f - (cameraOffset.x * cameraOffset.x / 12.0f);
 
 		// Updates movements if any are active
 		if (GetMoving())

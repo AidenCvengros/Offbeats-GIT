@@ -70,7 +70,11 @@ TextureManager::TextureManager() : textureList(), defaultFont(NULL)
 /*************************************************************************************************/
 TextureManager::~TextureManager()
 {
-
+	// If there is a default font, delete it
+	if (defaultFont)
+	{
+		defaultFont->Free();
+	}
 }
 
 /*************************************************************************************************/
@@ -81,7 +85,8 @@ TextureManager::~TextureManager()
 /*************************************************************************************************/
 void TextureManager::Init()
 {
-
+	Font* retrofitFont = new Font("Assets/Fonts/SwanseaBold-D0ox.ttf");
+	_TextureManager->SetDefaultFont(retrofitFont);
 }
 
 /*************************************************************************************************/
@@ -102,12 +107,6 @@ void TextureManager::Shutdown()
 
 	// Clears the texture list
 	textureList.clear();
-
-	// If there is a default font, delete it
-	if (defaultFont)
-	{
-		defaultFont->Free();
-	}
 }
 
 /*************************************************************************************************/

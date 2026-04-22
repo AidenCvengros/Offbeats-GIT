@@ -98,7 +98,7 @@ public:
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(-100), facingRight(false),
+		drawPriority(-100), facingRight(false), followingCamera(false),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(0), texture(NULL), color(0.0f), drawThisFrame(false),
@@ -134,7 +134,7 @@ public:
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, glm::vec4 color_) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_), facingRight(facingRight_),
+		drawPriority(drawPriority_), facingRight(facingRight_), followingCamera(false),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(1), texture(NULL), color(color_), drawThisFrame(false),
@@ -161,7 +161,7 @@ public:
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, std::pair<int, int> mapCoords_) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(-100), facingRight(true),
+		drawPriority(-100), facingRight(true), followingCamera(false),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(0), texture(NULL), color(0.0f), drawThisFrame(false),
@@ -208,7 +208,7 @@ public:
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_), facingRight(facingRight_),
+		drawPriority(drawPriority_), facingRight(facingRight_), followingCamera(false),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(0), texture(NULL), color(color_), drawThisFrame(false),
@@ -264,7 +264,7 @@ public:
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_), facingRight(facingRight_),
+		drawPriority(drawPriority_), facingRight(facingRight_), followingCamera(false),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(1), texture(texture_), color(color_), drawThisFrame(false),
@@ -303,7 +303,7 @@ public:
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
 		active(true), toBeDestroyed(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_), facingRight(facingRight_),
+		drawPriority(drawPriority_), facingRight(facingRight_), followingCamera(false),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(1), texture(texture_), color(color_), drawThisFrame(false),
@@ -648,6 +648,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Sets the game object's color
+
+		\param newColor
+			The game object's new color
+	*/
+	/*************************************************************************************************/
+	void SetFollowingCamera(bool _followingCamera) { followingCamera = _followingCamera; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Marks this game object to be drawn this frame
 
 		\param _drawThisFrame
@@ -719,6 +730,7 @@ private:
 	glm::vec2 scale;							// The scale of the game object
 	int drawPriority;							// How forward the game object is drawn
 	bool facingRight;							// Whether the game object is facing right (true if right, false if left)
+	bool followingCamera;						// Whether the game object is positioned relative to the camera
 
 	bool moving;								// Whether the move-to action is active
 	glm::vec2 moveOriginalPosition;				// The starting position of the movement
