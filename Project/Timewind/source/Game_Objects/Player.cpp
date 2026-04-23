@@ -218,7 +218,11 @@ void Player::Update(double dt)
 			// If the player can wall jump but would be falling otherwise, hangs on the wall during the wall jump window
 			if (wallJumpTimer > 0.0f && verticalVelocity <= 0.0f)
 			{
-				verticalVelocity = 0.0f;
+				// Double checks that we're still at a wall
+				if (_MapMatrix->GetTile(_MapMatrix->CalculateOffsetTile(CalculatePlayerMapPositions(GetPosition(), Positions::Center), !wallJumpRight, 1, 0)).tileStatus > MapMatrix::TileStatus::Player)
+				{
+					verticalVelocity = 0.0f;
+				}
 			}
 		}
 
@@ -249,21 +253,24 @@ void Player::Update(double dt)
 			// If we can wall jump wall jump
 			else if (wallJumpTimer > 0.0f)
 			{
-				// Jumps and reverses momentum (horizontal velocity could only be max)
-				AcceleratePlayerVertical(24.0f, 1.0f);
-				if (wallJumpRight)
+				if (abs(verticalVelocity) < 0.5f)
 				{
-					horizontalVelocity = maxSpeed;
-				}
-				else
-				{
-					horizontalVelocity = -maxSpeed;
-				}
+					// Jumps and reverses momentum (horizontal velocity could only be max)
+					AcceleratePlayerVertical(24.0f, 1.0f);
+					if (wallJumpRight)
+					{
+						horizontalVelocity = maxSpeed;
+					}
+					else
+					{
+						horizontalVelocity = -maxSpeed;
+					}
 
-				// Sets the jumping variables
-				grounded = false;
-				jumped = true;
-				wallJumpTimer = 0.0f;
+					// Sets the jumping variables
+					grounded = false;
+					jumped = true;
+					wallJumpTimer = 0.0f;
+				}
 			}
 		}
 		// Checks if the jump input was released

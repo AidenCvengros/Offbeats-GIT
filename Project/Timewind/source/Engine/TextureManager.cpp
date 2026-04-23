@@ -70,11 +70,7 @@ TextureManager::TextureManager() : textureList(), defaultFont(NULL)
 /*************************************************************************************************/
 TextureManager::~TextureManager()
 {
-	// If there is a default font, delete it
-	if (defaultFont)
-	{
-		defaultFont->Free();
-	}
+
 }
 
 /*************************************************************************************************/
@@ -85,17 +81,17 @@ TextureManager::~TextureManager()
 /*************************************************************************************************/
 void TextureManager::Init()
 {
-	Font* retrofitFont = new Font("Assets/Fonts/SwanseaBold-D0ox.ttf");
+	Font* retrofitFont = new Font("Assets/Fonts/Retrofit_Small-Regular.otf");
 	_TextureManager->SetDefaultFont(retrofitFont);
 }
 
 /*************************************************************************************************/
 /*!
 	\brief
-		Shuts down the texture manager and all the textures in it.
+		Empties the texture list
 */
 /*************************************************************************************************/
-void TextureManager::Shutdown()
+void TextureManager::Clear()
 {
 	// Walks through the texture list
 	for (std::list<Texture*>::iterator it = textureList.begin(); it != textureList.end();)
@@ -107,6 +103,23 @@ void TextureManager::Shutdown()
 
 	// Clears the texture list
 	textureList.clear();
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Shuts down the texture manager and all the textures in it.
+*/
+/*************************************************************************************************/
+void TextureManager::Shutdown()
+{
+	Clear();
+
+	// If there is a default font, delete it
+	if (defaultFont)
+	{
+		defaultFont->Free();
+	}
 }
 
 /*************************************************************************************************/

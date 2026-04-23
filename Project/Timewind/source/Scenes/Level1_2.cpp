@@ -127,6 +127,7 @@ void Level1_2::LoadScene()
         case 'C':
             newObject = new BigCoin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
             newObject->SetScale({ 3.5f, 3.5f });
+            newObject->SetPosition(newObject->GetPosition() + glm::vec2(1.0f, 1.0f));
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::BigCoin, newObject);
             _MapMatrix->SetTile(i->second.first + 1, i->second.second, MapMatrix::TileStatus::BigCoin, newObject);
             _MapMatrix->SetTile(i->second.first + 1, i->second.second + 1, MapMatrix::TileStatus::BigCoin, newObject);
@@ -199,7 +200,7 @@ void Level1_2::UnloadScene()
 
     // Shuts down those systems to refresh them
     _GameObjectManager->Shutdown();
-    _TextureManager->Shutdown();
+    _TextureManager->Clear();
 }
 
 //-------------------------------------------------------------------------------------------------

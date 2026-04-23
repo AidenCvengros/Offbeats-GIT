@@ -233,7 +233,7 @@ void Sandbox::UnloadScene()
 
     // Shuts down those systems to refresh them
     _GameObjectManager->Shutdown();
-    _TextureManager->Shutdown();
+    _TextureManager->Clear();
 }
 
 //-------------------------------------------------------------------------------------------------

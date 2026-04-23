@@ -66,9 +66,16 @@ Copyright (c) 2025 Aiden Cvengros
 /*************************************************************************************************/
 Inventory::Inventory() : keyList(), coinCount(0), stickerList(), stickerInventoryCursor(0)
 {
+	// Creates the text object
 	coinText = new Text("x00", _TextureManager->GetDefaultFont(), 12, {12.0f, 10.0f}, 0.0f, {0.1f, 0.1f}, 90, {1.0f, 1.0f, 1.0f, 1.0f});
 	_GameObjectManager->AddGameObject(coinText);
 	coinText->SetFollowingCamera(true);
+
+	// Creates the coin icon
+	Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
+	GameObject* coinIcon = new GameObject({ 11.5f, 10.4f }, 0.0f, { 1.0f, 1.0f }, 90, true, coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f });
+	_GameObjectManager->AddGameObject(coinIcon);
+	coinIcon->SetFollowingCamera(true);
 }
 
 /*************************************************************************************************/
@@ -139,7 +146,7 @@ void Inventory::AddCoin()
 
 	// Updates the coin text
 	std::stringstream newString;
-	newString << "x" << std::setw(2) << coinCount;
+	newString << "x" << std::setw(2) << std::setfill('0') << coinCount;
 	coinText->SetText(newString.str());
 }
 
@@ -153,6 +160,12 @@ void Inventory::AddBigCoin()
 {
 	// Increments the big coin count
 	bigCoinCount++;
+
+	// Creates the coin icon
+	Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
+	GameObject* coinIcon = new GameObject({ 9.5f, 10.4f }, 0.0f, { 2.0f, 2.0f }, 90, true, coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f });
+	_GameObjectManager->AddGameObject(coinIcon);
+	coinIcon->SetFollowingCamera(true);
 }
 
 /*************************************************************************************************/
