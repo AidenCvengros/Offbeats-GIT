@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Scene.h
+\file Main_Menu.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2026.4.27
 \brief
-    The base scene class to facilitate scene functionality
+    Main Menu level
 
     Functions include:
         + [FILL]
@@ -14,8 +14,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Scene_H_
-#define Syncopatience_Scene_H_
+#ifndef Syncopatience_Main_Menu_H_
+#define Syncopatience_Main_Menu_H_
 
 #pragma once
 
@@ -23,14 +23,18 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base include
+// Base reference
 #include "../Engine/stdafx.h"
+
+// The base scene class
+#include "Scene.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
-class GameObject;								// Game object class reference to hold default square
+class Menu;
+class GameObject;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -43,10 +47,10 @@ class GameObject;								// Game object class reference to hold default square
 /*************************************************************************************************/
 /*!
 	\brief
-		The base scene class
+		The main menu level
 */
 /*************************************************************************************************/
-class Scene
+class MainMenu : public Scene
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -69,12 +73,9 @@ public:
 	/*!
 		\brief
 			Constructor for the base scene class
-
-		\param _sceneID
-			The id for this scene
 	*/
 	/*************************************************************************************************/
-	Scene(int _sceneID);
+	MainMenu() : Scene(0), mainMenu(NULL), menuCursor(NULL) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -82,7 +83,7 @@ public:
 			Deconstructor for the base scene class
 	*/
 	/*************************************************************************************************/
-	~Scene();
+	~MainMenu() {}
 
 	/*************************************************************************************************/
 	/*!
@@ -90,7 +91,7 @@ public:
 			Loads in all the objects of the scene
 	*/
 	/*************************************************************************************************/
-	virtual void LoadScene() = 0;
+	void LoadScene();
 
 	/*************************************************************************************************/
 	/*!
@@ -101,56 +102,23 @@ public:
 			Time elapsed since previous frame
 	*/
 	/*************************************************************************************************/
-	virtual void Update(double dt) {}
+	void Update(double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Unloads all the objects of the scene
+			Loads in all the objects of the scene
 	*/
 	/*************************************************************************************************/
-	virtual void UnloadScene() = 0;
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets the default square
-
-		\param newDefaultSquare
-			The new default quare
-	*/
-	/*************************************************************************************************/
-	void SetDefaultSquare(GameObject* newDefaultSquare) { defaultSquare = newDefaultSquare; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Draws a square of the given color at the given tile
-
-		\param tileCoords
-			The coordinates of the tile being drawn.
-
-		\param color
-			The color of square to draw
-	*/
-	/*************************************************************************************************/
-	void DrawTile(std::pair<int, int> coords, glm::vec4 color);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Gets the scene id
-
-		\return
-			The scene's id
-	*/
-	/*************************************************************************************************/
-	int GetSceneID() { return sceneID; }
+	void UnloadScene();
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	Menu* mainMenu;								// The main main menu menu object
+	GameObject* menuCursor;						// The main menu cursor object
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -159,15 +127,11 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-	
-	bool inUse;									// Determines whether the scene is in use
-	int sceneID;								// The id for the scene
 
-	GameObject* defaultSquare;					// Default square used for coloring in an important tile
-	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
+
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -178,4 +142,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Scene_H_
+#endif // Syncopatience_Main_Menu_H_

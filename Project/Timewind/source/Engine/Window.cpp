@@ -1987,6 +1987,14 @@ void Window::RunFisheyeRenderPass()
 	// Starts the render pass
 	vkCmdBeginRenderPass(commandBuffer[currentFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
+	// Sets the vertex buffers
+	VkBuffer vertexBuffers[] = { vertexBuffer };
+	VkDeviceSize offsets[] = { 0 };
+	vkCmdBindVertexBuffers(commandBuffer[currentFrame], 0, 1, vertexBuffers, offsets);
+
+	// Sets the index buffer
+	vkCmdBindIndexBuffer(commandBuffer[currentFrame], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
 	// Sets the fisheye lense pass
 	vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, postProcessPass.GetGraphicsPipelineLayout(), 0, 1, &postProcessPass.GetDescriptorSets()[currentFrame], 0, NULL);
 	vkCmdBindPipeline(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, postProcessPass.GetGraphicsPipeline());

@@ -64,6 +64,7 @@ public:
 		TogglePlacing,
 		StartRun,
 		MenuAdvance,
+		MenuSelect,
 		MenuBack,
 		Left,
 		Right,
@@ -85,10 +86,10 @@ public:
 
 	enum class InputStatus
 	{
-		Off,
 		Pressed,
 		Held,
 		Released,
+		Off,
 		Max
 	};
 
@@ -168,6 +169,20 @@ public:
 	*/
 	/*************************************************************************************************/
 	InputStatus CheckInputStatus(Inputs input);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Check the status of the given inputs
+
+		\param inputs
+			The given inputs
+
+		\return
+			The status of the inputs (priority order: pressed, held, released, off)
+	*/
+	/*************************************************************************************************/
+	InputStatus CheckInputStatus(std::vector<Inputs> inputs);
 
 	/*************************************************************************************************/
 	/*!

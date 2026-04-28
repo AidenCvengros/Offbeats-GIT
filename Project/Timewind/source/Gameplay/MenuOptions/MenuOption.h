@@ -1,21 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Scene.h
+\file MenuOption.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2026.4.27
 \brief
-    The base scene class to facilitate scene functionality
+    The menu option base class
 
     Functions include:
         + [FILL]
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Scene_H_
-#define Syncopatience_Scene_H_
+#ifndef Syncopatience_MenuOption_H_
+#define Syncopatience_MenuOption_H_
 
 #pragma once
 
@@ -24,13 +24,16 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base include
-#include "../Engine/stdafx.h"
+#include "../../Engine/stdafx.h"
+
+// Additional Includes
+#include <vector>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
-class GameObject;								// Game object class reference to hold default square
+class GameObject;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -43,10 +46,10 @@ class GameObject;								// Game object class reference to hold default square
 /*************************************************************************************************/
 /*!
 	\brief
-		The base scene class
+		The menu base class
 */
 /*************************************************************************************************/
-class Scene
+class MenuOption
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -64,93 +67,48 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Constructor for the base scene class
-
-		\param _sceneID
-			The id for this scene
-	*/
-	/*************************************************************************************************/
-	Scene(int _sceneID);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Deconstructor for the base scene class
-	*/
-	/*************************************************************************************************/
-	~Scene();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Loads in all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	virtual void LoadScene() = 0;
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the scene
-
-		\param dt
-			Time elapsed since previous frame
-	*/
-	/*************************************************************************************************/
-	virtual void Update(double dt) {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Unloads all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	virtual void UnloadScene() = 0;
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets the default square
-
-		\param newDefaultSquare
-			The new default quare
-	*/
-	/*************************************************************************************************/
-	void SetDefaultSquare(GameObject* newDefaultSquare) { defaultSquare = newDefaultSquare; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Draws a square of the given color at the given tile
-
-		\param tileCoords
-			The coordinates of the tile being drawn.
-
-		\param color
-			The color of square to draw
-	*/
-	/*************************************************************************************************/
-	void DrawTile(std::pair<int, int> coords, glm::vec4 color);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Gets the scene id
-
-		\return
-			The scene's id
-	*/
-	/*************************************************************************************************/
-	int GetSceneID() { return sceneID; }
 	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the menu class
+
+		\param _optionVisual
+			The visual representation of the option
+	*/
+	/*************************************************************************************************/
+	MenuOption(GameObject* _optionVisual) : optionVisual(_optionVisual) {}
+
+	/*************************************************************************************************/
+	/*!
+		 \brief
+			Destructor for menu class
+	*/
+	/*************************************************************************************************/
+	~MenuOption() {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Performs the hovering behavior
+	*/
+	/*************************************************************************************************/
+	virtual void Hovering() {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Performs the behavior when this option is selected
+	*/
+	/*************************************************************************************************/
+	virtual void Selected() {}
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	GameObject* optionVisual;						// The list of keys the player has collected
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -159,11 +117,6 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-	
-	bool inUse;									// Determines whether the scene is in use
-	int sceneID;								// The id for the scene
-
-	GameObject* defaultSquare;					// Default square used for coloring in an important tile
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -178,4 +131,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Scene_H_
+#endif // Syncopatience_MenuOption_H_

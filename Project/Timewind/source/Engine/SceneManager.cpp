@@ -22,6 +22,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // List of scenes
 #include "../Scenes/Sandbox.h"
+#include "../Scenes/Main_Menu.h"
 #include "../Scenes/Level1.h"
 #include "../Scenes/Level1_2.h"
 #include "../Scenes/Level1_3.h"
@@ -63,6 +64,7 @@ Copyright (c) 2023 Aiden Cvengros
 SceneManager::SceneManager()
 {
 	// Adds the list of scenes
+	sceneList.push_back(new MainMenu());
 	sceneList.push_back(new Level1());
 	sceneList.push_back(new Level1_2());
 	sceneList.push_back(new Level1_3());
@@ -113,6 +115,9 @@ void SceneManager::Update(double dt)
 		// Sets that the scene no longer needs changing
 		changeScene = false;
 	}
+
+	// Updates the current scene
+	sceneList[currentSceneIndex]->Update(dt);
 }
 
 /*************************************************************************************************/

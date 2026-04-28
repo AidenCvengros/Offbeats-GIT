@@ -88,9 +88,6 @@ void Sandbox::LoadScene()
     Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
     Texture* teleporterTexture = _TextureManager->AddTexture("Assets/Sprites/Portal_Crack.png");
 
-    Font* retrofitFont = new Font("Assets/Fonts/SwanseaBold-D0ox.ttf");
-    _TextureManager->SetDefaultFont(retrofitFont);
-
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
 
@@ -218,6 +215,20 @@ void Sandbox::LoadScene()
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);
+}
+
+/*************************************************************************************************/
+/*!
+    \brief
+        Updates the scene
+
+    \param dt
+        Time elapsed since previous frame
+*/
+/*************************************************************************************************/
+void Sandbox::Update(double dt)
+{
+
 }
 
 /*************************************************************************************************/

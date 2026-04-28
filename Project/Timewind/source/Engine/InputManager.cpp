@@ -75,6 +75,7 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::StartRun, GLFW_KEY_ENTER));
 	keybinds.insert(std::pair(Inputs::MenuAdvance, GLFW_KEY_E));
 	keybinds.insert(std::pair(Inputs::MenuAdvance, GLFW_KEY_ENTER));
+	keybinds.insert(std::pair(Inputs::MenuSelect, GLFW_KEY_TAB));
 	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_Q));
 	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_BACKSPACE));
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_LEFT));
@@ -186,6 +187,39 @@ InputManager::InputStatus InputManager::CheckInputStatus(Inputs input)
 
 	// Otherwise returns the button status
 	return inputTracker[(int)input];
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Check the status of the given inputs
+
+	\param inputs
+		The given inputs
+
+	\return
+		The status of the inputs (priority order: pressed, held, released, off)
+*/
+/*************************************************************************************************/
+InputManager::InputStatus InputManager::CheckInputStatus(std::vector<Inputs> inputs)
+{
+	InputStatus strongestInputStatus = InputStatus::Off;	// Holds the strongest input status to be output
+
+	// Loops through the vector
+	for (int i = 0; i < inputs.size(); i++)
+	{
+		// Gets the input status
+		InputStatus newInputStatus = CheckInputStatus(inputs[i]);
+
+		// Checks for priority
+		if (newInputStatus < strongestInputStatus)
+		{
+			strongestInputStatus = newInputStatus;
+		}
+	}
+
+	// Returns the strongest input status found
+	return strongestInputStatus;
 }
 
 //-------------------------------------------------------------------------------------------------
