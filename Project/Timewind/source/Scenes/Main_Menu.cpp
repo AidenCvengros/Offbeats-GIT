@@ -116,14 +116,29 @@ void MainMenu::LoadScene()
 
     // Creates the main main menu menu
     mainMenu = new Menu();
-    Text* startOptionText = new Text("Start", _TextureManager->GetDefaultFont(), 12, {8.0f, 6.0f}, 0.0f, {0.1f, 0.1f}, 90, {1.0f, 1.0f, 1.0f, 1.0f});
-    Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 12, { 8.0f, 5.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+    Text* startOptionText = new Text("Start", _TextureManager->GetDefaultFont(), 24, { -1.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+    Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 24, { -1.5f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
     GoToSceneOption* startOption = new GoToSceneOption(startOptionText, 101);
     GoToSceneOption* quitOption = new GoToSceneOption(quitOptionText, -1);
     _GameObjectManager->AddGameObject(startOptionText);
     _GameObjectManager->AddGameObject(quitOptionText);
     mainMenu->AddOption(startOption);
     mainMenu->AddOption(quitOption);
+
+    // Creates main menu ui elements
+    menuCursor = new GameObject({ -0.5f, 0.5f }, 0.0f, { 1.0f, 1.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 1.0f });
+    _GameObjectManager->AddGameObject(menuCursor);
+    GameObject* newUIObject = new GameObject({ 0.0f, 0.0f }, 0.0f, { 32.0f, 32.0f / camera->GetAspectRatio() }, 80, true, { 0.1f, 0.1f, 0.1f, 0.4f });
+    _GameObjectManager->AddGameObject(newUIObject);
+    newUIObject->SetFollowingCamera(true);
+    Text* titleText = new Text("Retrofit", _TextureManager->GetDefaultFont(), 48, { -14.0f, 3.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+    _GameObjectManager->AddGameObject(titleText);
+    titleText->SetFollowingCamera(true);
+
+    // Sets the UI to follow the camera
+    startOptionText->SetFollowingCamera(true);
+    quitOptionText->SetFollowingCamera(true);
+    menuCursor->SetFollowingCamera(true);
 }
 
 /*************************************************************************************************/
@@ -146,6 +161,10 @@ void MainMenu::Update(double dt)
     {
         mainMenu->DecrementOptionIndex();
     }
+
+    // Updates cursor position
+    glm::vec2 visualPosition = mainMenu->GetSelectedOption()->GetVisual()->GetPosition();
+    menuCursor->SetPosition({ visualPosition.x - 1.0f, visualPosition.y + 1.0f });
     
     // Checks for a selection
     if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuAdvance) == InputManager::InputStatus::Pressed)
