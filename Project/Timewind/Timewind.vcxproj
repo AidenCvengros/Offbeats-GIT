@@ -166,9 +166,12 @@
     <ClInclude Include="Includes\ft2build.h" />
     <ClInclude Include="source\Engine\AudioManager.h" />
     <ClInclude Include="source\Engine\Font.h" />
+    <ClInclude Include="source\Engine\MenuManager.h" />
     <ClInclude Include="source\Gameplay\ActionManager.h" />
     <ClInclude Include="source\Gameplay\MenuOptions\GoToSceneOption.h" />
     <ClInclude Include="source\Gameplay\MenuOptions\MenuOption.h" />
+    <ClInclude Include="source\Gameplay\MenuOptions\QuitOption.h" />
+    <ClInclude Include="source\Gameplay\MenuOptions\SubmenuOption.h" />
     <ClInclude Include="source\Game_Objects\BigCoin.h" />
     <ClInclude Include="source\Game_Objects\Camera.h" />
     <ClInclude Include="source\Game_Objects\ChildObject.h" />
@@ -216,9 +219,12 @@
   <ItemGroup>
     <ClCompile Include="source\Engine\AudioManager.cpp" />
     <ClCompile Include="source\Engine\Font.cpp" />
+    <ClCompile Include="source\Engine\MenuManager.cpp" />
     <ClCompile Include="source\Gameplay\ActionManager.cpp" />
     <ClCompile Include="source\Gameplay\MenuOptions\GoToSceneOption.cpp" />
     <ClCompile Include="source\Gameplay\MenuOptions\MenuOption.cpp" />
+    <ClCompile Include="source\Gameplay\MenuOptions\QuitOption.cpp" />
+    <ClCompile Include="source\Gameplay\MenuOptions\SubmenuOption.cpp" />
     <ClCompile Include="source\Game_Objects\BigCoin.cpp" />
     <ClCompile Include="source\Game_Objects\Camera.cpp" />
     <ClCompile Include="source\Game_Objects\ChildObject.cpp" />

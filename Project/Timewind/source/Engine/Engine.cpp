@@ -44,6 +44,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Gameplay/MapMatrix.h"
 #include "EffectManager.h"
 #include "AudioManager.h"
+#include "MenuManager.h"
 
 // Adds the camera class so a starting camera can be set
 #include "../Game_Objects/Camera.h"
@@ -135,15 +136,17 @@ void Engine::Init()
 	SceneManager* sceneManager = new SceneManager();
 	MapMatrix* mapMatrix = new MapMatrix(100, 50);
 	EffectManager* effectManager = new EffectManager();
+	MenuManager* menuManager = new MenuManager();
 
 	// Creates and pushes back systems
-	systemList.push_back((System*)inputManager);
-	systemList.push_back((System*)audioManager);
-	systemList.push_back((System*)mapMatrix);
-	systemList.push_back((System*)objectManager);
-	systemList.push_back((System*)texManager);
-	systemList.push_back((System*)sceneManager);
-	systemList.push_back((System*)effectManager);
+	systemList.push_back(inputManager);
+	systemList.push_back(audioManager);
+	systemList.push_back(mapMatrix);
+	systemList.push_back(objectManager);
+	systemList.push_back(texManager);
+	systemList.push_back(sceneManager);
+	systemList.push_back(effectManager);
+	systemList.push_back(menuManager);
 
 	// Loops through, initializing each system
 	for (size_t i = 0; i < systemList.size(); i++)
@@ -313,6 +316,17 @@ System* Engine::GetSystem(SystemTypes systemType)
 			}
 		}
 	}
+	// Checks for a menu manager
+	else if (systemType == SystemTypes::menuManager)
+	{
+		for (int i = 0; i < systemList.size(); i++)
+		{
+			if (dynamic_cast<MenuManager*>(systemList[i]) != NULL)
+			{
+				return systemList[i];
+			}
+		}
+	}
 
 	// Otherwise return null
 	return NULL;
@@ -339,7 +353,7 @@ Scene* Engine::GetCurrentScene()
 		Engine class initializer.
 */
 /*********************************************************************************************/
-Engine::Engine()
+Engine::Engine() : gameWindow(NULL), lastTime(0.0f)
 {
 	
 }

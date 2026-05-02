@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Menu.h
+\file SubmenuOption.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.4.27
+\date 2026.4.29
 \brief
-    The menu base class
+    The menu option for opening or closing a submenu
 
     Functions include:
         + [FILL]
@@ -14,8 +14,8 @@ Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Menu_H_
-#define Syncopatience_Menu_H_
+#ifndef Syncopatience_SubmenuOption_H_
+#define Syncopatience_SubmenuOption_H_
 
 #pragma once
 
@@ -24,17 +24,14 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base include
-#include "../Engine/stdafx.h"
-
-// Additional Includes
-#include <vector>
+#include "../../Engine/stdafx.h"
+#include "MenuOption.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
-class MenuOption;
-class GameObject;
+class Menu;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -47,15 +44,23 @@ class GameObject;
 /*************************************************************************************************/
 /*!
 	\brief
-		The menu base class
+		The class for menu options to open or close
 */
 /*************************************************************************************************/
-class Menu
+class SubmenuOption : public MenuOption
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
+
+	enum class SubmenuInteraction
+	{
+		Open,
+		Close,
+		Toggle,
+		Max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
@@ -73,9 +78,18 @@ public:
 	/*!
 		\brief
 			Constructor for the menu class
+
+		\param _optionVisual
+			The visual representation of the menu option
+
+		\param _submenu
+			The submenu this option is interacting with
+
+		\param _interaction
+			What action this button takes on the submenu
 	*/
 	/*************************************************************************************************/
-	Menu();
+	SubmenuOption(GameObject* _optionVisual, Menu* _submenu, SubmenuInteraction _interaction) : MenuOption(_optionVisual), submenu(_submenu), interaction(_interaction) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -83,111 +97,31 @@ public:
 			Destructor for menu class
 	*/
 	/*************************************************************************************************/
-	~Menu();
+	~SubmenuOption() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Adds the given key to the inventory
-
-		\param newKey
-			The new key to be added into the inventory
-
-		\return
-			Returns true if the key was added. False if not
+			Performs the hovering behavior
 	*/
 	/*************************************************************************************************/
-	bool AddOption(MenuOption* newOption);
+	virtual void Hovering();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Adds the given object to the menu objects list
-
-		\param newObject
-			The new object to be added into the menu objects list
+			Performs the behavior when this option is selected
 	*/
 	/*************************************************************************************************/
-	void AddMenuObject(GameObject* newObject);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the sticker at the selected index
-
-		\return
-			The chosen sticker
-	*/
-	/*************************************************************************************************/
-	int GetOptionIndex() { return optionIndex; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the sticker at the selected index
-
-		\return
-			The chosen sticker
-	*/
-	/*************************************************************************************************/
-	MenuOption* GetSelectedOption();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns whether the menu is active
-
-		\return
-			Whether the menu is on (true) or off (false)
-	*/
-	/*************************************************************************************************/
-	bool GetActive() { return active; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Increments the selected menu option
-	*/
-	/*************************************************************************************************/
-	void IncrementOptionIndex();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Decrements the selected menu option
-	*/
-	/*************************************************************************************************/
-	void DecrementOptionIndex();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Turns on the menu and all associated objects
-	*/
-	/*************************************************************************************************/
-	void TurnOnMenu();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Turns off the menu and all associated objects
-
-		\param resetIndex
-			Whether to reset the option index
-	*/
-	/*************************************************************************************************/
-	void TurnOffMenu(bool resetIndex);
+	virtual void Selected();
 
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	std::vector<MenuOption*> optionList;		// The list of keys the player has collected
-	std::vector<GameObject*> menuObjects;		// List of other game objects related to the menu
-	int optionIndex;							// The current index the menu is on
-	bool active;								// Whether the menu is on or off
-	bool vertical;								// Whether the menu is vertical (true) or horizontal (false)
+	Menu* submenu;								// The scene this button goes to
+	SubmenuInteraction interaction;				// What the button does with the submenu
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -210,4 +144,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Menu_H_
+#endif // Syncopatience_SubmenuOption_H_

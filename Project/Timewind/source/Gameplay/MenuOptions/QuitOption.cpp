@@ -1,9 +1,9 @@
 /*************************************************************************************************/
 /*!
-\file GoToSceneOption.cpp
+\file QuitOption.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.4.27
+\date 2026.4.29
 \brief
     The class for the menu option that sends to a new scene
 
@@ -19,12 +19,17 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "GoToSceneOption.h"
+#include "QuitOption.h"
 #include "../../Engine/cppShortcuts.h"
 
 // Additional Includes
-#include "../../Engine/SceneManager.h"
-#include "../../Engine/MenuManager.h"
+// Includes glfw input reading functionality
+#define VK_USE_PLATFORM_WIN32_KHR
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+// Includes the window class that we are reading inputs from
+#include "../../Engine/Window.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -56,7 +61,7 @@ Copyright (c) 2025 Aiden Cvengros
 		Performs the hovering behavior
 */
 /*************************************************************************************************/
-void GoToSceneOption::Hovering()
+void QuitOption::Hovering()
 {
 
 }
@@ -67,10 +72,9 @@ void GoToSceneOption::Hovering()
 		Performs the behavior when this option is selected
 */
 /*************************************************************************************************/
-void GoToSceneOption::Selected()
+void QuitOption::Selected()
 {
-	_SceneManager->ChangeScene(sceneID);
-	_MenuManager->SetCurrentMenu(NULL);
+	glfwSetWindowShouldClose(_Window->GetVulkanWindowPtr(), true);
 }
 
 //-------------------------------------------------------------------------------------------------

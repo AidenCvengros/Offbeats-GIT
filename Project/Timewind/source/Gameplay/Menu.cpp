@@ -24,6 +24,7 @@ Copyright (c) 2025 Aiden Cvengros
 
 // Additional Includes
 #include "MenuOptions/MenuOption.h"
+#include "../Game_Objects/GameObject.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -55,7 +56,7 @@ Copyright (c) 2025 Aiden Cvengros
 		Constructor for the inventory class
 */
 /*************************************************************************************************/
-Menu::Menu() : optionList(), optionIndex(0)
+Menu::Menu() : optionList(), menuObjects(), optionIndex(0), active(true), vertical(true)
 {
 
 }
@@ -94,6 +95,24 @@ bool Menu::AddOption(MenuOption* newOption)
 
 	// If error checking failed, returns false
 	return false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Adds the given object to the menu objects list
+
+	\param newObject
+		The new object to be added into the menu objects list
+*/
+/*************************************************************************************************/
+void Menu::AddMenuObject(GameObject* newObject)
+{
+	// Error checking
+	if (newObject)
+	{
+		menuObjects.push_back(newObject);
+	}
 }
 
 /*************************************************************************************************/
@@ -151,6 +170,67 @@ void Menu::DecrementOptionIndex()
 	{
 		optionIndex = optionList.size();
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Turns on the menu and all associated objects
+*/
+/*************************************************************************************************/
+void Menu::TurnOnMenu()
+{
+	// Loops through the option list
+	for (auto i = optionList.begin(); i != optionList.end(); i++)
+	{
+		// Turns on the option's visual
+		(*i)->GetVisual()->SetActive(true);
+	}
+
+	// Loops through the objects list
+	for (auto i = menuObjects.begin(); i != menuObjects.end(); i++)
+	{
+		// Turns on the objects
+		(*i)->SetActive(true);
+	}
+
+	// Sets the menu to on
+	active = true;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Turns off the menu and all associated objects
+
+	\param resetIndex
+		Whether to reset the option index
+*/
+/*************************************************************************************************/
+void Menu::TurnOffMenu(bool resetIndex)
+{
+	// Loops through the option list
+	for (auto i = optionList.begin(); i != optionList.end(); i++)
+	{
+		// Turns off the option's visual
+		(*i)->GetVisual()->SetActive(false);
+	}
+
+	// Loops through the objects list
+	for (auto i = menuObjects.begin(); i != menuObjects.end(); i++)
+	{
+		// Turns off the objects
+		(*i)->SetActive(false);
+	}
+
+	// Resets the index if requested
+	if (resetIndex)
+	{
+		optionIndex = 0;
+	}
+
+	// Sets the menu to off
+	active = false;
 }
 
 //-------------------------------------------------------------------------------------------------

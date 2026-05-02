@@ -31,6 +31,8 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Text.h"
 #include "../Gameplay/Menu.h"
 #include "../Gameplay/MenuOptions/GoToSceneOption.h"
+#include "../Gameplay/MenuOptions/QuitOption.h"
+#include "../Engine/MenuManager.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -119,20 +121,24 @@ void MainMenu::LoadScene()
     Text* startOptionText = new Text("Start", _TextureManager->GetDefaultFont(), 24, { -1.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
     Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 24, { -1.5f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
     GoToSceneOption* startOption = new GoToSceneOption(startOptionText, 101);
-    GoToSceneOption* quitOption = new GoToSceneOption(quitOptionText, -1);
+    QuitOption* quitOption = new QuitOption(quitOptionText);
     _GameObjectManager->AddGameObject(startOptionText);
     _GameObjectManager->AddGameObject(quitOptionText);
     mainMenu->AddOption(startOption);
     mainMenu->AddOption(quitOption);
+    _MenuManager->SetCurrentMenu(mainMenu);
 
     // Creates main menu ui elements
     menuCursor = new GameObject({ -0.5f, 0.5f }, 0.0f, { 1.0f, 1.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 1.0f });
     _GameObjectManager->AddGameObject(menuCursor);
+    mainMenu->AddMenuObject(menuCursor);
     GameObject* newUIObject = new GameObject({ 0.0f, 0.0f }, 0.0f, { 32.0f, 32.0f / camera->GetAspectRatio() }, 80, true, { 0.1f, 0.1f, 0.1f, 0.4f });
     _GameObjectManager->AddGameObject(newUIObject);
+    mainMenu->AddMenuObject(newUIObject);
     newUIObject->SetFollowingCamera(true);
-    Text* titleText = new Text("Retrofit", _TextureManager->GetDefaultFont(), 48, { -14.0f, 3.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+    Text* titleText = new Text("RETROFIT", _TextureManager->GetDefaultFont(), 48, { -14.0f, 3.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
     _GameObjectManager->AddGameObject(titleText);
+    mainMenu->AddMenuObject(titleText);
     titleText->SetFollowingCamera(true);
 
     // Sets the UI to follow the camera
@@ -152,30 +158,9 @@ void MainMenu::LoadScene()
 /*************************************************************************************************/
 void MainMenu::Update(double dt)
 {
-    // Checks for menu inputs
-    if (_InputManager->CheckInputStatus({ InputManager::Inputs::Down, InputManager::Inputs::MenuSelect }) == InputManager::InputStatus::Pressed)
-    {
-        mainMenu->IncrementOptionIndex();
-    }
-    else if (_InputManager->CheckInputStatus(InputManager::Inputs::Up) == InputManager::InputStatus::Pressed)
-    {
-        mainMenu->DecrementOptionIndex();
-    }
-
     // Updates cursor position
     glm::vec2 visualPosition = mainMenu->GetSelectedOption()->GetVisual()->GetPosition();
     menuCursor->SetPosition({ visualPosition.x - 1.0f, visualPosition.y + 1.0f });
-    
-    // Checks for a selection
-    if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuAdvance) == InputManager::InputStatus::Pressed)
-    {
-        mainMenu->GetSelectedOption()->Selected();
-    }
-    else
-    {
-        // Otherwise runs hovering behavior
-        mainMenu->GetSelectedOption()->Hovering();
-    }
 }
 
 /*************************************************************************************************/

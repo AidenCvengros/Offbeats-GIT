@@ -192,6 +192,15 @@
     <ClInclude Include="source\Gameplay\MenuOptions\GoToSceneOption.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\Gameplay\MenuOptions\QuitOption.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Gameplay\MenuOptions\SubmenuOption.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Engine\MenuManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine\Engine.cpp">
@@ -336,6 +345,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Gameplay\MenuOptions\GoToSceneOption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Gameplay\MenuOptions\QuitOption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Gameplay\MenuOptions\SubmenuOption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Engine\MenuManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

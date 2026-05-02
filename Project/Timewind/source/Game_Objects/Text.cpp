@@ -135,11 +135,12 @@ void Text::SetText(const std::string& newText)
 			float u0 = (float)fontData.offset * font->GetInvertedBmpWidth();
 			float v = (hraw) / font->GetBmpHeight();
 			float u1 = (float)(fontData.offset + fontData.size.x) * font->GetInvertedBmpWidth();
+			float offset = 0.00048828125;
 
-			Vertex bottomRight({ localXPos - w, localYPos }, GetColor(), { u1, 1.0f - v });
-			Vertex bottomLeft({ localXPos, localYPos }, GetColor(), { u0, 1.f - v });
-			Vertex topLeft({ localXPos, localYPos + h }, GetColor(), { u0, 1.0f });
-			Vertex topRight = { {localXPos - w, localYPos + h }, GetColor(), { u1, 1.0f } };
+			Vertex bottomRight({ localXPos - w, localYPos }, GetColor(), { u1 - offset, 1.0f - v });
+			Vertex bottomLeft({ localXPos, localYPos }, GetColor(), { u0 + offset, 1.f - v });
+			Vertex topLeft({ localXPos, localYPos + h }, GetColor(), { u0 + offset, 1.0f });
+			Vertex topRight = { {localXPos - w, localYPos + h }, GetColor(), { u1 - offset, 1.0f } };
 			vertices.push_back(bottomRight);
 			vertices.push_back(bottomLeft);
 			vertices.push_back(topLeft);

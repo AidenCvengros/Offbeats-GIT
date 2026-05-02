@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file GoToSceneOption.cpp
+\file SubmenuOption.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.4.27
+\date 2026.4.29
 \brief
-    The class for the menu option that sends to a new scene
+    The class for the menu option that interacts with submenus
 
     Functions include:
         + [FILL]
@@ -19,12 +19,12 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "GoToSceneOption.h"
+#include "SubmenuOption.h"
 #include "../../Engine/cppShortcuts.h"
 
 // Additional Includes
 #include "../../Engine/SceneManager.h"
-#include "../../Engine/MenuManager.h"
+#include "../Menu.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -56,7 +56,7 @@ Copyright (c) 2025 Aiden Cvengros
 		Performs the hovering behavior
 */
 /*************************************************************************************************/
-void GoToSceneOption::Hovering()
+void SubmenuOption::Hovering()
 {
 
 }
@@ -67,10 +67,33 @@ void GoToSceneOption::Hovering()
 		Performs the behavior when this option is selected
 */
 /*************************************************************************************************/
-void GoToSceneOption::Selected()
+void SubmenuOption::Selected()
 {
-	_SceneManager->ChangeScene(sceneID);
-	_MenuManager->SetCurrentMenu(NULL);
+	// Checks the option's behavior
+	if (interaction == SubmenuInteraction::Open)
+	{
+		// Opens the menu
+		submenu->TurnOnMenu();
+	}
+	else if (interaction == SubmenuInteraction::Close)
+	{
+		// Closes the menu
+		submenu->TurnOffMenu(true);
+	}
+	else if (interaction == SubmenuInteraction::Toggle)
+	{
+		// Checks if the submenu is currently on
+		if (submenu->GetActive())
+		{
+			// Turns off the submenu
+			submenu->TurnOffMenu(false);
+		}
+		else
+		{
+			// Otherwise turns on the submenu
+			submenu->TurnOnMenu();
+		}
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
