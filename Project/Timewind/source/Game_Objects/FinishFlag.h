@@ -94,8 +94,8 @@ public:
 			The scene the player will be sent to
 	*/
 	/*************************************************************************************************/
-	FinishFlag(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(pos, rot, sca, 99, facingRight_, texture_, color_, mapCoords_), targetScene(_targetScene) {}
-	FinishFlag(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(99, texture_, color_, mapCoords_), targetScene(_targetScene) {}
+	FinishFlag(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(pos, rot, sca, 99, facingRight_, texture_, color_, mapCoords_), targetScene(_targetScene), timed(false), timer(0.0) {}
+	FinishFlag(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(99, texture_, color_, mapCoords_), targetScene(_targetScene), timed(false), timer(0.0) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -108,10 +108,32 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Updates the game object
+
+		\param dt
+			The time elapsed since the previous frame
+	*/
+	/*************************************************************************************************/
+	void Update(double dt);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Activates the flag to go to the next scene
 	*/
 	/*************************************************************************************************/
 	void JumpToTargetScene();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Starts the timer for the flag to glitch out
+
+		\param timerLength
+			How long the timer runs
+	*/
+	/*************************************************************************************************/
+	void SetTimer(double timerLength);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -127,6 +149,8 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	int targetScene;							// The scene that this flag sends the player to
+	bool timed;									// Whether the finish flag is timed
+	double timer;								// How long until the finish flag glitches
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

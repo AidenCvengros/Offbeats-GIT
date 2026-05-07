@@ -549,6 +549,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns true if the draw priority has changed since last checked
+
+		\return
+			The original position of the current move
+	*/
+	/*************************************************************************************************/
+	bool GetDrawPriorityChanged();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets whether the game object is active
 
 		\param newActive
@@ -659,6 +670,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Sets the game object's color
+
+		\param newColor
+			The game object's new color
+	*/
+	/*************************************************************************************************/
+	void SetDrawPriority(int newDrawPriority);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Marks this game object to be drawn this frame
 
 		\param _drawThisFrame
@@ -729,6 +751,7 @@ private:
 	float rotation;								// The rotation (in 2d space) of the game object
 	glm::vec2 scale;							// The scale of the game object
 	int drawPriority;							// How forward the game object is drawn
+	bool drawPriorityChanged;					// Whether the draw priority of this game object has changed
 	bool facingRight;							// Whether the game object is facing right (true if right, false if left)
 	bool followingCamera;						// Whether the game object is positioned relative to the camera
 

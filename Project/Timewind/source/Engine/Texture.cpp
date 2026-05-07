@@ -76,7 +76,7 @@ Texture::Texture(std::string filename_)
 	// Checks that an image was loaded in this way
 	if (!pixels)
 	{
-		throw std::runtime_error("failed to load texture image!");
+		std::cout << "Failed to load image: " << filename << std::endl;
 	}
 
 	// Creates a buffer in memory for the texture buffer

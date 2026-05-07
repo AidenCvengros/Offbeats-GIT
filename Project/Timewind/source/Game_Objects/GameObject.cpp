@@ -273,6 +273,26 @@ int GameObject::GetDirectionModifier()
 /*************************************************************************************************/
 /*!
 	\brief
+		Returns true if the draw priority has changed since last checked
+
+	\return
+		The original position of the current move
+*/
+/*************************************************************************************************/
+bool GameObject::GetDrawPriorityChanged()
+{
+	bool returnValue = drawPriorityChanged;		// Holds the current value
+
+	// Resets the boolean
+	drawPriorityChanged = false;
+
+	// Returns the saved value
+	return returnValue;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Sets the position of the game object
 
 	\param newPosition
@@ -340,6 +360,22 @@ void GameObject::SetRender(int newRender)
 	// Sets the new render boolean and turns off draw this frame
 	render = newRender;
 	drawThisFrame = false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets the game object's draw priority
+
+	\param newDrawPriority
+		The game object's new drawPriority
+*/
+/*************************************************************************************************/
+void GameObject::SetDrawPriority(int newDrawPriority)
+{
+	// Changes the draw priority
+	drawPriority = newDrawPriority;
+	drawPriorityChanged = true;
 }
 
 /*************************************************************************************************/

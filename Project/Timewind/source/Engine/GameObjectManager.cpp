@@ -77,6 +77,25 @@ void GameObjectManager::Update(double dt)
 	// Walks through the game object list
 	for (std::multimap<int, GameObject*>::iterator it = gameObjectList.begin(); it != gameObjectList.end();)
 	{
+		// Checks if draw priority has changed
+		if (it->second->GetDrawPriorityChanged())
+		{
+			// Readds the object with the updated priority
+			AddGameObject(it->second);
+
+			// Erases this node
+			it = gameObjectList.erase(it);
+		}
+		// Otherwise keeps walking
+		else
+		{
+			it++;
+		}
+	}
+
+	// Now walks through with updated draw priorities
+	for (std::multimap<int, GameObject*>::iterator it = gameObjectList.begin(); it != gameObjectList.end();)
+	{
 		// Destroys the game object if it is marked for destruction
 		if ((*it).second->GetToBeDestroyed())
 		{
