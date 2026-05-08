@@ -85,6 +85,7 @@ void Level1_3::LoadScene()
     Texture* lockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LockedWall.png");
     Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
     Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
+    Texture* flagTexture = _TextureManager->AddTexture("Assets/Sprites/Flag.png");
 
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
@@ -96,7 +97,8 @@ void Level1_3::LoadScene()
     // Creates essential game objects (player, camera, and default square)
     Player* player = new Player(ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition()), 0.0f, {2.0f, 2.0f}, 50, playerTexture, {2, 2});
     Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
-    FinishFlag* finishFlag = new FinishFlag(NULL, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, 104);
+    FinishFlag* finishFlag = new FinishFlag(flagTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, 104);
+    finishFlag->SetScale({ 4.0f, 12.0f });
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject(camera);
     _GameObjectManager->AddGameObject(player);
@@ -138,7 +140,7 @@ void Level1_3::LoadScene()
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Sticker, newObject);
             break;
         case 'F':
-            finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second));
+            finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second, finishFlag->GetScale()));
             finishFlag->SetMapCoords(i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
             break;

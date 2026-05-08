@@ -94,8 +94,8 @@ public:
 			The scene the player will be sent to
 	*/
 	/*************************************************************************************************/
-	FinishFlag(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(pos, rot, sca, 99, facingRight_, texture_, color_, mapCoords_), targetScene(_targetScene), timed(false), timer(0.0) {}
-	FinishFlag(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(99, texture_, color_, mapCoords_), targetScene(_targetScene), timed(false), timer(0.0) {}
+	FinishFlag(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(pos, rot, sca, 99, facingRight_, texture_, color_, mapCoords_), targetScene(_targetScene), timed(false), timer(0.0), flagActive(true) {}
+	FinishFlag(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(40, texture_, color_, mapCoords_), targetScene(_targetScene), timed(false), timer(0.0), flagActive(true) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -151,6 +151,7 @@ private:
 	int targetScene;							// The scene that this flag sends the player to
 	bool timed;									// Whether the finish flag is timed
 	double timer;								// How long until the finish flag glitches
+	bool flagActive;							// Whether the flag takes you to the next level
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

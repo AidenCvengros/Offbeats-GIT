@@ -62,6 +62,7 @@ void FinishFlag::Update(double dt)
 		{
 			// Stops running the timer
 			timed = false;
+			flagActive = false;
 
 			// Makes like a dark, fucked up version of the finish flag haha. Just a glimpse into my dark reality. A full stare into my twisted perspective would make most simply go insane lmao
 			SetDrawPriority(150);
@@ -79,8 +80,12 @@ void FinishFlag::Update(double dt)
 /*************************************************************************************************/
 void FinishFlag::JumpToTargetScene()
 {
-    // Tells the scene manager to switch scenes
-    _SceneManager->ChangeScene(targetScene);
+	// Checks that the flag is active
+	if (flagActive)
+	{
+		// Tells the scene manager to switch scenes
+		_SceneManager->ChangeScene(targetScene);
+	}
 }
 
 /*************************************************************************************************/

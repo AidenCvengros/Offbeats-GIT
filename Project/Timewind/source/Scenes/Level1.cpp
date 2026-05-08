@@ -98,7 +98,7 @@ void Level1::LoadScene()
     Player* player = new Player(ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition()), 0.0f, {2.0f, 2.0f}, 50, playerTexture, {2, 2});
     Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
     FinishFlag* finishFlag = new FinishFlag(flagTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, 102);
-    finishFlag->SetScale({ 2.0f, 6.0f });
+    finishFlag->SetScale({ 4.0f, 12.0f });
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject((GameObject*)camera);
     _GameObjectManager->AddGameObject((GameObject*)player);
@@ -106,7 +106,6 @@ void Level1::LoadScene()
     _GameObjectManager->AddGameObject(finishFlag);
     _Window->SetCamera(camera);
     SetDefaultSquare(newDefaultSquare);
-    finishFlag->SetTimer(20.0);
 
     // Adds in all special tiles
     for (auto i = specialTileList.begin(); i != specialTileList.end(); i++)
@@ -136,7 +135,7 @@ void Level1::LoadScene()
             _MapMatrix->SetTile(i->second.first, i->second.second + 1, MapMatrix::TileStatus::BigCoin, newObject);
             break;
         case 'F':
-            finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second));
+            finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second, finishFlag->GetScale()));
             finishFlag->SetMapCoords(i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
             break;

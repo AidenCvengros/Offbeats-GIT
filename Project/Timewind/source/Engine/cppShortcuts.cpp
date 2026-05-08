@@ -92,13 +92,16 @@ glm::vec2 ConvertMapCoordsToWorldCoords(int mapXCoordinate, int mapYCoordinate)
 	\param mapCoordinates
 		The given map tile coordinates
 
+	\param scale
+		The scale of the object. Defaults to (2.0f, 2.0f)
+
 	\return
 		The corresponding location in world coordinates
 */
 /*************************************************************************************************/
-glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates)
+glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates, glm::vec2 scale)
 {
-	return { ConvertMapCoordToWorldCoord(mapCoordinates.first), ConvertMapCoordToWorldCoord(mapCoordinates.second) };
+	return { ConvertMapCoordToWorldCoord(mapCoordinates.first) + ((scale.x - 2.0f) * 0.5f), ConvertMapCoordToWorldCoord(mapCoordinates.second) + ((scale.y - 2.0f) * 0.5f)};
 }
 
 /*************************************************************************************************/

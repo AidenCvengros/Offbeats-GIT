@@ -88,13 +88,16 @@ glm::vec2 ConvertMapCoordsToWorldCoords(int mapXCoordinate, int mapYCoordinate);
 		Converts the given map matrix tile coordinates to world coordinates
 
 	\param mapCoordinates
-		The given map tile coordinates
+		The given map tile 
+
+	\param scale
+		The scale of the object. Defaults to (2.0f, 2.0f)
 
 	\return
 		The corresponding location in world coordinates
 */
 /*************************************************************************************************/
-glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates);
+glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates, glm::vec2 scale = { 2.0f, 2.0f });
 
 /*************************************************************************************************/
 /*!
