@@ -80,7 +80,7 @@ public:
 			Constructor for the game object manager class
 	*/
 	/*************************************************************************************************/
-	GameObjectManager() {}
+	GameObjectManager() : System(SystemTypes::gameObjectManager) {}
 	
 	/*************************************************************************************************/
 	/*!

@@ -57,7 +57,7 @@ Copyright (c) 2023 Aiden Cvengros
 		Constructor for the texture manager class
 */
 /*************************************************************************************************/
-TextureManager::TextureManager() : textureList(), defaultFont(NULL)
+TextureManager::TextureManager() : System(SystemTypes::textureManager), textureList(), defaultFont(NULL)
 {
 	
 }

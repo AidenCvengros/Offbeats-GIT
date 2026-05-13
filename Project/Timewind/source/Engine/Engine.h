@@ -35,7 +35,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Includes to make system vector
 #include "System.h"
-#include <vector>
+#include <map>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -70,20 +70,6 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
-
-	enum SystemTypes
-	{
-		window,
-		inputManager,
-		audioManager,
-		gameObjectManager,
-		textureManager,
-		sceneManager,
-		mapMatrix,
-		effectManager,
-		menuManager,
-		max
-	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -154,7 +140,7 @@ public:
 			The given system type
 	*/
 	/*********************************************************************************************/
-	System* GetSystem(SystemTypes systemType);
+	System* GetSystem(System::SystemTypes systemType);
 
 	/*********************************************************************************************/
 	/*!
@@ -188,12 +174,12 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	static Engine* engineInstance;			// Points to the singleton engine instance
+	static Engine* engineInstance;						// Points to the singleton engine instance
 
-	std::vector<System *> systemList;		// Holds a list of all systems that need to be managed
-	Window* gameWindow;						// Points to the window so the engine can communicate directly with the window
+	std::map<System::SystemTypes, System *> systemList;	// Holds a list of all systems that need to be managed
+	Window* gameWindow;									// Points to the window so the engine can communicate directly with the window
 
-	double lastTime;						// Tracks the last recorded time for calculating dt
+	double lastTime;									// Tracks the last recorded time for calculating dt
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

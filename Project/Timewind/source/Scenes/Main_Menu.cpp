@@ -32,7 +32,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Gameplay/Menu.h"
 #include "../Gameplay/MenuOptions/GoToSceneOption.h"
 #include "../Gameplay/MenuOptions/QuitOption.h"
-#include "../Engine/MenuManager.h"
+#include "../Engine/GameStateManager.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -126,7 +126,7 @@ void MainMenu::LoadScene()
     _GameObjectManager->AddGameObject(quitOptionText);
     mainMenu->AddOption(startOption);
     mainMenu->AddOption(quitOption);
-    _MenuManager->SetCurrentMenu(mainMenu);
+    _GameStateManager->SetCurrentMenu(mainMenu);
 
     // Creates main menu ui elements
     menuCursor = new GameObject({ -0.5f, 0.5f }, 0.0f, { 1.0f, 1.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 1.0f });

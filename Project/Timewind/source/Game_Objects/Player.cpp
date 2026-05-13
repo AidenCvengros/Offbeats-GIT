@@ -29,6 +29,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Engine/InputManager.h"
 #include "../Gameplay/MapMatrix.h"
 #include "../Engine/SceneManager.h"
+#include "../Engine/GameStateManager.h"
 
 // Other game object classes so the player can interact with them
 #include "Enemy.h"
@@ -97,7 +98,7 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(15.0f), reducedGravity(0.0f), currentPlayerState(PlayerStates::Walking), wallJumpTimer(0.0f),
+	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(15.0f), reducedGravity(0.0f), wallJumpTimer(0.0f),
 	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords);
@@ -126,39 +127,41 @@ Player::~Player()
 /*************************************************************************************************/
 void Player::Update(double dt)
 {
+	// Checks that the game is in a state where the player is being controlled
+	
 	// Flips the player state
 	if (grounded && _InputManager->CheckInputStatus(InputManager::Inputs::TogglePlacing) == InputManager::InputStatus::Pressed)
 	{
 		// If running set to placing
-		if (currentPlayerState == PlayerStates::Walking)
+		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking)
 		{
-			currentPlayerState = PlayerStates::Placing;
+			_GameStateManager->SetGameState(GameStateManager::GameStates::Placing);
 		}
 		// If placing set to walking
-		else if (currentPlayerState == PlayerStates::Placing)
+		else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
 		{
-			currentPlayerState = PlayerStates::Walking;
+			_GameStateManager->SetGameState(GameStateManager::GameStates::Walking);
 		}
 	}
 	// Starts running
 	if (_InputManager->CheckInputStatus(InputManager::Inputs::StartRun) == InputManager::InputStatus::Pressed)
 	{
 		// If walking or placing, start running
-		if (currentPlayerState == PlayerStates::Walking || currentPlayerState == PlayerStates::Placing)
+		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking || _GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
 		{
-			currentPlayerState = PlayerStates::Running;
+			_GameStateManager->SetGameState(GameStateManager::GameStates::Running);
 		}
 		// Otherwise goes back to walking
-		else if (currentPlayerState == PlayerStates::Running)
+		else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
 		{
-			currentPlayerState = PlayerStates::Walking;
+			_GameStateManager->SetGameState(GameStateManager::GameStates::Walking);
 		}
 
 		_Window->GetCamera()->ResetCameraOffset();
 	}
 
 	// If the player is running
-	if (currentPlayerState == PlayerStates::Running || currentPlayerState == PlayerStates::Walking)
+	if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running || _GameStateManager->GetGameState() == GameStateManager::GameStates::Walking)
 	{
 		// Checks if the player input a teleport
 		if (_InputManager->CheckInputStatus(InputManager::Inputs::MovementTeleport) == InputManager::InputStatus::Pressed)
@@ -297,7 +300,7 @@ void Player::Update(double dt)
 	}
 
 	// If the player is placing
-	else if (currentPlayerState == PlayerStates::Placing)
+	else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
 	{
 		// Gets the point the camera is looking at
 		std::pair<int, int> cursorTile = ConvertWorldCoordsToMapCoords(_Window->GetCamera()->GetLookAtPosition());

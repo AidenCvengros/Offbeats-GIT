@@ -61,7 +61,7 @@ const int bufferSize = 512;					// The default buffer size used for reading file
 		The max height for maps
 */
 /*************************************************************************************************/
-MapMatrix::MapMatrix(int width, int height) : debugDraw(false), defaultWallTexture(NULL), defaultWallColor(0)
+MapMatrix::MapMatrix(int width, int height) : System(SystemTypes::mapMatrix), debugDraw(false), defaultWallTexture(NULL), defaultWallColor(0)
 {
 	// Creates width number of columns
 	for (int i = 0; i < width; i++)

@@ -28,6 +28,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Includes the input manager to collect camera control inputs
 #include "../Engine/InputManager.h"
 #include "../Engine/Window.h"
+#include "../Engine/GameStateManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -115,7 +116,7 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 void Camera::Update(double dt)
 {
 	// Checks if the player can move the camera
-	if (centeredObject->GetPlayerState() == Player::PlayerStates::Walking || centeredObject->GetPlayerState() == Player::PlayerStates::Placing)
+	if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking || _GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
 	{
 		// Updates camera view positioning
 		UpdateRelativePosition();
@@ -126,7 +127,7 @@ void Camera::Update(double dt)
 		zDist = 15.5f;
 	}
 	// Checks if the player is using the running camera
-	else if (centeredObject->GetPlayerState() == Player::PlayerStates::Running)
+	else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
 	{
 		// Updates the Camera Box
 		UpdateCameraBox(dt);
@@ -252,7 +253,7 @@ glm::mat4 Camera::GetPerspectiveMatrix()
 	// Checks that the perspective matrix has been adjusted
 	if (perspectiveChanged)
 	{
-		if (centeredObject->GetPlayerState() == Player::PlayerStates::Running)
+		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
 		{
 			// Calculates the new perspective matrix
 			perspMat = glm::perspective(fov, aspectRatio, 0.1f, 100.0f);

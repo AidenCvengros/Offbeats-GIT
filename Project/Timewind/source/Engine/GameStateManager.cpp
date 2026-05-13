@@ -1,6 +1,6 @@
 /*************************************************************************************************/
 /*!
-\file MenuManager.h
+\file GameStateManager.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
 \date 2026.4.29
@@ -19,7 +19,7 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 #include "cppShortcuts.h"
-#include "MenuManager.h"
+#include "GameStateManager.h"
 
 // Additional Includes
 #include "../Gameplay/Menu.h"
@@ -57,7 +57,7 @@ Copyright (c) 2023 Aiden Cvengros
 		Constructor for the menu manager class
 */
 /*************************************************************************************************/
-MenuManager::MenuManager() : System(), currentMenu(NULL)
+GameStateManager::GameStateManager() : System(SystemTypes::gameStateManager), currentState(GameStates::Walking), currentMenu(NULL)
 {
 	
 }
@@ -68,7 +68,7 @@ MenuManager::MenuManager() : System(), currentMenu(NULL)
 		Initializes the menu manager
 */
 /*************************************************************************************************/
-void MenuManager::Init()
+void GameStateManager::Init()
 {
 	
 }
@@ -82,30 +82,34 @@ void MenuManager::Init()
 		The time elapsed since the previous frame.
 */
 /*************************************************************************************************/
-void MenuManager::Update(double dt)
+void GameStateManager::Update(double dt)
 {
-	// Checks that we have a current menu
-	if (currentMenu)
+	// If interacting with a menu
+	if (currentState == GameStates::Menu)
 	{
-		// Checks for menu inputs
-		if (_InputManager->CheckInputStatus({ InputManager::Inputs::Down, InputManager::Inputs::MenuSelect }) == InputManager::InputStatus::Pressed)
+		// Checks that we have a current menu
+		if (currentMenu)
 		{
-			currentMenu->IncrementOptionIndex();
-		}
-		else if (_InputManager->CheckInputStatus(InputManager::Inputs::Up) == InputManager::InputStatus::Pressed)
-		{
-			currentMenu->DecrementOptionIndex();
-		}
+			// Checks for menu inputs
+			if (_InputManager->CheckInputStatus({ InputManager::Inputs::Down, InputManager::Inputs::MenuSelect }) == InputManager::InputStatus::Pressed)
+			{
+				currentMenu->IncrementOptionIndex();
+			}
+			else if (_InputManager->CheckInputStatus(InputManager::Inputs::Up) == InputManager::InputStatus::Pressed)
+			{
+				currentMenu->DecrementOptionIndex();
+			}
 
-		// Checks for a selection
-		if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuAdvance) == InputManager::InputStatus::Pressed)
-		{
-			currentMenu->GetSelectedOption()->Selected();
-		}
-		else
-		{
-			// Otherwise runs hovering behavior
-			currentMenu->GetSelectedOption()->Hovering();
+			// Checks for a selection
+			if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuAdvance) == InputManager::InputStatus::Pressed)
+			{
+				currentMenu->GetSelectedOption()->Selected();
+			}
+			else
+			{
+				// Otherwise runs hovering behavior
+				currentMenu->GetSelectedOption()->Hovering();
+			}
 		}
 	}
 }
@@ -116,7 +120,7 @@ void MenuManager::Update(double dt)
 		Draws the current scene (currently empty)
 */
 /*************************************************************************************************/
-void MenuManager::Draw()
+void GameStateManager::Draw()
 {
 
 }
@@ -127,7 +131,7 @@ void MenuManager::Draw()
 		Shuts down the scene manager and all the scenes in it.
 */
 /*************************************************************************************************/
-void MenuManager::Shutdown()
+void GameStateManager::Shutdown()
 {
 
 }
@@ -141,9 +145,10 @@ void MenuManager::Shutdown()
 		The id of the new scene
 */
 /*************************************************************************************************/
-void MenuManager::SetCurrentMenu(Menu* newMenu)
+void GameStateManager::SetCurrentMenu(Menu* newMenu)
 {
 	currentMenu = newMenu;
+	currentState = GameStates::Menu;
 }
 
 //-------------------------------------------------------------------------------------------------

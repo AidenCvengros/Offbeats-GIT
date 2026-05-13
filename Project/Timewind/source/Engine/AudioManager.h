@@ -75,7 +75,7 @@ public:
 	    Constructor for the FILL class
 	*/
 	/*************************************************************************************************/
-	AudioManager() : stream(NULL), currentSine(0) {}
+	AudioManager() : System(SystemTypes::audioManager), stream(NULL), currentSine(0) {}
 	
 	/*************************************************************************************************/
 	/*!

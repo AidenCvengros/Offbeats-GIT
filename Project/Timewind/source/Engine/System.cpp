@@ -52,9 +52,12 @@ Copyright (c) 2023 Aiden Cvengros
 /*!
 	\brief
 		Constructor for base system class
+
+	\param _systemType
+		The type of this system
 */
 /*************************************************************************************************/
-System::System()
+System::System(SystemTypes _systemType) : systemType(_systemType)
 {
 
 }

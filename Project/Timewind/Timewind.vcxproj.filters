@@ -198,7 +198,7 @@
     <ClInclude Include="source\Gameplay\MenuOptions\SubmenuOption.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\Engine\MenuManager.h">
+    <ClInclude Include="source\Engine\GameStateManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -353,7 +353,7 @@
     <ClCompile Include="source\Gameplay\MenuOptions\SubmenuOption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Engine\MenuManager.cpp">
+    <ClCompile Include="source\Engine\GameStateManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

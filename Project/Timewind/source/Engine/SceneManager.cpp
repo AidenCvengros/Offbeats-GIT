@@ -61,7 +61,7 @@ Copyright (c) 2023 Aiden Cvengros
 		The engine of the scene manager
 */
 /*************************************************************************************************/
-SceneManager::SceneManager()
+SceneManager::SceneManager() : System(SystemTypes::sceneManager)
 {
 	// Adds the list of scenes
 	sceneList.push_back(new MainMenu());

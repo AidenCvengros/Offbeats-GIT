@@ -44,7 +44,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Gameplay/MapMatrix.h"
 #include "EffectManager.h"
 #include "AudioManager.h"
-#include "MenuManager.h"
+#include "GameStateManager.h"
 
 // Adds the camera class so a starting camera can be set
 #include "../Game_Objects/Camera.h"
@@ -136,22 +136,22 @@ void Engine::Init()
 	SceneManager* sceneManager = new SceneManager();
 	MapMatrix* mapMatrix = new MapMatrix(100, 50);
 	EffectManager* effectManager = new EffectManager();
-	MenuManager* menuManager = new MenuManager();
+	GameStateManager* gameStateManager = new GameStateManager();
 
 	// Creates and pushes back systems
-	systemList.push_back(inputManager);
-	systemList.push_back(audioManager);
-	systemList.push_back(mapMatrix);
-	systemList.push_back(objectManager);
-	systemList.push_back(texManager);
-	systemList.push_back(sceneManager);
-	systemList.push_back(effectManager);
-	systemList.push_back(menuManager);
+	systemList[System::SystemTypes::inputManager] = inputManager;
+	systemList[System::SystemTypes::audioManager] = audioManager;
+	systemList[System::SystemTypes::mapMatrix] = mapMatrix;
+	systemList[System::SystemTypes::gameObjectManager] = objectManager;
+	systemList[System::SystemTypes::textureManager] = texManager;
+	systemList[System::SystemTypes::sceneManager] = sceneManager;
+	systemList[System::SystemTypes::effectManager] = effectManager;
+	systemList[System::SystemTypes::gameStateManager] = gameStateManager;
 
 	// Loops through, initializing each system
-	for (size_t i = 0; i < systemList.size(); i++)
+	for (const auto& [key, system] : systemList)
 	{
-		systemList[i]->Init();
+		system->Init();
 	}
 }
 
@@ -180,9 +180,9 @@ void Engine::Update()
 		_Window->Update(dt);
 
 		// Loops through, updating each system
-		for (size_t i = 0; i < systemList.size(); i++)
+		for (const auto& [key, system] : systemList)
 		{
-			systemList[i]->Update(dt);
+			system->Update(dt);
 		}
 
 		// After updating, draws to screen
@@ -202,9 +202,9 @@ void Engine::Draw()
 	_Window->Draw();
 
 	// Loops through, drawing each system
-	for (size_t i = 0; i < systemList.size(); i++)
+	for (const auto& [key, system] : systemList)
 	{
-		systemList[i]->Draw();
+		system->Draw();
 	}
 
 	// Starts the mask render pass draw
@@ -224,9 +224,9 @@ void Engine::Draw()
 void Engine::Shutdown()
 {
 	// Loops through, shutting down each system
-	for (size_t i = 0; i < systemList.size(); i++)
+	for (const auto& [key, system] : systemList)
 	{
-		systemList[i]->Shutdown();
+		system->Shutdown();
 	}
 
 	// Closes the window
@@ -242,90 +242,17 @@ void Engine::Shutdown()
 		The given system type
 */
 /*********************************************************************************************/
-System* Engine::GetSystem(SystemTypes systemType)
+System* Engine::GetSystem(System::SystemTypes systemType)
 {
 	// Checks for a window system
-	if (systemType == SystemTypes::window)
+	if (systemType == System::SystemTypes::window)
 	{
 		return (System*)gameWindow;
 	}
-	// Checks for an input manager
-	else if (systemType == SystemTypes::inputManager)
+	// Otherwise returns the system
+	else
 	{
-		for (int i = 0; i < systemList.size(); i++)
-		{
-			if (dynamic_cast<InputManager*>(systemList[i]) != NULL)
-			{
-				return systemList[i];
-			}
-		}
-		return systemList[0];
-	}
-	// Checks for a scene manager
-	else if (systemType == SystemTypes::sceneManager)
-	{
-		for (int i = 0; i < systemList.size(); i++)
-		{
-			if (dynamic_cast<SceneManager*>(systemList[i]) != NULL)
-			{
-				return systemList[i];
-			}
-		}
-	}
-	// Checks for a game object manager
-	else if (systemType == SystemTypes::gameObjectManager)
-	{
-		for (int i = 0; i < systemList.size(); i++)
-		{
-			if (dynamic_cast<GameObjectManager*>(systemList[i]) != NULL)
-			{
-				return systemList[i];
-			}
-		}
-	}
-	// Checks for a texture manager
-	else if (systemType == SystemTypes::textureManager)
-	{
-		for (int i = 0; i < systemList.size(); i++)
-		{
-			if (dynamic_cast<TextureManager*>(systemList[i]) != NULL)
-			{
-				return systemList[i];
-			}
-		}
-	}
-	// Checks for a map matrix
-	else if (systemType == SystemTypes::mapMatrix)
-	{
-		for (int i = 0; i < systemList.size(); i++)
-		{
-			if (dynamic_cast<MapMatrix*>(systemList[i]) != NULL)
-			{
-				return systemList[i];
-			}
-		}
-	}
-	// Checks for an effect manager
-	else if (systemType == SystemTypes::effectManager)
-	{
-		for (int i = 0; i < systemList.size(); i++)
-		{
-			if (dynamic_cast<EffectManager*>(systemList[i]) != NULL)
-			{
-				return systemList[i];
-			}
-		}
-	}
-	// Checks for a menu manager
-	else if (systemType == SystemTypes::menuManager)
-	{
-		for (int i = 0; i < systemList.size(); i++)
-		{
-			if (dynamic_cast<MenuManager*>(systemList[i]) != NULL)
-			{
-				return systemList[i];
-			}
-		}
+		return systemList[systemType];
 	}
 
 	// Otherwise return null
@@ -340,7 +267,7 @@ System* Engine::GetSystem(SystemTypes systemType)
 /*********************************************************************************************/
 Scene* Engine::GetCurrentScene()
 {
-	return ((SceneManager*)GetSystem(Engine::SystemTypes::sceneManager))->GetCurrentScene();
+	return ((SceneManager*)GetSystem(System::SystemTypes::sceneManager))->GetCurrentScene();
 }
 
 //-------------------------------------------------------------------------------------------------

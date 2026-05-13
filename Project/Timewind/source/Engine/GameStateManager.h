@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file MenuManager.h
+\file GameStateManager.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
 \date 2026.4.29
 \brief
-    Manages what menu the player is interacting with
+    Manages what game state the player is interacting with
 
     Functions include:
         + [FILL]
@@ -14,8 +14,8 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_MenuManager_H_
-#define Syncopatience_MenuManager_H_
+#ifndef Syncopatience_GameStateManager_H_
+#define Syncopatience_GameStateManager_H_
 
 #pragma once
 
@@ -46,15 +46,26 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		Manages which menu is being used
+		Manages which game state is being used
 */
 /*************************************************************************************************/
-class MenuManager : public System
+class GameStateManager : public System
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
+
+	enum class GameStates
+	{
+		Menu,
+		Walking,
+		Placing,
+		Running,
+		Cutscene,
+		Transition,
+		Max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
@@ -74,7 +85,7 @@ public:
 			Constructor for the menu manager class
 	*/
 	/*************************************************************************************************/
-	MenuManager();
+	GameStateManager();
 
 	/*************************************************************************************************/
 	/*!
@@ -82,7 +93,7 @@ public:
 			Destructor for the menu manager class
 	*/
 	/*************************************************************************************************/
-	~MenuManager() {}
+	~GameStateManager() {}
 
 	/*************************************************************************************************/
 	/*!
@@ -122,13 +133,35 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Sets a new active game state
+
+		\param newGameState
+			The id of the new scene
+	*/
+	/*************************************************************************************************/
+	void SetGameState(GameStates newGameState) { currentState = newGameState; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets the current menu
 
-		\param sceneID
+		\param newMenu
 			The id of the new scene
 	*/
 	/*************************************************************************************************/
 	void SetCurrentMenu(Menu* newMenu);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets the active game state
+
+		\return
+			The active game state
+	*/
+	/*************************************************************************************************/
+	GameStates GetGameState() { return currentState; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -143,6 +176,7 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 
+	GameStates currentState;					// The current game state
 	Menu* currentMenu;							// The current active menu
 	
 	//---------------------------------------------------------------------------------------------
@@ -158,4 +192,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_MenuManager_H_
+#endif // Syncopatience_GameStateManager_H_

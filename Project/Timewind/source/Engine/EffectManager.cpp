@@ -67,7 +67,7 @@ Copyright (c) 2023 Aiden Cvengros
 		The game object manager to store effect objects in
 */
 /*************************************************************************************************/
-EffectManager::EffectManager() : activeEffects()
+EffectManager::EffectManager() : System(SystemTypes::effectManager), activeEffects()
 {
 	
 }

@@ -74,7 +74,7 @@ class GameObject;
 		Creates and manages the Vulkan window
 */
 /*************************************************************************************************/
-class Window : System
+class Window : public System
 {
 private:
 	GLFWwindow* window;									// Pointer to the window. NEEDS TO BE THE FIRST VARIABLE
@@ -114,6 +114,7 @@ public:
 	*/
 	/*********************************************************************************************/
 	Window(int initWidth, int initHeight, std::string initWindowName) :
+		System(SystemTypes::window),
 		window(NULL), vulkanInstance(NULL), physicalCard(NULL), logicalDevice(NULL),
 		graphicsQueue(NULL), surface(NULL), presentQueue(NULL), commandPool(NULL), commandBuffer(),
 		imageIndex(0), textureDescriptorSetLayout(NULL), descriptorPool(NULL), pipelineCache(NULL), debugMessenger(NULL),

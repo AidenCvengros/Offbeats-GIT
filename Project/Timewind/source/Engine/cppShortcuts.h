@@ -31,13 +31,13 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 #define _Window Engine::createEngine()->GetWindow()																			// Gets the window object
-#define _SceneManager ((SceneManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::sceneManager))					// Gets the scene manager
-#define _MapMatrix ((MapMatrix*)Engine::createEngine()->GetSystem(Engine::SystemTypes::mapMatrix))							// Gets the active map matrix
-#define _EffectManager ((EffectManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::effectManager))				// Gets the effect manager
-#define _TextureManager ((TextureManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::textureManager))			// Gets the texture manager
-#define _GameObjectManager ((GameObjectManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::gameObjectManager))	// Gets the game object manager
-#define _InputManager ((InputManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::inputManager))					// Gets the input manager
-#define _MenuManager ((MenuManager*)Engine::createEngine()->GetSystem(Engine::SystemTypes::menuManager))					// Gets the menu manager
+#define _SceneManager ((SceneManager*)Engine::createEngine()->GetSystem(System::SystemTypes::sceneManager))					// Gets the scene manager
+#define _MapMatrix ((MapMatrix*)Engine::createEngine()->GetSystem(System::SystemTypes::mapMatrix))							// Gets the active map matrix
+#define _EffectManager ((EffectManager*)Engine::createEngine()->GetSystem(System::SystemTypes::effectManager))				// Gets the effect manager
+#define _TextureManager ((TextureManager*)Engine::createEngine()->GetSystem(System::SystemTypes::textureManager))			// Gets the texture manager
+#define _GameObjectManager ((GameObjectManager*)Engine::createEngine()->GetSystem(System::SystemTypes::gameObjectManager))	// Gets the game object manager
+#define _InputManager ((InputManager*)Engine::createEngine()->GetSystem(System::SystemTypes::inputManager))					// Gets the input manager
+#define _GameStateManager ((GameStateManager*)Engine::createEngine()->GetSystem(System::SystemTypes::gameStateManager))		// Gets the menu manager
 
 //-------------------------------------------------------------------------------------------------
 // Public Classes

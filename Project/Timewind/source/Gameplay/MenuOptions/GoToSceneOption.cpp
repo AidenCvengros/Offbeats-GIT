@@ -24,7 +24,7 @@ Copyright (c) 2025 Aiden Cvengros
 
 // Additional Includes
 #include "../../Engine/SceneManager.h"
-#include "../../Engine/MenuManager.h"
+#include "../../Engine/GameStateManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -70,7 +70,8 @@ void GoToSceneOption::Hovering()
 void GoToSceneOption::Selected()
 {
 	_SceneManager->ChangeScene(sceneID);
-	_MenuManager->SetCurrentMenu(NULL);
+	_GameStateManager->SetCurrentMenu(NULL);
+	_GameStateManager->SetGameState(GameStateManager::GameStates::Walking);
 }
 
 //-------------------------------------------------------------------------------------------------

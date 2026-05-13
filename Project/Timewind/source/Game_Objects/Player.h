@@ -70,15 +70,6 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
-
-	enum class PlayerStates
-	{
-		Walking,
-		Running,
-		Placing,
-		Cutscene,
-		Max
-	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
@@ -154,17 +145,6 @@ public:
 	*/
 	/*************************************************************************************************/
 	bool GetIsGrounded() { return grounded; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Gets the current player state
-
-		\return
-			The current player state
-	*/
-	/*************************************************************************************************/
-	PlayerStates GetPlayerState() { return currentPlayerState; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -202,7 +182,6 @@ private:
 	bool goingMaxSpeed;							// Whether the player is going max speed
 	float maxSpeed;								// The max speed of the player
 	float reducedGravity;						// Whether the player is in a reduced gravity state (floating, just shot out of a bumper, etc.). Ticks down every frame until it runs out
-	PlayerStates currentPlayerState;			// The current player state
 	float wallJumpTimer;						// Timer that determines whether the player can wall jump
 	bool wallJumpRight;							// Whether the wall jump is going left or right
 
