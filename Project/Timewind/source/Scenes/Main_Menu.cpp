@@ -85,7 +85,7 @@ void MainMenu::LoadScene()
 
     // Creates essential game objects (player, camera, and default square)
     Player* player = new Player({ 6.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, playerTexture, { 3, 2 });
-    Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(1.0f, 1.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
+    Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(1.0f, 1.0f), player, 4.0f / 3.0f, glm::radians(50.0f));
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 0, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject(camera);
     _GameObjectManager->AddGameObject(player);

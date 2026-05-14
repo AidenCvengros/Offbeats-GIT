@@ -96,7 +96,7 @@ void Level1_4::LoadScene()
 
     // Creates essential game objects (player, camera, and default square)
     Player* player = new Player(ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition()), 0.0f, {2.0f, 2.0f}, 50, playerTexture, _MapMatrix->GetPlayerPosition());
-    Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
+    Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, 4.0f / 3.0f, glm::radians(50.0f));
     FinishFlag* finishFlag = new FinishFlag(flagTexture, {1.0f, 1.0f, 1.0f, 1.0f}, {-1, -1}, 0);
     finishFlag->SetScale({ 4.0f, 12.0f });
     finishFlag->SetTimer(20.0f);
