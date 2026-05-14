@@ -102,7 +102,7 @@ void Level1_4::LoadScene()
     finishFlag->SetTimer(20.0f);
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject(camera);
-    _GameObjectManager->AddGameObject(player);
+    _GameObjectManager->AddPlayerObject(player);
     _GameObjectManager->AddGameObject(finishFlag);
     _GameObjectManager->AddGameObject(newDefaultSquare);
     _Window->SetCamera(camera);
@@ -184,6 +184,121 @@ void Level1_4::LoadScene()
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);
+}
+
+/*************************************************************************************************/
+/*!
+    \brief
+        Refreshes the scene
+*/
+/*************************************************************************************************/
+void Level1_4::RefreshScene()
+{
+    // Fetches textures
+    Texture* playerTexture = _TextureManager->AddTexture("Assets/Sprites/Alice_Neutral.png");
+    Texture* wallTexture = _TextureManager->AddTexture("Assets/Sprites/Wall2.png");
+    Texture* destructibleWallTexture = _TextureManager->AddTexture("Assets/Sprites/Wall_Cracked.png");
+    Texture* keyTexture = _TextureManager->AddTexture("Assets/Sprites/Key.png");
+    Texture* lockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LockedWall.png");
+    Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
+    Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
+    Texture* flagTexture = _TextureManager->AddTexture("Assets/Sprites/Flag.png");
+
+    // Sets the map for the scene
+    std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
+    _MapMatrix->ReadMapFromFile("Assets/Maps/Level1-4.csv", specialTileList, false);
+
+    // Resets the player and camera positions
+    glm::vec2 playerPosition = ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerPosition());
+    _GameObjectManager->GetPlayer()->SetPosition(playerPosition);
+    _GameObjectManager->GetPlayer()->ResetVelocity();
+
+    // Creates a new finish flag
+    FinishFlag* finishFlag = new FinishFlag(flagTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, 0);
+    finishFlag->SetScale({ 4.0f, 12.0f });
+    finishFlag->SetTimer(20.0f);
+    _GameObjectManager->AddGameObject(finishFlag);
+
+    // Adds in all special tiles
+    for (auto i = specialTileList.begin(); i != specialTileList.end(); i++)
+    {
+        if (_MapMatrix->GetTile(i->second).tileObject == NULL)
+        {
+            GameObject* newObject = NULL;           // Game object pointer to store newly made objects
+
+            // Checks what character marked the special tile
+            switch (i->first)
+            {
+            case 'd':
+                newObject = new DestructibleWall(NULL, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
+                break;
+                // Generic coin
+            case 'c':
+                newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+                newObject->SetScale(glm::vec2(1.25, 1.25));
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Coin, newObject);
+                break;
+            case 'F':
+                finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second, finishFlag->GetScale()));
+                finishFlag->SetMapCoords(i->second);
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
+                break;
+            case 'f':
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
+                break;
+                // Key 1 is a key hidden behind a destructible wall
+            case '1':
+                newObject = new Key(33, keyTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
+                break;
+                // Door ! is the lock for key 1
+            case '!':
+                newObject = new LockedWall(33, 40, lockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second);
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+                break;
+                // This was a bumper hidden in a block
+            case 'B':
+                newObject = new DestructibleWall(NULL, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
+                break;
+                // This is a coin hidden in a block
+            case 'D':
+                newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+                newObject = new DestructibleWall((Item*)newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
+                break;
+            default:
+                break;
+            }
+
+            // Adds the new object to the object manager
+            if (newObject)
+            {
+                _GameObjectManager->AddGameObject(newObject);
+            }
+        }
+        // If there is already an object there
+        else
+        {
+            // Checks for finish zone
+            if (i->first == 'f')
+            {
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
+            }
+            // Checks for finish flag
+            if (i->first == 'F')
+            {
+                // Deletes the old flag
+                _MapMatrix->GetTile(i->second).tileObject->SetToBeDestroyed(true);
+
+                // Sets the new flag
+                finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second, finishFlag->GetScale()));
+                finishFlag->SetMapCoords(i->second);
+                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
+            }
+        }
+    }
 }
 
 /*************************************************************************************************/

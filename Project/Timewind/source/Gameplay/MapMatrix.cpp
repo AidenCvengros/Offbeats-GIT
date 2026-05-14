@@ -502,9 +502,12 @@ std::pair<int, int> MapMatrix::CalculateOffsetTile(int xCoord, int yCoord, bool 
 
 	\param specialTileList
 		The list of all nonstandard tiles that need filling
+
+	\param clear
+		Whether the map should be cleared before overwriting (defaults to true, only set false if refreshing map)
 */
 /*************************************************************************************************/
-void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< char, std::pair< int, int > > >& specialTileList)
+void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< char, std::pair< int, int > > >& specialTileList, bool clear)
 {
 	// Opens the file
 	std::ifstream fileInput(filename);
@@ -521,14 +524,18 @@ void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< ch
 		fileInput >> mapHeight;
 		fileInput.getline(bufferInput, bufferSize);
 
-		// Sets the size of the map matrix
-		mapMatrix.clear();
-		for (size_t i = 0; i < mapWidth; i++)
+		// Checks that we are clearing the map
+		if (clear)
 		{
-			// Makes the columns height tall
-			std::vector<MapTile> column;
-			column.resize(mapHeight, { TileStatus::Empty, NULL });
-			mapMatrix.push_back(column);
+			// Sets the size of the map matrix
+			mapMatrix.clear();
+			for (size_t i = 0; i < mapWidth; i++)
+			{
+				// Makes the columns height tall
+				std::vector<MapTile> column;
+				column.resize(mapHeight, { TileStatus::Empty, NULL });
+				mapMatrix.push_back(column);
+			}
 		}
 
 		// Fills in the map

@@ -40,6 +40,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Dependency Reference
 class GameObject;
+class Player;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -140,6 +141,22 @@ public:
 	*/
 	/*************************************************************************************************/
 	void AddGameObject(GameObject* newGameObject);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Adds the player object to the manager's list. Also sets the player reference
+	*/
+	/*************************************************************************************************/
+	void AddPlayerObject(Player* newGameObject);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Fetches the player object
+	*/
+	/*************************************************************************************************/
+	Player* GetPlayer() { return player; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -155,6 +172,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 	
 	std::multimap<int, GameObject*> gameObjectList;			// The list of game objects being managed
+	Player* player;											// Extra reference to the player for ease of use
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

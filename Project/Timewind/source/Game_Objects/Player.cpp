@@ -149,6 +149,7 @@ void Player::Update(double dt)
 		// If walking or placing, start running
 		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking || _GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
 		{
+			_SceneManager->GetCurrentScene()->RefreshScene();
 			_GameStateManager->SetGameState(GameStateManager::GameStates::Running);
 		}
 		// Otherwise goes back to walking

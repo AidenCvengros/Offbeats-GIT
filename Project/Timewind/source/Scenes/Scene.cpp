@@ -25,6 +25,10 @@ Copyright (c) 2023 Aiden Cvengros
 // Includes game object class to draw default square
 #include "../Game_Objects/GameObject.h"
 
+// Additional includes
+#include <vector>
+#include "../Gameplay/MapMatrix.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------

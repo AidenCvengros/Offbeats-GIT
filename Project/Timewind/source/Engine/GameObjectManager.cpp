@@ -27,6 +27,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Includes the game object class cause this is the game object manager
 #include "../Game_Objects/GameObject.h"
 
+#include "../Game_Objects/Player.h"
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -212,6 +214,18 @@ void GameObjectManager::DrawGlitches()
 void GameObjectManager::AddGameObject(GameObject* newGameObject)
 {
 	gameObjectList.insert(std::pair(newGameObject->GetDrawPriority(), newGameObject));
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Adds the player object to the manager's list. Also sets the player reference
+*/
+/*************************************************************************************************/
+void GameObjectManager::AddPlayerObject(Player* newGameObject)
+{
+	AddGameObject(newGameObject);
+	player = newGameObject;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -462,9 +462,12 @@ public:
 
 		\param specialTileList
 			The list of all nonstandard tiles that need filling
+
+		\param clear
+			Whether the map should be cleared before overwriting (defaults to true, only set false if refreshing map)
 	*/
 	/*************************************************************************************************/
-	void ReadMapFromFile(std::string filename, std::vector< std::pair< char, std::pair< int, int > > >& specialTileList);
+	void ReadMapFromFile(std::string filename, std::vector< std::pair< char, std::pair< int, int > > >& specialTileList, bool clear = true);
 
 	/*************************************************************************************************/
 	/*!
