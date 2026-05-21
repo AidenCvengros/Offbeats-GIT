@@ -1,21 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file GameStateManager.h
+\file CreateSubmenuOption.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.4.29
+\date 2026.5.20
 \brief
-    Manages what game state the player is interacting with
+    The menu option for creating a submenu
 
     Functions include:
         + [FILL]
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_GameStateManager_H_
-#define Syncopatience_GameStateManager_H_
+#ifndef Syncopatience_CreateSubmenuOption_H_
+#define Syncopatience_CreateSubmenuOption_H_
 
 #pragma once
 
@@ -23,14 +23,10 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "stdafx.h"
-
-// Gets the base system class
-#include "System.h"
-
-// The menu class
-#include "../Gameplay/Menu.h"
-#include <stack>
+// Base include
+#include "../../Engine/stdafx.h"
+#include "MenuOption.h"
+#include "../Menu.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -47,26 +43,15 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		Manages which game state is being used
+		The class for menu options that create submenus
 */
 /*************************************************************************************************/
-class GameStateManager : public System
+class CreateSubmenuOption : public MenuOption
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-
-	enum class GameStates
-	{
-		Walking,
-		Placing,
-		Running,								// ^^ Everything Running and below is considered "normal" gameplay
-		Menu,
-		Cutscene,
-		Transition,
-		Max
-	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
@@ -79,95 +64,52 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Constructor for the menu manager class
-	*/
-	/*************************************************************************************************/
-	GameStateManager();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Destructor for the menu manager class
-	*/
-	/*************************************************************************************************/
-	~GameStateManager() {}
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Initializes the menu manager
-	*/
-	/*************************************************************************************************/
-	void Init();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the current menu
-
-		\param
-			The time elapsed since the previous frame.
-	*/
-	/*************************************************************************************************/
-	void Update(double dt);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Draws the current menu (currently empty)
-	*/
-	/*************************************************************************************************/
-	void Draw();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Shuts down the scene manager and the current scene
-	*/
-	/*************************************************************************************************/
-	void Shutdown();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets a new active game state
-
-		\param newGameState
-			The id of the new scene
-	*/
-	/*************************************************************************************************/
-	void SetGameState(GameStates newGameState);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets the current menu
-
-		\param newMenu
-			The id of the new scene
-	*/
-	/*************************************************************************************************/
-	void SetCurrentMenu(Menu* newMenu);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Gets the active game state
-
-		\return
-			The active game state
-	*/
-	/*************************************************************************************************/
-	GameStates GetGameState() { return currentState; }
 	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the menu class
+
+		\param _optionVisual
+			The visual representation of the menu option
+
+		\param _menuType
+			The submenu this option is interacting with
+	*/
+	/*************************************************************************************************/
+	CreateSubmenuOption(GameObject* _optionVisual, Menu::MenuType _menuType) : MenuOption(_optionVisual), submenu(NULL), menuType(_menuType) {}
+
+	/*************************************************************************************************/
+	/*!
+		 \brief
+			Destructor for menu class
+	*/
+	/*************************************************************************************************/
+	~CreateSubmenuOption();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Performs the hovering behavior
+	*/
+	/*************************************************************************************************/
+	virtual void Hovering();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Performs the behavior when this option is selected
+	*/
+	/*************************************************************************************************/
+	virtual void Selected();
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
+
+	Menu* submenu;								// The scene this button goes to
+	Menu::MenuType menuType;					// The type of menu to create
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -176,11 +118,6 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-
-	GameStates currentState;					// The current game state
-	std::stack<GameStates> previousStates;		// Tracks the previous state, useful for seamlessly entering and exiting pause menu
-	std::stack<Menu*> previousMenus;			// Saves menus we went deeper than so we go back to them on our way out
-	Menu* currentMenu;							// The current active menu
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -195,4 +132,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_GameStateManager_H_
+#endif // Syncopatience_CreateSubmenuOption_H_

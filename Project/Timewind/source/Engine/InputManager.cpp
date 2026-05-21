@@ -78,6 +78,7 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::MenuSelect, GLFW_KEY_TAB));
 	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_Q));
 	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_BACKSPACE));
+	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_ESCAPE));
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_LEFT));
 	keybinds.insert(std::pair(Inputs::Left, GLFW_KEY_A));
 	keybinds.insert(std::pair(Inputs::Right, GLFW_KEY_RIGHT));
@@ -135,10 +136,10 @@ void InputManager::Update(double dt)
 		std::cout << mouseCoords.first << ", " << mouseCoords.second << std::endl;
 	}
 
-	if (CheckInputStatus(Inputs::Escape) == InputStatus::Pressed)
-	{
-		glfwSetWindowShouldClose(_Window->GetVulkanWindowPtr(), true);
-	}
+	//if (CheckInputStatus(Inputs::Escape) == InputStatus::Pressed)
+	//{
+	//	glfwSetWindowShouldClose(_Window->GetVulkanWindowPtr(), true);
+	//}
 }
 
 /*************************************************************************************************/

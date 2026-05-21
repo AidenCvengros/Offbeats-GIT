@@ -56,6 +56,15 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
+
+	enum class MenuType
+	{
+		Other,
+		Pause,
+		Options,
+		QuitConfirmation,
+		Max
+	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
@@ -76,6 +85,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	Menu();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructs a default menu type (won't do anything if type is other or max)
+
+		\param _menuType
+			The default menu type to build
+	*/
+	/*************************************************************************************************/
+	Menu(MenuType _menuType);
 
 	/*************************************************************************************************/
 	/*!
@@ -170,24 +190,29 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Turns off the menu and all associated objects
+			Turns off the menu and all associated objects and returns true. If menu is fragile, will delete and return false instead
 
 		\param resetIndex
 			Whether to reset the option index
+
+		\return
+			Returns true if the menu is now dormant. Returns false if the menu was destroyed
 	*/
 	/*************************************************************************************************/
-	void TurnOffMenu(bool resetIndex);
+	bool TurnOffMenu(bool resetIndex = true);
 
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
+	MenuType menuType;							// What type of menu this is
 	std::vector<MenuOption*> optionList;		// The list of keys the player has collected
 	std::vector<GameObject*> menuObjects;		// List of other game objects related to the menu
 	int optionIndex;							// The current index the menu is on
 	bool active;								// Whether the menu is on or off
 	bool vertical;								// Whether the menu is vertical (true) or horizontal (false)
+	bool fragile;								// Whether the menu will be destroyed when TurnOffMenu is called
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

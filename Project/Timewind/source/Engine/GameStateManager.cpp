@@ -84,31 +84,58 @@ void GameStateManager::Init()
 /*************************************************************************************************/
 void GameStateManager::Update(double dt)
 {
+	// If in "normal" gameplay
+	if (currentState <= GameStates::Running)
+	{
+		// If we get an input to pause
+		if (_InputManager->CheckInputStatus(InputManager::Inputs::Pause) == InputManager::InputStatus::Pressed)
+		{
+			SetCurrentMenu(new Menu(Menu::MenuType::Pause));
+		}
+	}
 	// If interacting with a menu
-	if (currentState == GameStates::Menu)
+	else if (currentState == GameStates::Menu)
 	{
 		// Checks that we have a current menu
 		if (currentMenu)
 		{
-			// Checks for menu inputs
-			if (_InputManager->CheckInputStatus({ InputManager::Inputs::Down, InputManager::Inputs::MenuSelect }) == InputManager::InputStatus::Pressed)
+			// Checks for a cancel input to close the pause or quit confirmation menus
+			if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuBack) == InputManager::InputStatus::Pressed)
 			{
-				currentMenu->IncrementOptionIndex();
-			}
-			else if (_InputManager->CheckInputStatus(InputManager::Inputs::Up) == InputManager::InputStatus::Pressed)
-			{
-				currentMenu->DecrementOptionIndex();
-			}
+				currentMenu->TurnOffMenu(true);
+				currentState = previousStates.top();
+				previousStates.pop();
 
-			// Checks for a selection
-			if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuAdvance) == InputManager::InputStatus::Pressed)
-			{
-				currentMenu->GetSelectedOption()->Selected();
+				// If we are going back to a menu, gets that menu
+				if (currentState == GameStates::Menu)
+				{
+					currentMenu = previousMenus.top();
+					previousMenus.pop();
+				}
 			}
+			// If the player didn't press to leave the menu, we can interact with the rest of the menu
 			else
 			{
-				// Otherwise runs hovering behavior
-				currentMenu->GetSelectedOption()->Hovering();
+				// Checks for menu inputs
+				if (_InputManager->CheckInputStatus({ InputManager::Inputs::Down, InputManager::Inputs::MenuSelect }) == InputManager::InputStatus::Pressed)
+				{
+					currentMenu->IncrementOptionIndex();
+				}
+				else if (_InputManager->CheckInputStatus(InputManager::Inputs::Up) == InputManager::InputStatus::Pressed)
+				{
+					currentMenu->DecrementOptionIndex();
+				}
+
+				// Checks for a selection
+				if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuAdvance) == InputManager::InputStatus::Pressed)
+				{
+					currentMenu->GetSelectedOption()->Selected();
+				}
+				else
+				{
+					// Otherwise runs hovering behavior
+					currentMenu->GetSelectedOption()->Hovering();
+				}
 			}
 		}
 	}
@@ -139,6 +166,25 @@ void GameStateManager::Shutdown()
 /*************************************************************************************************/
 /*!
 	\brief
+		Sets a new active game state
+
+	\param newGameState
+		The id of the new scene
+*/
+/*************************************************************************************************/
+void GameStateManager::SetGameState(GameStates newGameState)
+{
+	// Sets the new state
+	currentState = newGameState;
+
+	// Clears the stacks
+	previousStates.empty();
+	previousMenus.empty();
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Sets the current menu
 
 	\param sceneID
@@ -147,8 +193,20 @@ void GameStateManager::Shutdown()
 /*************************************************************************************************/
 void GameStateManager::SetCurrentMenu(Menu* newMenu)
 {
-	currentMenu = newMenu;
-	currentState = GameStates::Menu;
+	// Error check
+	if (newMenu)
+	{
+		// Adds the previous game state to the stack
+		previousStates.push(currentState);
+		if (currentState == GameStates::Menu)
+		{
+			previousMenus.push(currentMenu);
+		}
+
+		// Sets the new menu and puts us in the menu state
+		currentMenu = newMenu;
+		currentState = GameStates::Menu;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

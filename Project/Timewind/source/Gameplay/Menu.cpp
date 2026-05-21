@@ -25,6 +25,12 @@ Copyright (c) 2025 Aiden Cvengros
 // Additional Includes
 #include "MenuOptions/MenuOption.h"
 #include "../Game_Objects/GameObject.h"
+#include "../Game_Objects/Text.h"
+#include "../Engine/TextureManager.h"
+#include "MenuOptions/SubmenuOption.h"
+#include "MenuOptions/QuitOption.h"
+#include "../Engine/GameObjectManager.h"
+#include "MenuOptions/CreateSubmenuOption.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -56,9 +62,52 @@ Copyright (c) 2025 Aiden Cvengros
 		Constructor for the inventory class
 */
 /*************************************************************************************************/
-Menu::Menu() : optionList(), menuObjects(), optionIndex(0), active(true), vertical(true)
+Menu::Menu() : menuType(MenuType::Other), optionList(), menuObjects(), optionIndex(0), active(true), vertical(true)
 {
 
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Constructs a default menu type (won't do anything if type is other or max)
+
+	\param _menuType
+		The default menu type to build
+*/
+/*************************************************************************************************/
+Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(), optionIndex(0), active(true), vertical(true)
+{
+	if (_menuType == MenuType::Pause)
+	{
+		// Creates the pause menu
+		Text* resumeOptionText = new Text("Resume", _TextureManager->GetDefaultFont(), 24, { -2.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* optionsOptionText = new Text("Options", _TextureManager->GetDefaultFont(), 24, { -2.25f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 24, { -1.5f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		SubmenuOption* resumeOption = new SubmenuOption(resumeOptionText, this, SubmenuOption::SubmenuInteraction::Close);
+		CreateSubmenuOption* quitOption = new CreateSubmenuOption(quitOptionText, MenuType::QuitConfirmation);
+		_GameObjectManager->AddGameObject(resumeOptionText);
+		_GameObjectManager->AddGameObject(quitOptionText);
+		AddOption(resumeOption);
+		AddOption(quitOption);
+		active = false;
+		fragile = true;
+	}
+	else if (_menuType == MenuType::QuitConfirmation)
+	{
+		// Creates the main main menu menu
+		Text* yesOptionText = new Text("Yes", _TextureManager->GetDefaultFont(), 24, { -3.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* noOptionText = new Text("No", _TextureManager->GetDefaultFont(), 24, { 0.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		QuitOption* quitOption = new QuitOption(yesOptionText);
+		SubmenuOption* noOption = new SubmenuOption(noOptionText, this, SubmenuOption::SubmenuInteraction::Close);
+		_GameObjectManager->AddGameObject(yesOptionText);
+		_GameObjectManager->AddGameObject(noOptionText);
+		AddOption(quitOption);
+		AddOption(noOption);
+		active = false;
+		vertical = false;
+		fragile = true;
+	}
 }
 
 /*************************************************************************************************/
@@ -69,7 +118,17 @@ Menu::Menu() : optionList(), menuObjects(), optionIndex(0), active(true), vertic
 /*************************************************************************************************/
 Menu::~Menu()
 {
+	// Destroys each option
+	for (auto i = optionList.begin(); i != optionList.end(); i++)
+	{
+		delete* i;
+	}
 
+	// Marks all the objects for destruction
+	for (auto i = menuObjects.begin(); i != menuObjects.end(); i++)
+	{
+		(*i)->SetToBeDestroyed(true);
+	}
 }
 
 /*************************************************************************************************/
@@ -201,36 +260,50 @@ void Menu::TurnOnMenu()
 /*************************************************************************************************/
 /*!
 	\brief
-		Turns off the menu and all associated objects
+		Turns off the menu and all associated objects and returns true. If menu is fragile, will delete and return false instead
 
 	\param resetIndex
 		Whether to reset the option index
+
+	\return
+		Returns true if the menu is now dormant. Returns false if the menu was destroyed
 */
 /*************************************************************************************************/
-void Menu::TurnOffMenu(bool resetIndex)
+bool Menu::TurnOffMenu(bool resetIndex)
 {
-	// Loops through the option list
-	for (auto i = optionList.begin(); i != optionList.end(); i++)
+	// If the menu is persistent
+	if (!fragile)
 	{
-		// Turns off the option's visual
-		(*i)->GetVisual()->SetActive(false);
-	}
+		// Loops through the option list
+		for (auto i = optionList.begin(); i != optionList.end(); i++)
+		{
+			// Turns off the option's visual
+			(*i)->GetVisual()->SetActive(false);
+		}
 
-	// Loops through the objects list
-	for (auto i = menuObjects.begin(); i != menuObjects.end(); i++)
+		// Loops through the objects list
+		for (auto i = menuObjects.begin(); i != menuObjects.end(); i++)
+		{
+			// Turns off the objects
+			(*i)->SetActive(false);
+		}
+
+		// Resets the index if requested
+		if (resetIndex)
+		{
+			optionIndex = 0;
+		}
+
+		// Sets the menu to off
+		active = false;
+		return true;
+	}
+	// If the menu is fragile, destroy it
+	else
 	{
-		// Turns off the objects
-		(*i)->SetActive(false);
+		delete this;
+		return false;
 	}
-
-	// Resets the index if requested
-	if (resetIndex)
-	{
-		optionIndex = 0;
-	}
-
-	// Sets the menu to off
-	active = false;
 }
 
 //-------------------------------------------------------------------------------------------------

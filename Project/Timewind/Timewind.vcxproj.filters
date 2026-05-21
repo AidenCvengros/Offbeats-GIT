@@ -201,6 +201,9 @@
     <ClInclude Include="source\Engine\GameStateManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\Gameplay\MenuOptions\CreateSubmenuOption.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine\Engine.cpp">
@@ -354,6 +357,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Engine\GameStateManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Gameplay\MenuOptions\CreateSubmenuOption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

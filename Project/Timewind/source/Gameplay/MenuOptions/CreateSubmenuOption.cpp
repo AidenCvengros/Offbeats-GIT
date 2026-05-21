@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file MenuOption.cpp
+\file CreateSubmenuOption.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.4.27
+\date 2026.5.20
 \brief
-    The menu option base class
+    The class for the menu option that interacts with submenus
 
     Functions include:
         + [FILL]
@@ -19,11 +19,12 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "MenuOption.h"
+#include "CreateSubmenuOption.h"
 #include "../../Engine/cppShortcuts.h"
 
-// Additional includes
-#include "../../Game_Objects/GameObject.h"
+// Additional Includes
+#include "../../Engine/GameStateManager.h"
+#include "../Menu.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -55,9 +56,33 @@ Copyright (c) 2025 Aiden Cvengros
 		Destructor for menu class
 */
 /*************************************************************************************************/
-MenuOption::~MenuOption()
+CreateSubmenuOption::~CreateSubmenuOption()
 {
-    optionVisual->SetToBeDestroyed(true);
+
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Performs the hovering behavior
+*/
+/*************************************************************************************************/
+void CreateSubmenuOption::Hovering()
+{
+
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Performs the behavior when this option is selected
+*/
+/*************************************************************************************************/
+void CreateSubmenuOption::Selected()
+{
+	// Creates the new submenu
+	submenu = new Menu(menuType);
+	_GameStateManager->SetCurrentMenu(submenu);
 }
 
 //-------------------------------------------------------------------------------------------------

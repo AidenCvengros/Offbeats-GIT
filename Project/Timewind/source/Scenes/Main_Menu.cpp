@@ -31,7 +31,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Text.h"
 #include "../Gameplay/Menu.h"
 #include "../Gameplay/MenuOptions/GoToSceneOption.h"
-#include "../Gameplay/MenuOptions/QuitOption.h"
+#include "../Gameplay/MenuOptions/CreateSubmenuOption.h"
 #include "../Engine/GameStateManager.h"
 
 // Includes the map matrix class
@@ -121,7 +121,7 @@ void MainMenu::LoadScene()
     Text* startOptionText = new Text("Start", _TextureManager->GetDefaultFont(), 24, { -1.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
     Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 24, { -1.5f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
     GoToSceneOption* startOption = new GoToSceneOption(startOptionText, 101);
-    QuitOption* quitOption = new QuitOption(quitOptionText);
+    CreateSubmenuOption* quitOption = new CreateSubmenuOption(quitOptionText, Menu::MenuType::QuitConfirmation);
     _GameObjectManager->AddGameObject(startOptionText);
     _GameObjectManager->AddGameObject(quitOptionText);
     mainMenu->AddOption(startOption);

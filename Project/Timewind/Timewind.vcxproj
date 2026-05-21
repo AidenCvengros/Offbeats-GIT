@@ -168,6 +168,7 @@
     <ClInclude Include="source\Engine\Font.h" />
     <ClInclude Include="source\Engine\GameStateManager.h" />
     <ClInclude Include="source\Gameplay\ActionManager.h" />
+    <ClInclude Include="source\Gameplay\MenuOptions\CreateSubmenuOption.h" />
     <ClInclude Include="source\Gameplay\MenuOptions\GoToSceneOption.h" />
     <ClInclude Include="source\Gameplay\MenuOptions\MenuOption.h" />
     <ClInclude Include="source\Gameplay\MenuOptions\QuitOption.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="source\Engine\Font.cpp" />
     <ClCompile Include="source\Engine\GameStateManager.cpp" />
     <ClCompile Include="source\Gameplay\ActionManager.cpp" />
+    <ClCompile Include="source\Gameplay\MenuOptions\CreateSubmenuOption.cpp" />
     <ClCompile Include="source\Gameplay\MenuOptions\GoToSceneOption.cpp" />
     <ClCompile Include="source\Gameplay\MenuOptions\MenuOption.cpp" />
     <ClCompile Include="source\Gameplay\MenuOptions\QuitOption.cpp" />
