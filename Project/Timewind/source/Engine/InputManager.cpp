@@ -178,13 +178,13 @@ void InputManager::Shutdown()
 /*************************************************************************************************/
 InputManager::InputStatus InputManager::CheckInputStatus(Inputs input)
 {
-	// If the buffer check passed
-	if (timeSincePressed[(int)input].first < 0.05 && timeSincePressed[(int)input].second == true)
-	{
-		// Returns that the button was pressed
-		timeSincePressed[(int)input].second = false;
-		inputTracker[(int)input] = InputStatus::Pressed;
-	}
+	//// If the buffer check passed
+	//if (timeSincePressed[(int)input].first < 0.05 && timeSincePressed[(int)input].second == true)
+	//{
+	//	// Returns that the button was pressed
+	//	timeSincePressed[(int)input].second = false;
+	//	inputTracker[(int)input] = InputStatus::Pressed;
+	//}
 
 	// Otherwise returns the button status
 	return inputTracker[(int)input];

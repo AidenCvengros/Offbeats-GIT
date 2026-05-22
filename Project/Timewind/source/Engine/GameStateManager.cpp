@@ -102,16 +102,7 @@ void GameStateManager::Update(double dt)
 			// Checks for a cancel input to close the pause or quit confirmation menus
 			if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuBack) == InputManager::InputStatus::Pressed)
 			{
-				currentMenu->TurnOffMenu(true);
-				currentState = previousStates.top();
-				previousStates.pop();
-
-				// If we are going back to a menu, gets that menu
-				if (currentState == GameStates::Menu)
-				{
-					currentMenu = previousMenus.top();
-					previousMenus.pop();
-				}
+				TurnOffCurrentMenu();
 			}
 			// If the player didn't press to leave the menu, we can interact with the rest of the menu
 			else
@@ -178,8 +169,15 @@ void GameStateManager::SetGameState(GameStates newGameState)
 	currentState = newGameState;
 
 	// Clears the stacks
-	previousStates.empty();
-	previousMenus.empty();
+	while (!previousStates.empty())
+	{
+		previousStates.pop();
+	}
+	while (!previousMenus.empty())
+	{
+		previousMenus.pop();
+	}
+	currentMenu = NULL;
 }
 
 /*************************************************************************************************/
@@ -206,6 +204,30 @@ void GameStateManager::SetCurrentMenu(Menu* newMenu)
 		// Sets the new menu and puts us in the menu state
 		currentMenu = newMenu;
 		currentState = GameStates::Menu;
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Turns off the current menu and rolls back the game state
+*/
+/*************************************************************************************************/
+void GameStateManager::TurnOffCurrentMenu()
+{
+	currentMenu->TurnOffMenu(true);
+	currentState = previousStates.top();
+	previousStates.pop();
+
+	// If we are going back to a menu, gets that menu
+	if (currentState == GameStates::Menu)
+	{
+		currentMenu = previousMenus.top();
+		previousMenus.pop();
+	}
+	else
+	{
+		currentMenu = NULL;
 	}
 }
 

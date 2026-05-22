@@ -76,12 +76,12 @@ Menu::Menu() : menuType(MenuType::Other), optionList(), menuObjects(), optionInd
 		The default menu type to build
 */
 /*************************************************************************************************/
-Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(), optionIndex(0), active(true), vertical(true)
+Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(), optionIndex(0), active(true), vertical(true), fragile(false)
 {
 	if (_menuType == MenuType::Pause)
 	{
 		// Creates the pause menu
-		Text* resumeOptionText = new Text("Resume", _TextureManager->GetDefaultFont(), 24, { -2.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* resumeOptionText = new Text("Resume", _TextureManager->GetDefaultFont(), 24, { -2.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		Text* optionsOptionText = new Text("Options", _TextureManager->GetDefaultFont(), 24, { -2.25f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 24, { -1.5f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		SubmenuOption* resumeOption = new SubmenuOption(resumeOptionText, this, SubmenuOption::SubmenuInteraction::Close);
@@ -121,7 +121,7 @@ Menu::~Menu()
 	// Destroys each option
 	for (auto i = optionList.begin(); i != optionList.end(); i++)
 	{
-		delete* i;
+		delete (*i);
 	}
 
 	// Marks all the objects for destruction

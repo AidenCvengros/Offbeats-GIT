@@ -25,6 +25,7 @@ Copyright (c) 2025 Aiden Cvengros
 // Additional Includes
 #include "../../Engine/SceneManager.h"
 #include "../Menu.h"
+#include "../../Engine/GameStateManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -78,7 +79,7 @@ void SubmenuOption::Selected()
 	else if (interaction == SubmenuInteraction::Close)
 	{
 		// Closes the menu
-		submenu->TurnOffMenu(true);
+		_GameStateManager->TurnOffCurrentMenu();
 	}
 	else if (interaction == SubmenuInteraction::Toggle)
 	{
@@ -86,7 +87,7 @@ void SubmenuOption::Selected()
 		if (submenu->GetActive())
 		{
 			// Turns off the submenu
-			submenu->TurnOffMenu(false);
+			_GameStateManager->TurnOffCurrentMenu();
 		}
 		else
 		{
