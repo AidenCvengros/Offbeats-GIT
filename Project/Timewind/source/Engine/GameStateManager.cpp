@@ -26,6 +26,12 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Gameplay/MenuOptions/MenuOption.h"
 #include "InputManager.h"
 #include "../Game_Objects/GameObject.h"
+#include "Window.h"
+
+// Includes glfw input reading functionality
+#define VK_USE_PLATFORM_WIN32_KHR
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -70,7 +76,7 @@ GameStateManager::GameStateManager() : System(SystemTypes::gameStateManager), cu
 /*************************************************************************************************/
 void GameStateManager::Init()
 {
-	
+	glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 /*************************************************************************************************/
@@ -204,6 +210,7 @@ void GameStateManager::SetCurrentMenu(Menu* newMenu)
 		// Sets the new menu and puts us in the menu state
 		currentMenu = newMenu;
 		currentState = GameStates::Menu;
+		glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
 
@@ -228,6 +235,7 @@ void GameStateManager::TurnOffCurrentMenu()
 	else
 	{
 		currentMenu = NULL;
+		glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	}
 }
 

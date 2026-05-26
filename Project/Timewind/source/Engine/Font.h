@@ -124,6 +124,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the filename for the font
+
+		\return
+			The filename
+	*/
+	/*************************************************************************************************/
+	const std::string& GetFilename() { return filename; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the inverted width of the texture aka the width of a character
 
 		\return

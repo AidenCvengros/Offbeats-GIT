@@ -155,6 +155,20 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Adds a font to the manager's list.
+
+		\param filename_
+			The name of the font file
+
+		\return
+			Pointer to the new font
+	*/
+	/*************************************************************************************************/
+	Font* AddFont(std::string filename_);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Gets the default font
 
 		\return
@@ -188,6 +202,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	std::list<Texture*> textureList;			// The list of game objects being managed
+	std::list<Font*> fontList;					// The list of game fonts
 
 	Font* defaultFont;							// The default font to be used
 

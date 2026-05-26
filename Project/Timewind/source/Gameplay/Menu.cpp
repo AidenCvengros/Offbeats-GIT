@@ -84,11 +84,17 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 		Text* resumeOptionText = new Text("Resume", _TextureManager->GetDefaultFont(), 24, { -2.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		Text* optionsOptionText = new Text("Options", _TextureManager->GetDefaultFont(), 24, { -2.25f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 24, { -1.5f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		resumeOptionText->SetFollowingCamera(true);
+		optionsOptionText->SetFollowingCamera(true);
+		quitOptionText->SetFollowingCamera(true);
 		SubmenuOption* resumeOption = new SubmenuOption(resumeOptionText, this, SubmenuOption::SubmenuInteraction::Close);
+		CreateSubmenuOption* optionsOption = new CreateSubmenuOption(optionsOptionText, MenuType::Options);
 		CreateSubmenuOption* quitOption = new CreateSubmenuOption(quitOptionText, MenuType::QuitConfirmation);
 		_GameObjectManager->AddGameObject(resumeOptionText);
+		_GameObjectManager->AddGameObject(optionsOptionText);
 		_GameObjectManager->AddGameObject(quitOptionText);
 		AddOption(resumeOption);
+		AddOption(optionsOption);
 		AddOption(quitOption);
 		active = false;
 		fragile = true;
@@ -96,16 +102,43 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 	else if (_menuType == MenuType::QuitConfirmation)
 	{
 		// Creates the main main menu menu
-		Text* yesOptionText = new Text("Yes", _TextureManager->GetDefaultFont(), 24, { -3.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Text* noOptionText = new Text("No", _TextureManager->GetDefaultFont(), 24, { 0.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* yesOptionText = new Text("Yes", _TextureManager->GetDefaultFont(), 24, { -3.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* noOptionText = new Text("No", _TextureManager->GetDefaultFont(), 24, { 0.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		GameObject* background = new GameObject({ -4.0f, -1.0f }, 0.0f, { 8.0f, 3.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 0.5f });
+		yesOptionText->SetFollowingCamera(true);
+		noOptionText->SetFollowingCamera(true);
+		background->SetFollowingCamera(true);
 		QuitOption* quitOption = new QuitOption(yesOptionText);
 		SubmenuOption* noOption = new SubmenuOption(noOptionText, this, SubmenuOption::SubmenuInteraction::Close);
 		_GameObjectManager->AddGameObject(yesOptionText);
 		_GameObjectManager->AddGameObject(noOptionText);
+		_GameObjectManager->AddGameObject(background);
 		AddOption(quitOption);
 		AddOption(noOption);
+		AddMenuObject(background);
 		active = false;
 		vertical = false;
+		fragile = true;
+	}
+	else if (_menuType == MenuType::Options)
+	{
+		// Creates the main main menu menu
+		Text* yesOptionText = new Text("Yes", _TextureManager->GetDefaultFont(), 24, { -1.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* noOptionText = new Text("No", _TextureManager->GetDefaultFont(), 24, { -1.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		GameObject* background = new GameObject({ -2.0f, -1.0f }, 0.0f, { 4.0f, 5.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 0.5f });
+		yesOptionText->SetFollowingCamera(true);
+		noOptionText->SetFollowingCamera(true);
+		background->SetFollowingCamera(true);
+		QuitOption* quitOption = new QuitOption(yesOptionText);
+		SubmenuOption* noOption = new SubmenuOption(noOptionText, this, SubmenuOption::SubmenuInteraction::Close);
+		_GameObjectManager->AddGameObject(yesOptionText);
+		_GameObjectManager->AddGameObject(noOptionText);
+		_GameObjectManager->AddGameObject(background);
+		AddOption(quitOption);
+		AddOption(noOption);
+		AddMenuObject(background);
+		active = false;
+		vertical = true;
 		fragile = true;
 	}
 }

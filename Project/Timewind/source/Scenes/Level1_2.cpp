@@ -86,6 +86,7 @@ void Level1_2::LoadScene()
     Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
     Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
     Texture* flagTexture = _TextureManager->AddTexture("Assets/Sprites/Flag.png");
+    _TextureManager->SetDefaultFont(_TextureManager->AddFont("Assets/Fonts/Retrofit_Small-Regular.otf"));
 
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });

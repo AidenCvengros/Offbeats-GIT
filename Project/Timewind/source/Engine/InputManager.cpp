@@ -100,7 +100,6 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::F3, GLFW_KEY_F3));
 
 	// Grabs the cursor and uses it's current position as the starting for the program
-	glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwGetCursorPos(_Window->GetVulkanWindowPtr(), &mouseCoords.first, &mouseCoords.second);
 }
 

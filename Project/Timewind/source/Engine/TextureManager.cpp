@@ -81,8 +81,7 @@ TextureManager::~TextureManager()
 /*************************************************************************************************/
 void TextureManager::Init()
 {
-	Font* retrofitFont = new Font("Assets/Fonts/Retrofit_Small-Regular.otf");
-	_TextureManager->SetDefaultFont(retrofitFont);
+	
 }
 
 /*************************************************************************************************/
@@ -101,8 +100,18 @@ void TextureManager::Clear()
 		it++;
 	}
 
+	// Walks through the font list
+	for (auto it = fontList.begin(); it != fontList.end();)
+	{
+		// Frees the font
+		delete* it;
+		it++;
+	}
+
 	// Clears the texture list
 	textureList.clear();
+	fontList.clear();
+	defaultFont = NULL;
 }
 
 /*************************************************************************************************/
@@ -114,12 +123,6 @@ void TextureManager::Clear()
 void TextureManager::Shutdown()
 {
 	Clear();
-
-	// If there is a default font, delete it
-	if (defaultFont)
-	{
-		defaultFont->Free();
-	}
 }
 
 /*************************************************************************************************/
@@ -166,6 +169,50 @@ Texture* TextureManager::AddTexture(std::string filename_)
 
 		// Returns the new texture
 		return newTexture;
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Adds a font to the manager's list.
+
+	\param filename_
+		The name of the font file
+
+	\return
+		Pointer to the new font
+*/
+/*************************************************************************************************/
+Font* TextureManager::AddFont(std::string filename_)
+{
+	// Loops through the font list to see if this file has already been loaded
+	auto it = fontList.begin();
+	for (; it != fontList.end(); it++)
+	{
+		if ((*it)->GetFilename() == filename_)
+		{
+			break;
+		}
+	}
+
+	// If this file has been loaded
+	if (it != fontList.end())
+	{
+		// Return that font
+		return *it;
+	}
+	// If the file has not been loaded yet
+	else
+	{
+		// Creates the new texture
+		Font* newFont = new Font(filename_);
+
+		// Puts the new texture on the list
+		fontList.push_back(newFont);
+
+		// Returns the new texture
+		return newFont;
 	}
 }
 

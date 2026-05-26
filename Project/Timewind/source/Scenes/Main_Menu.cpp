@@ -75,6 +75,7 @@ void MainMenu::LoadScene()
     // Creates textures
     Texture* playerTexture = _TextureManager->AddTexture("Assets/Sprites/Alice_Neutral.png");
     Texture* wallTexture = _TextureManager->AddTexture("Assets/Sprites/Wall2.png");
+    _TextureManager->SetDefaultFont(_TextureManager->AddFont("Assets/Fonts/Retrofit_Small-Regular.otf"));
 
     // Sets the default wall for the scene
     _MapMatrix->SetDefaultWallTexture(wallTexture, { 0.4f, 0.075f, 0.0f, 1.0f });
