@@ -135,12 +135,14 @@ void Player::Update(double dt)
 		// If running set to placing
 		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking)
 		{
-			_GameStateManager->SetGameState(GameStateManager::GameStates::Placing);
+			// Updates the inventory ui
+			inventory->PlacingMode(true);
 		}
 		// If placing set to walking
 		else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
 		{
 			_GameStateManager->SetGameState(GameStateManager::GameStates::Walking);
+			inventory->PlacingMode(false);
 		}
 	}
 	// Starts running
@@ -151,6 +153,7 @@ void Player::Update(double dt)
 		{
 			_SceneManager->GetCurrentScene()->RefreshScene();
 			_GameStateManager->SetGameState(GameStateManager::GameStates::Running);
+			inventory->PlacingMode(false);
 		}
 		// Otherwise goes back to walking
 		else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
@@ -759,34 +762,34 @@ std::pair<int, int> Player::CalculatePlayerMapPositions(glm::vec2 position, Play
 	switch (anchorPoint)
 	{
 	case Player::Positions::Center:
-		return ConvertWorldCoordsToMapCoords(position + (GetScale() * 0.5f));
+		return ConvertWorldCoordsToMapCoords(position);
 		break;
 	case Player::Positions::BottomLeftOut:
-		return ConvertWorldCoordsToMapCoords(position.x + lowerInnerGap, position.y);
+		return ConvertWorldCoordsToMapCoords(position.x - (GetScale().x * 0.5f) + lowerInnerGap, position.y - (GetScale().y * 0.5f));
 		break;
 	case Player::Positions::BottomLeftIn:
-		return ConvertWorldCoordsToMapCoords(position.x + upperInnerGap, position.y);
+		return ConvertWorldCoordsToMapCoords(position.x - (GetScale().x * 0.5f) + upperInnerGap, position.y - (GetScale().y * 0.5f));
 		break;
 	case Player::Positions::BottomRightIn:
-		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x - upperInnerGap, position.y);
+		return ConvertWorldCoordsToMapCoords(position.x + (GetScale().x * 0.5f) - upperInnerGap, position.y - (GetScale().y * 0.5f));
 		break;
 	case Player::Positions::BottomRightOut:
-		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x - lowerInnerGap, position.y);
+		return ConvertWorldCoordsToMapCoords(position.x + (GetScale().x * 0.5f) - lowerInnerGap, position.y - (GetScale().y * 0.5f));
 		break;
 	case Player::Positions::TopLeftOut:
-		return ConvertWorldCoordsToMapCoords(position.x, position.y + GetScale().y);
+		return ConvertWorldCoordsToMapCoords(position.x - (GetScale().x * 0.5f), position.y + GetScale().y + (GetScale().y * 0.5f));
 		break;
 	case Player::Positions::TopLeftIn:
-		return ConvertWorldCoordsToMapCoords(position.x + upperInnerGap, position.y + GetScale().y - upperInnerGap);
+		return ConvertWorldCoordsToMapCoords(position.x - (GetScale().x * 0.5f) + upperInnerGap, position.y + (GetScale().y * 0.5f) - upperInnerGap);
 		break;
 	case Player::Positions::TopRightIn:
-		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x - upperInnerGap, position.y + GetScale().y - upperInnerGap);
+		return ConvertWorldCoordsToMapCoords(position.x + (GetScale().x * 0.5f) - upperInnerGap, position.y + (GetScale().y * 0.5f) - upperInnerGap);
 		break;
 	case Player::Positions::TopRightOut:
-		return ConvertWorldCoordsToMapCoords(position.x + GetScale().x, position.y + GetScale().y);
+		return ConvertWorldCoordsToMapCoords(position.x + (GetScale().x * 0.5f), position.y + (GetScale().y * 0.5f));
 		break;
 	case Player::Positions::TopCenter:
-		return ConvertWorldCoordsToMapCoords(position.x + (GetScale().x * 0.5f), position.y + GetScale().y - upperInnerGap);
+		return ConvertWorldCoordsToMapCoords(position.x, position.y + (GetScale().y * 0.5f) - upperInnerGap);
 		break;
 	default:
 		// If something went wrong, returns (-1, -1)
@@ -848,15 +851,5 @@ void Player::Hovering(std::pair<int, int> targetTileCoords)
 	else
 	{
 		_SceneManager->GetCurrentScene()->DrawTile(targetTileCoords, {1.0f, 0.0f, 0.0f, 0.5f});
-	}
-
-	// Cycles through the sticker selection when the player presses left or right
-	if (_InputManager->CheckInputStatus(InputManager::Inputs::Right) == InputManager::InputStatus::Pressed)
-	{
-		inventory->IncrementSelectedSticker();
-	}
-	else if (_InputManager->CheckInputStatus(InputManager::Inputs::Left) == InputManager::InputStatus::Pressed)
-	{
-		inventory->DecrementSelectedSticker();
 	}
 }

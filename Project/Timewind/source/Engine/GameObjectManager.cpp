@@ -110,6 +110,10 @@ void GameObjectManager::Update(double dt)
 			(*it).second->Update(dt);
 			it++;
 		}
+		else
+		{
+			it++;
+		}
 	}
 }
 

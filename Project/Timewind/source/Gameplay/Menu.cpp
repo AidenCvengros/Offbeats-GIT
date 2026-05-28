@@ -31,6 +31,7 @@ Copyright (c) 2025 Aiden Cvengros
 #include "MenuOptions/QuitOption.h"
 #include "../Engine/GameObjectManager.h"
 #include "MenuOptions/CreateSubmenuOption.h"
+#include "MenuOptions/GoToSceneOption.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -81,15 +82,15 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 	if (_menuType == MenuType::Pause)
 	{
 		// Creates the pause menu
-		Text* resumeOptionText = new Text("Resume", _TextureManager->GetDefaultFont(), 24, { -2.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Text* optionsOptionText = new Text("Options", _TextureManager->GetDefaultFont(), 24, { -2.25f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 24, { -1.5f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* resumeOptionText = new Text("RESUME", _TextureManager->GetDefaultFont(), 18, { -4.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* optionsOptionText = new Text("OPTIONS", _TextureManager->GetDefaultFont(), 18, { -4.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* quitOptionText = new Text("MAIN MENU", _TextureManager->GetDefaultFont(), 18, { -4.0f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		resumeOptionText->SetFollowingCamera(true);
 		optionsOptionText->SetFollowingCamera(true);
 		quitOptionText->SetFollowingCamera(true);
 		SubmenuOption* resumeOption = new SubmenuOption(resumeOptionText, this, SubmenuOption::SubmenuInteraction::Close);
 		CreateSubmenuOption* optionsOption = new CreateSubmenuOption(optionsOptionText, MenuType::Options);
-		CreateSubmenuOption* quitOption = new CreateSubmenuOption(quitOptionText, MenuType::QuitConfirmation);
+		GoToSceneOption* quitOption = new GoToSceneOption(quitOptionText, 0);
 		_GameObjectManager->AddGameObject(resumeOptionText);
 		_GameObjectManager->AddGameObject(optionsOptionText);
 		_GameObjectManager->AddGameObject(quitOptionText);
@@ -98,13 +99,17 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 		AddOption(quitOption);
 		active = false;
 		fragile = true;
+		GameObject* menuCursor = new GameObject({ 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }, 91, true, { 1.0f, 1.0f, 1.0f, 1.0f });
+		_GameObjectManager->AddGameObject(menuCursor);
+		SetCursorObject(menuCursor, { -1.0f, 0.5f });
+		menuCursor->SetFollowingCamera(true);
 	}
 	else if (_menuType == MenuType::QuitConfirmation)
 	{
 		// Creates the main main menu menu
-		Text* yesOptionText = new Text("Yes", _TextureManager->GetDefaultFont(), 24, { -3.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Text* noOptionText = new Text("No", _TextureManager->GetDefaultFont(), 24, { 0.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
-		GameObject* background = new GameObject({ -4.0f, -1.0f }, 0.0f, { 8.0f, 3.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 0.5f });
+		Text* yesOptionText = new Text("YES", _TextureManager->GetDefaultFont(), 24, { -5.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* noOptionText = new Text("NO", _TextureManager->GetDefaultFont(), 24, { 0.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		GameObject* background = new GameObject({ 0.0f, 0.0f }, 0.0f, { 8.0f, 3.0f }, 90, true, { 0.0f, 0.0f, 0.0f, 0.8f });
 		yesOptionText->SetFollowingCamera(true);
 		noOptionText->SetFollowingCamera(true);
 		background->SetFollowingCamera(true);
@@ -119,12 +124,16 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 		active = false;
 		vertical = false;
 		fragile = true;
+		GameObject* menuCursor = new GameObject({ 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }, 91, true, { 1.0f, 1.0f, 1.0f, 1.0f });
+		_GameObjectManager->AddGameObject(menuCursor);
+		SetCursorObject(menuCursor, { 1.0f, -1.0f });
+		menuCursor->SetFollowingCamera(true);
 	}
 	else if (_menuType == MenuType::Options)
 	{
 		// Creates the main main menu menu
-		Text* yesOptionText = new Text("Yes", _TextureManager->GetDefaultFont(), 24, { -1.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Text* noOptionText = new Text("No", _TextureManager->GetDefaultFont(), 24, { -1.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* yesOptionText = new Text("PLACEHOLDER", _TextureManager->GetDefaultFont(), 24, { -1.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* noOptionText = new Text("CLOSE", _TextureManager->GetDefaultFont(), 24, { -1.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		GameObject* background = new GameObject({ -2.0f, -1.0f }, 0.0f, { 4.0f, 5.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 0.5f });
 		yesOptionText->SetFollowingCamera(true);
 		noOptionText->SetFollowingCamera(true);
@@ -140,6 +149,10 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 		active = false;
 		vertical = true;
 		fragile = true;
+		GameObject* menuCursor = new GameObject({ 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }, 91, true, { 1.0f, 1.0f, 1.0f, 1.0f });
+		_GameObjectManager->AddGameObject(menuCursor);
+		SetCursorObject(menuCursor, { -1.0f, 0.0f });
+		menuCursor->SetFollowingCamera(true);
 	}
 }
 
@@ -161,6 +174,12 @@ Menu::~Menu()
 	for (auto i = menuObjects.begin(); i != menuObjects.end(); i++)
 	{
 		(*i)->SetToBeDestroyed(true);
+	}
+
+	// Deletes the cursor object
+	if (cursorObject)
+	{
+		cursorObject->SetToBeDestroyed(true);
 	}
 }
 
@@ -210,6 +229,28 @@ void Menu::AddMenuObject(GameObject* newObject)
 /*************************************************************************************************/
 /*!
 	\brief
+		Adds the cursor object with the given offset
+
+	\param newCursorObject
+		The new cursor object
+
+	\param newCursorOffset
+		The cursor offset for the menu
+*/
+/*************************************************************************************************/
+void Menu::SetCursorObject(GameObject* newCursorObject, glm::vec2 newCursorOffset)
+{
+	// Sets the variables
+	cursorObject = newCursorObject;
+	cursorOffset = newCursorOffset;
+
+	// Positions the cursor object correctly
+	cursorObject->SetPosition(optionList[optionIndex]->GetVisual()->GetPosition() + cursorOffset);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Returns the sticker at the selected index
 
 	\return
@@ -244,6 +285,12 @@ void Menu::IncrementOptionIndex()
 	{
 		optionIndex = 0;
 	}
+
+	// Positions the cursor object correctly
+	if (cursorObject)
+	{
+		cursorObject->SetPosition(optionList[optionIndex]->GetVisual()->GetPosition() + cursorOffset);
+	}
 }
 
 /*************************************************************************************************/
@@ -260,7 +307,13 @@ void Menu::DecrementOptionIndex()
 	// Checks if we overflow
 	if (optionIndex < 0)
 	{
-		optionIndex = optionList.size();
+		optionIndex = optionList.size() - 1;
+	}
+
+	// Positions the cursor object correctly
+	if (cursorObject)
+	{
+		cursorObject->SetPosition(optionList[optionIndex]->GetVisual()->GetPosition() + cursorOffset);
 	}
 }
 
@@ -277,6 +330,11 @@ void Menu::TurnOnMenu()
 	{
 		// Turns on the option's visual
 		(*i)->GetVisual()->SetActive(true);
+		// Checks that the object can be rendered
+		if ((*i)->GetVisual()->GetTexture())
+		{
+			(*i)->GetVisual()->SetRender(true);
+		}
 	}
 
 	// Loops through the objects list
@@ -284,10 +342,19 @@ void Menu::TurnOnMenu()
 	{
 		// Turns on the objects
 		(*i)->SetActive(true);
+		(*i)->SetRender(true);
 	}
 
 	// Sets the menu to on
 	active = true;
+
+	// Positions the cursor object correctly
+	if (cursorObject)
+	{
+		cursorObject->SetActive(true);
+		cursorObject->SetRender(true);
+		cursorObject->SetPosition(optionList[optionIndex]->GetVisual()->GetPosition() + cursorOffset);
+	}
 }
 
 /*************************************************************************************************/
@@ -312,6 +379,7 @@ bool Menu::TurnOffMenu(bool resetIndex)
 		{
 			// Turns off the option's visual
 			(*i)->GetVisual()->SetActive(false);
+			(*i)->GetVisual()->SetRender(false);
 		}
 
 		// Loops through the objects list
@@ -319,12 +387,20 @@ bool Menu::TurnOffMenu(bool resetIndex)
 		{
 			// Turns off the objects
 			(*i)->SetActive(false);
+			(*i)->SetRender(false);
 		}
 
 		// Resets the index if requested
 		if (resetIndex)
 		{
 			optionIndex = 0;
+		}
+
+		// Positions the cursor object correctly
+		if (cursorObject)
+		{
+			cursorObject->SetActive(false);
+			cursorObject->SetRender(false);
 		}
 
 		// Sets the menu to off

@@ -49,6 +49,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Private Constants
 //-------------------------------------------------------------------------------------------------
 
+GameObject* sizeChecker;
+
 //-------------------------------------------------------------------------------------------------
 // Public Declarations
 //-------------------------------------------------------------------------------------------------
@@ -96,8 +98,8 @@ void Sandbox::LoadScene()
     Player* player = new Player({ 4.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, playerTexture, { 2, 2 });
     Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(0.0f, 0.0f), player, _Window->GetWindowSize().x / _Window->GetWindowSize().y, glm::radians(50.0f));
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
-    _GameObjectManager->AddGameObject((GameObject*)camera);
-    _GameObjectManager->AddGameObject((GameObject*)player);
+    _GameObjectManager->AddGameObject(camera);
+    _GameObjectManager->AddPlayerObject(player);
     _GameObjectManager->AddGameObject(newDefaultSquare);
     _Window->SetCamera(camera);
     SetDefaultSquare(newDefaultSquare);
@@ -216,6 +218,9 @@ void Sandbox::LoadScene()
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);
+
+    sizeChecker = new GameObject({ 0.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 92, true, { 1.0f, 1.0f, 1.0f, 1.0f });
+    _GameObjectManager->AddGameObject(sizeChecker);
 }
 
 /*************************************************************************************************/
@@ -229,7 +234,8 @@ void Sandbox::LoadScene()
 /*************************************************************************************************/
 void Sandbox::Update(double dt)
 {
-
+    float size = 4.0f * (sin(Engine::createEngine()->GetTotalTime()) + 1.1f);
+    sizeChecker->SetScale({ size, size });
 }
 
 /*************************************************************************************************/

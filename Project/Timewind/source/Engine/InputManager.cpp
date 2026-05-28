@@ -75,7 +75,7 @@ void InputManager::Init()
 	keybinds.insert(std::pair(Inputs::StartRun, GLFW_KEY_ENTER));
 	keybinds.insert(std::pair(Inputs::MenuAdvance, GLFW_KEY_E));
 	keybinds.insert(std::pair(Inputs::MenuAdvance, GLFW_KEY_ENTER));
-	keybinds.insert(std::pair(Inputs::MenuSelect, GLFW_KEY_TAB));
+	//keybinds.insert(std::pair(Inputs::MenuSelect, GLFW_KEY_TAB));
 	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_Q));
 	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_BACKSPACE));
 	keybinds.insert(std::pair(Inputs::MenuBack, GLFW_KEY_ESCAPE));

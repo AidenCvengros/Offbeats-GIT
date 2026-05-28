@@ -98,6 +98,11 @@ void GameStateManager::Update(double dt)
 		{
 			SetCurrentMenu(new Menu(Menu::MenuType::Pause));
 		}
+		// Otherwise, if we are placing we can update the inventory menu
+		else if (currentState == GameStates::Placing)
+		{
+			UpdateCurrentMenu();
+		}
 	}
 	// If interacting with a menu
 	else if (currentState == GameStates::Menu)
@@ -113,26 +118,7 @@ void GameStateManager::Update(double dt)
 			// If the player didn't press to leave the menu, we can interact with the rest of the menu
 			else
 			{
-				// Checks for menu inputs
-				if (_InputManager->CheckInputStatus({ InputManager::Inputs::Down, InputManager::Inputs::MenuSelect }) == InputManager::InputStatus::Pressed)
-				{
-					currentMenu->IncrementOptionIndex();
-				}
-				else if (_InputManager->CheckInputStatus(InputManager::Inputs::Up) == InputManager::InputStatus::Pressed)
-				{
-					currentMenu->DecrementOptionIndex();
-				}
-
-				// Checks for a selection
-				if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuAdvance) == InputManager::InputStatus::Pressed)
-				{
-					currentMenu->GetSelectedOption()->Selected();
-				}
-				else
-				{
-					// Otherwise runs hovering behavior
-					currentMenu->GetSelectedOption()->Hovering();
-				}
+				UpdateCurrentMenu();
 			}
 		}
 	}
@@ -193,9 +179,12 @@ void GameStateManager::SetGameState(GameStates newGameState)
 
 	\param sceneID
 		The id of the new scene
+	
+	\param isPlacing
+		Set true if game mode should be set to placing
 */
 /*************************************************************************************************/
-void GameStateManager::SetCurrentMenu(Menu* newMenu)
+void GameStateManager::SetCurrentMenu(Menu* newMenu, bool isPlacing)
 {
 	// Error check
 	if (newMenu)
@@ -209,8 +198,16 @@ void GameStateManager::SetCurrentMenu(Menu* newMenu)
 
 		// Sets the new menu and puts us in the menu state
 		currentMenu = newMenu;
-		currentState = GameStates::Menu;
-		glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		if (!isPlacing)
+		{
+			currentState = GameStates::Menu;
+			glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+		else
+		{
+			currentState = GameStates::Placing;
+			glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		}
 	}
 }
 
@@ -242,3 +239,48 @@ void GameStateManager::TurnOffCurrentMenu()
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Checks for inputs to affect the current menu
+*/
+/*************************************************************************************************/
+void GameStateManager::UpdateCurrentMenu()
+{
+	if (currentMenu->GetIsVertical())
+	{
+		// Checks for menu inputs
+		if (_InputManager->CheckInputStatus({ InputManager::Inputs::Down, InputManager::Inputs::MenuSelect }) == InputManager::InputStatus::Pressed)
+		{
+			currentMenu->IncrementOptionIndex();
+		}
+		else if (_InputManager->CheckInputStatus(InputManager::Inputs::Up) == InputManager::InputStatus::Pressed)
+		{
+			currentMenu->DecrementOptionIndex();
+		}
+	}
+	else
+	{
+		// Checks for menu inputs
+		if (_InputManager->CheckInputStatus({ InputManager::Inputs::Right, InputManager::Inputs::MenuSelect }) == InputManager::InputStatus::Pressed)
+		{
+			currentMenu->IncrementOptionIndex();
+		}
+		else if (_InputManager->CheckInputStatus(InputManager::Inputs::Left) == InputManager::InputStatus::Pressed)
+		{
+			currentMenu->DecrementOptionIndex();
+		}
+	}
+
+	// Checks for a selection
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::MenuAdvance) == InputManager::InputStatus::Pressed)
+	{
+		currentMenu->GetSelectedOption()->Selected();
+	}
+	else
+	{
+		// Otherwise runs hovering behavior
+		currentMenu->GetSelectedOption()->Hovering();
+	}
+}

@@ -629,10 +629,21 @@ public:
 			Sets whether the game object should be drawn
 
 		\param newRender
-			The game object's new render value (0 for don't draw, 1 for draw, 2 for text
+			The game object's new render value (0 for don't draw, 1 for draw, 2 for text)
 	*/
 	/*************************************************************************************************/
 	void SetRender(int newRender);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets a new texture for the game object
+
+		\param newTexture
+			The new texture for the game object
+	*/
+	/*************************************************************************************************/
+	void SetTexture(Texture* newTexture);
 
 	/*************************************************************************************************/
 	/*!
@@ -762,7 +773,7 @@ private:
 	double moveTimeLeft;						// How much longer the move has
 	bool moveSmooth;							// Should the movement be smooth
 
-	int render;									// Says whether this game object should be rendered (1 is yes, 0 is no, 2 is for drawing text
+	int render;									// Says whether this game object should be rendered (1 is yes, 0 is no, 2 is for drawing text)
 	Texture* texture;							// Pointer to the object's texture (will not be referenced if render is false)
 	glm::vec4 color;							// The color of the game object
 	bool drawThisFrame;							// If this is true, draws the game object during this frame but turns it off afterwards

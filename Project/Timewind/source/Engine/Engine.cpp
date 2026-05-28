@@ -171,6 +171,7 @@ void Engine::Update()
 		double dt = std::min(newTime - lastTime, 0.1);
 		lastTime = newTime;
 		dt = fmin(dt, 0.1);
+		totalTime += dt;
 #ifdef _DEBUG
 		// Prints out the framerate. Debug only
 		//std::cout << 1 / dt << std::endl;
@@ -280,7 +281,7 @@ Scene* Engine::GetCurrentScene()
 		Engine class initializer.
 */
 /*********************************************************************************************/
-Engine::Engine() : gameWindow(NULL), lastTime(0.0f)
+Engine::Engine() : systemList(), gameWindow(NULL), lastTime(0.0), totalTime(0.0)
 {
 	
 }

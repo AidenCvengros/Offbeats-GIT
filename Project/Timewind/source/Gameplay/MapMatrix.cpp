@@ -29,6 +29,12 @@ Copyright (c) 2023 Aiden Cvengros
 // Includes window class to be drawn to
 #include "../Engine/Window.h"
 
+//#ifdef DEBUG
+#include "../Engine/TextureManager.h"
+#include "../Engine/GameObjectManager.h"
+#include "../Game_Objects/Player.h"
+//#endif // DEBUG
+
 #include <fstream>
 
 //-------------------------------------------------------------------------------------------------
@@ -153,6 +159,9 @@ void MapMatrix::Draw()
 		// Creates a square game object that's gonna be the drawing
 		GameObject debugSquare({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 49, true, { 0.0f, 0.0f, 0.0f, 0.3f });
 		debugSquare.SetRender(true);
+		Texture* teleporterTexture = _TextureManager->AddTexture("Assets/Sprites/Highlight_Box.png");
+		GameObject playerHighlight(ConvertMapCoordsToWorldCoords(ConvertWorldCoordsToMapCoords(_GameObjectManager->GetPlayer()->GetPosition())), 0.0f, {2.0f, 2.0f}, 49, true, teleporterTexture, {1.0f, 1.0f, 1.0f, 0.5f});
+		_Window->DrawGameObject(&playerHighlight);
 
 		// Draws the map
 		for (int i = 0; i < mapMatrix.size(); i++)

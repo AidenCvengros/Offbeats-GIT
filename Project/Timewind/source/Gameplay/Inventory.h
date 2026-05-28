@@ -40,6 +40,7 @@ class Teleporter;
 class GameObject;
 class BigCoin;
 class Text;
+class Menu;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -151,29 +152,13 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Increments the selected sticker one to the right
-	*/
-	/*************************************************************************************************/
-	void IncrementSelectedSticker();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Decrements the selected sticker one to the left
-	*/
-	/*************************************************************************************************/
-	void DecrementSelectedSticker();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
 			Returns the sticker at the selected index
 
 		\return
 			The chosen sticker
 	*/
 	/*************************************************************************************************/
-	Sticker* GetSelectedSticker() { return stickerList[stickerInventoryCursor]; }
+	Sticker* GetSelectedSticker();
 
 	/*************************************************************************************************/
 	/*!
@@ -181,7 +166,7 @@ public:
 			Clears the sticker at the selected index
 	*/
 	/*************************************************************************************************/
-	void ClearSelectedSticker() { stickerList[stickerInventoryCursor] = NULL; }
+	void ClearSelectedSticker();
 
 	/*************************************************************************************************/
 	/*!
@@ -208,21 +193,33 @@ public:
 	/*************************************************************************************************/
 	bool Teleport(GameObject* gameObject);
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Turns on or off placing mode
+
+		\param isPlacing
+			Whether placing mode is on or off
+	*/
+	/*************************************************************************************************/
+	void PlacingMode(bool isPlacing);
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	std::array<Key*, 56> keyList;				// The list of keys the player has collected
-	int coinCount;								// The number of coins the player has collected
-	int bigCoinCount;							// The number of big coins the player has collected
+	std::array<Key*, 56> keyList;					// The list of keys the player has collected
+	int coinCount;									// The number of coins the player has collected
+	int bigCoinCount;								// The number of big coins the player has collected
 
-	std::array<Sticker*, 10> stickerList;		// The list of stickers the player has currently
-	int stickerInventoryCursor;					// What sticker slot the player currently has selected
+	std::array<Sticker*, 10> stickerList;			// The list of stickers the player has currently
+	std::array<GameObject*, 10> inventoryObjects;	// The list of inventory objects
+	Menu* stickerMenu;								// The visual menu for sticker ui
 
-	Teleporter* activeTeleporter;				// The most recently active teleporter to send the player to
+	Teleporter* activeTeleporter;					// The most recently active teleporter to send the player to
 
-	Text* coinText;								// Text object showing the player how many coins they have collected
+	Text* coinText;									// Text object showing the player how many coins they have collected
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

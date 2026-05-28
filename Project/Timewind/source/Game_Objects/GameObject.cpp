@@ -352,7 +352,7 @@ void GameObject::SetIsFacingRight(bool newIsFacingRight)
 		Sets whether the game object should be drawn
 
 	\param newRender
-		The game object's new render boolean
+		The game object's new render boolean (1 is yes, 0 is no, 2 is for drawing text)
 */
 /*************************************************************************************************/
 void GameObject::SetRender(int newRender)
@@ -360,6 +360,21 @@ void GameObject::SetRender(int newRender)
 	// Sets the new render boolean and turns off draw this frame
 	render = newRender;
 	drawThisFrame = false;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets a new texture for the game object
+
+	\param newTexture
+		The new texture for the game object
+*/
+/*************************************************************************************************/
+void GameObject::SetTexture(Texture* newTexture)
+{
+	// Sets the texture and turns on render
+	texture = newTexture;
 }
 
 /*************************************************************************************************/

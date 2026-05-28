@@ -160,6 +160,14 @@ public:
 	*/
 	/*********************************************************************************************/
 	Scene* GetCurrentScene();
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Gets the total amount of simulation time since the game started running
+	*/
+	/*********************************************************************************************/
+	double GetTotalTime() { return totalTime; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -180,6 +188,7 @@ private:
 	Window* gameWindow;									// Points to the window so the engine can communicate directly with the window
 
 	double lastTime;									// Tracks the last recorded time for calculating dt
+	double totalTime;									// Tracks the total amount of simulation time that has elapsed
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

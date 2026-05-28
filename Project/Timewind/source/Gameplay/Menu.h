@@ -133,6 +133,31 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Adds the cursor object with the given offset
+
+		\param newCursorObject
+			The new cursor object
+
+		\param newCursorOffset
+			The cursor offset for the menu
+	*/
+	/*************************************************************************************************/
+	void SetCursorObject(GameObject* newCursorObject, glm::vec2 newCursorOffset);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets whether the menu is controlled with vertical controls (true) or horizontal controls (false)
+
+		\param newVertical
+			The new is vertical value
+	*/
+	/*************************************************************************************************/
+	void SetIsVertical(bool newVertical) { vertical = newVertical; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the sticker at the selected index
 
 		\return
@@ -162,6 +187,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	bool GetActive() { return active; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns whether the menu is active
+
+		\return
+			Whether the menu is on (true) or off (false)
+	*/
+	/*************************************************************************************************/
+	bool GetIsVertical() { return vertical; }
 
 	/*************************************************************************************************/
 	/*!
@@ -213,6 +249,8 @@ private:
 	bool active;								// Whether the menu is on or off
 	bool vertical;								// Whether the menu is vertical (true) or horizontal (false)
 	bool fragile;								// Whether the menu will be destroyed when TurnOffMenu is called
+	GameObject* cursorObject;					// The object to visually represent
+	glm::vec2 cursorOffset;						// Where to place the cursor in relation to option object
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
