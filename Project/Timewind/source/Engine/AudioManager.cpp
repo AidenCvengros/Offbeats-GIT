@@ -54,10 +54,16 @@ void AudioManager::Init()
 		return;
 	}
 
+	if (!SDL_LoadWAV("Assets/Audio/Retrofit_Retro_Level-consolidated.wav", &spec, &audioData, &audioLength))
+	{
+		SDL_Log("Couldn't load .wav file: %s", SDL_GetError());
+		return;
+	}
+
 	// Sets the audio stream specs
-	spec.channels = 1;
-	spec.format = SDL_AUDIO_F32;
-	spec.freq = 8000;
+	//spec.channels = 1;
+	//spec.format = SDL_AUDIO_F32;
+	//spec.freq = 8000;
 
 	// Sets up the audio stream
 	stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
@@ -86,23 +92,8 @@ void AudioManager::Update(double dt)
 	const int minAudio = (8000 * sizeof(float)) / 2; // a.k.a half empty
 	if (SDL_GetAudioStreamQueued(stream) < minAudio)
 	{
-		float samples[512];						// The temp buffer of new data to input in the stream
-
-		// Loops through the end of the stream adding new samples
-		for (int i = 0; i < SDL_arraysize(samples); i++)
-		{
-			// Generates a 440Hz pure tone
-			const int freq = 440;
-			const float phase = currentSine * freq / 8000.0f;
-			samples[i] = 0; // SDL_sinf(phase * 2 * SDL_PI_F);
-			currentSine++;
-		}
-
-		// Wraps the sine sample value around to keep it in a normal number range
-		currentSine %= 8000;
-
 		// Feeds new data to the stream
-		SDL_PutAudioStreamData(stream, samples, sizeof(samples));
+		SDL_PutAudioStreamData(stream, audioData, audioLength);
 	}
 }
 
@@ -125,7 +116,7 @@ void AudioManager::Draw()
 /*************************************************************************************************/
 void AudioManager::Shutdown()
 {
-
+	SDL_free(audioData);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -191,7 +191,7 @@ void GameStateManager::SetCurrentMenu(Menu* newMenu, bool isPlacing)
 	{
 		// Adds the previous game state to the stack
 		previousStates.push(currentState);
-		if (currentState == GameStates::Menu)
+		if (currentState == GameStates::Menu || currentState == GameStates::Placing)
 		{
 			previousMenus.push(currentMenu);
 		}
@@ -224,7 +224,7 @@ void GameStateManager::TurnOffCurrentMenu()
 	previousStates.pop();
 
 	// If we are going back to a menu, gets that menu
-	if (currentState == GameStates::Menu)
+	if (currentState == GameStates::Menu || currentState == GameStates::Placing)
 	{
 		currentMenu = previousMenus.top();
 		previousMenus.pop();

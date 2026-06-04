@@ -30,6 +30,7 @@ Copyright (c) 2025 Aiden Cvengros
 #include "System.h"
 
 // SDL audio libraries
+#define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -75,7 +76,7 @@ public:
 	    Constructor for the FILL class
 	*/
 	/*************************************************************************************************/
-	AudioManager() : System(SystemTypes::audioManager), stream(NULL), currentSine(0) {}
+	AudioManager() : System(SystemTypes::audioManager), stream(NULL), audioData(NULL), audioLength(0) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -126,7 +127,8 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	SDL_AudioStream* stream;					// The audio stream
-	int currentSine;							// The current sin wave value
+	Uint8* audioData;							// The array of audio data
+	Uint32 audioLength;							// How long the array of loaded audio data is
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

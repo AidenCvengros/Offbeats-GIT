@@ -49,8 +49,6 @@ Copyright (c) 2023 Aiden Cvengros
 // Private Constants
 //-------------------------------------------------------------------------------------------------
 
-GameObject* sizeChecker;
-
 //-------------------------------------------------------------------------------------------------
 // Public Declarations
 //-------------------------------------------------------------------------------------------------
@@ -218,9 +216,6 @@ void Sandbox::LoadScene()
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);
-
-    sizeChecker = new GameObject({ 0.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 92, true, { 1.0f, 1.0f, 1.0f, 1.0f });
-    _GameObjectManager->AddGameObject(sizeChecker);
 }
 
 /*************************************************************************************************/
@@ -234,8 +229,7 @@ void Sandbox::LoadScene()
 /*************************************************************************************************/
 void Sandbox::Update(double dt)
 {
-    float size = 4.0f * (sin(Engine::createEngine()->GetTotalTime()) + 1.1f);
-    sizeChecker->SetScale({ size, size });
+
 }
 
 /*************************************************************************************************/

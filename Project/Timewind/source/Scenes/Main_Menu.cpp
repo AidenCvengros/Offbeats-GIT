@@ -119,20 +119,27 @@ void MainMenu::LoadScene()
 
     // Creates the main main menu menu
     mainMenu = new Menu();
-    Text* startOptionText = new Text("Start", _TextureManager->GetDefaultFont(), 24, { -1.5f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
-    Text* quitOptionText = new Text("Quit", _TextureManager->GetDefaultFont(), 24, { -1.5f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+    Text* startOptionText = new Text("START", _TextureManager->GetDefaultFont(), 24, { -4.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+    Text* optionsOptionText = new Text("OPTIONS", _TextureManager->GetDefaultFont(), 24, { -4.0f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+    Text* quitOptionText = new Text("QUIT", _TextureManager->GetDefaultFont(), 24, { -4.0f, -4.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
     GoToSceneOption* startOption = new GoToSceneOption(startOptionText, 101);
+    CreateSubmenuOption* optionsOption = new CreateSubmenuOption(optionsOptionText, Menu::MenuType::Options);
     CreateSubmenuOption* quitOption = new CreateSubmenuOption(quitOptionText, Menu::MenuType::QuitConfirmation);
+    startOptionText->SetFollowingCamera(true);
+    optionsOptionText->SetFollowingCamera(true);
+    quitOptionText->SetFollowingCamera(true);
     _GameObjectManager->AddGameObject(startOptionText);
+    _GameObjectManager->AddGameObject(optionsOptionText);
     _GameObjectManager->AddGameObject(quitOptionText);
     mainMenu->AddOption(startOption);
+    mainMenu->AddOption(optionsOption);
     mainMenu->AddOption(quitOption);
     _GameStateManager->SetCurrentMenu(mainMenu);
 
     // Creates main menu ui elements
     menuCursor = new GameObject({ -0.5f, 0.5f }, 0.0f, { 1.0f, 1.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 1.0f });
     _GameObjectManager->AddGameObject(menuCursor);
-    mainMenu->AddMenuObject(menuCursor);
+    mainMenu->SetCursorObject(menuCursor, { -1.0f, 1.0f });
     GameObject* newUIObject = new GameObject({ 0.0f, 0.0f }, 0.0f, { 32.0f, 32.0f / camera->GetAspectRatio() }, 80, true, { 0.1f, 0.1f, 0.1f, 0.4f });
     _GameObjectManager->AddGameObject(newUIObject);
     mainMenu->AddMenuObject(newUIObject);

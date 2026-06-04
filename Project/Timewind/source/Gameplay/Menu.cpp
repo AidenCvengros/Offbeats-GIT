@@ -126,19 +126,19 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 		fragile = true;
 		GameObject* menuCursor = new GameObject({ 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }, 91, true, { 1.0f, 1.0f, 1.0f, 1.0f });
 		_GameObjectManager->AddGameObject(menuCursor);
-		SetCursorObject(menuCursor, { 1.0f, -1.0f });
+		SetCursorObject(menuCursor, { 2.0f, -1.0f });
 		menuCursor->SetFollowingCamera(true);
 	}
 	else if (_menuType == MenuType::Options)
 	{
 		// Creates the main main menu menu
-		Text* yesOptionText = new Text("PLACEHOLDER", _TextureManager->GetDefaultFont(), 24, { -1.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Text* noOptionText = new Text("CLOSE", _TextureManager->GetDefaultFont(), 24, { -1.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
-		GameObject* background = new GameObject({ -2.0f, -1.0f }, 0.0f, { 4.0f, 5.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 0.5f });
+		Text* yesOptionText = new Text("PLACEHOLDER", _TextureManager->GetDefaultFont(), 24, { -8.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* noOptionText = new Text("CLOSE", _TextureManager->GetDefaultFont(), 24, { -8.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		GameObject* background = new GameObject({ 0.0f, 0.0f }, 0.0f, { 24.0f, 12.0f }, 90, true, { 0.0f, 0.0f, 0.0f, 0.5f });
 		yesOptionText->SetFollowingCamera(true);
 		noOptionText->SetFollowingCamera(true);
 		background->SetFollowingCamera(true);
-		QuitOption* quitOption = new QuitOption(yesOptionText);
+		MenuOption* quitOption = new MenuOption(yesOptionText);
 		SubmenuOption* noOption = new SubmenuOption(noOptionText, this, SubmenuOption::SubmenuInteraction::Close);
 		_GameObjectManager->AddGameObject(yesOptionText);
 		_GameObjectManager->AddGameObject(noOptionText);
@@ -151,7 +151,7 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 		fragile = true;
 		GameObject* menuCursor = new GameObject({ 0.0f, 0.0f }, 0.0f, { 1.0f, 1.0f }, 91, true, { 1.0f, 1.0f, 1.0f, 1.0f });
 		_GameObjectManager->AddGameObject(menuCursor);
-		SetCursorObject(menuCursor, { -1.0f, 0.0f });
+		SetCursorObject(menuCursor, { -1.0f, 1.0f });
 		menuCursor->SetFollowingCamera(true);
 	}
 }
