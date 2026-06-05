@@ -29,6 +29,9 @@ Copyright (c) 2025 Aiden Cvengros
 // The base system class
 #include "System.h"
 
+// Additional includes
+#include <list>
+
 // SDL audio libraries
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL.h>
@@ -76,7 +79,7 @@ public:
 	    Constructor for the FILL class
 	*/
 	/*************************************************************************************************/
-	AudioManager() : System(SystemTypes::audioManager), stream(NULL), audioData(NULL), audioLength(0) {}
+	AudioManager() : System(SystemTypes::audioManager), audioList() {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -120,23 +123,51 @@ public:
 	*/
 	/*************************************************************************************************/
 	void Shutdown();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Plays an audio
+
+		\param filename
+			The name of the audio to play
+
+		\param repeats
+			The number of times to repeat it after. -1 loops indefinitely until ClearMusic() is called.
+	*/
+	/*************************************************************************************************/
+	void PlayAudio(std::string filename, int repeats);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Clears all looping audio
+	*/
+	/*************************************************************************************************/
+	void ClearMusic();
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
-
-	SDL_AudioStream* stream;					// The audio stream
-	Uint8* audioData;							// The array of audio data
-	Uint32 audioLength;							// How long the array of loaded audio data is
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
+
+	typedef struct Audio
+	{
+		SDL_AudioStream* stream;				// The audio stream
+		Uint8* audioData;						// The array of audio data
+		Uint32 audioLength;						// How long the array of loaded audio data is
+		int replays;							// How many more times the sound should replay. -1 is infinite loop
+	}Audio;
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+
+	std::list<Audio> audioList;					// The list of currently playing audio
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

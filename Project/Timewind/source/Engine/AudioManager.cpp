@@ -46,35 +46,11 @@ Copyright (c) 2025 Aiden Cvengros
 /*************************************************************************************************/
 void AudioManager::Init()
 {
-	SDL_AudioSpec spec;							// The specs we want for our audio stream
-
 	if (!SDL_Init(SDL_INIT_AUDIO))
 	{
 		SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
 		return;
 	}
-
-	if (!SDL_LoadWAV("Assets/Audio/Retrofit_Retro_Level-consolidated.wav", &spec, &audioData, &audioLength))
-	{
-		SDL_Log("Couldn't load .wav file: %s", SDL_GetError());
-		return;
-	}
-
-	// Sets the audio stream specs
-	//spec.channels = 1;
-	//spec.format = SDL_AUDIO_F32;
-	//spec.freq = 8000;
-
-	// Sets up the audio stream
-	stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
-	if (!stream)
-	{
-		SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
-		return;
-	}
-
-	// Starts the audio stream
-	SDL_ResumeAudioStreamDevice(stream);
 }
 
 /*************************************************************************************************/
@@ -89,11 +65,32 @@ void AudioManager::Init()
 void AudioManager::Update(double dt)
 {
 	// Checks if the audio stream needs more data
-	const int minAudio = (8000 * sizeof(float)) / 2; // a.k.a half empty
-	if (SDL_GetAudioStreamQueued(stream) < minAudio)
+	int minAudio = (8000 * sizeof(float)) / 2; // a.k.a half empty
+
+	// Walks through the list of running audios
+	for (auto i = audioList.begin(); i != audioList.end();)
 	{
-		// Feeds new data to the stream
-		SDL_PutAudioStreamData(stream, audioData, audioLength);
+		// If we are running low on the audio
+		int audioLeft = SDL_GetAudioStreamQueued(i->stream);
+		if (audioLeft < minAudio)
+		{
+			// Checks if the sound should be repeated
+			if (i->replays != 0)
+			{
+				// Feeds new data to the stream
+				SDL_PutAudioStreamData(i->stream, i->audioData, i->audioLength);
+				i->replays--;
+			}
+			// Checks if we are out of sound
+			else if (audioLeft <= 0)
+			{
+				SDL_DestroyAudioStream(i->stream);
+				i = audioList.erase(i);
+				continue;
+			}
+		}
+
+		i++;
 	}
 }
 
@@ -116,7 +113,77 @@ void AudioManager::Draw()
 /*************************************************************************************************/
 void AudioManager::Shutdown()
 {
-	SDL_free(audioData);
+	// Walks through the list of running audios
+	for (auto i = audioList.begin(); i != audioList.end(); i++)
+	{
+		SDL_DestroyAudioStream(i->stream);
+	}
+	audioList.clear();
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Plays an audio
+
+	\param filename
+		The name of the audio to play
+
+	\param repeats
+		The number of times to repeat it after. -1 loops indefinitely until ClearMusic() is called.
+*/
+/*************************************************************************************************/
+void AudioManager::PlayAudio(std::string filename, int repeats)
+{
+	SDL_AudioSpec spec;							// The specs we want for our audio stream
+	Audio newAudio;								// The new audio
+
+	// Sets the replay value
+	newAudio.replays = repeats;
+
+	// Loads in the wav
+	if (!SDL_LoadWAV(filename.c_str(), &spec, &newAudio.audioData, &newAudio.audioLength))
+	{
+		SDL_Log("Couldn't load .wav file: %s", SDL_GetError());
+		return;
+	}
+
+	// Sets up the audio stream
+	newAudio.stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
+	if (!newAudio.stream)
+	{
+		SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
+		return;
+	}
+
+	// Starts the audio stream
+	SDL_ResumeAudioStreamDevice(newAudio.stream);
+
+	audioList.push_back(newAudio);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Clears all looping audio
+*/
+/*************************************************************************************************/
+void AudioManager::ClearMusic()
+{
+	// Walks through the list of running audios
+	for (auto i = audioList.begin(); i != audioList.end();)
+	{
+		// Checks if it's a looping audio
+		if (i->replays < 0)
+		{
+			SDL_DestroyAudioStream(i->stream);
+			i = audioList.erase(i);
+		}
+		else
+		{
+			i++;
+		}
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

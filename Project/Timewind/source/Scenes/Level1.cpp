@@ -38,6 +38,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Stickers/Teleporter.h"
 #include "../Game_Objects/BigCoin.h"
 #include "../Game_Objects/FinishFlag.h"
+#include "../Engine/AudioManager.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -157,6 +158,9 @@ void Level1::LoadScene()
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);
+
+    // Starts the music
+    _AudioManager->PlayAudio("Assets/Audio/Retrofit_Retro_Level-consolidated.wav", -1);
 }
 
 /*************************************************************************************************/

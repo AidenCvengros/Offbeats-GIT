@@ -27,6 +27,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "InputManager.h"
 #include "../Game_Objects/GameObject.h"
 #include "Window.h"
+#include "AudioManager.h"
 
 // Includes glfw input reading functionality
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -97,6 +98,7 @@ void GameStateManager::Update(double dt)
 		if (_InputManager->CheckInputStatus(InputManager::Inputs::Pause) == InputManager::InputStatus::Pressed)
 		{
 			SetCurrentMenu(new Menu(Menu::MenuType::Pause));
+			_AudioManager->ClearMusic();
 		}
 		// Otherwise, if we are placing we can update the inventory menu
 		else if (currentState == GameStates::Placing)
