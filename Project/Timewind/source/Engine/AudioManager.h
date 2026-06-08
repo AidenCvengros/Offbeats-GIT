@@ -31,10 +31,12 @@ Copyright (c) 2025 Aiden Cvengros
 
 // Additional includes
 #include <list>
+#include <vector>
 
 // SDL audio libraries
-#define SDL_MAIN_USE_CALLBACKS 1
-#include <SDL3/SDL.h>
+//#define SDL_MAIN_USE_CALLBACKS 1
+//#include <SDL3/SDL.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -79,7 +81,7 @@ public:
 	    Constructor for the FILL class
 	*/
 	/*************************************************************************************************/
-	AudioManager() : System(SystemTypes::audioManager), audioList() {}
+	AudioManager() : System(SystemTypes::audioManager), mixer(NULL), trackList() {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -134,9 +136,15 @@ public:
 
 		\param repeats
 			The number of times to repeat it after. -1 loops indefinitely until ClearMusic() is called.
+
+		\param channelID
+			The channel to play this audio on. If value is negative, will reserve you a channel
+
+		\param reserve
+			Whether the channel should free itself after the audio finishes playing
 	*/
 	/*************************************************************************************************/
-	void PlayAudio(std::string filename, int repeats);
+	void PlayAudio(std::string filename, int repeats, int& channelID, bool reserve = false);
 
 	/*************************************************************************************************/
 	/*!
@@ -145,6 +153,22 @@ public:
 	*/
 	/*************************************************************************************************/
 	void ClearMusic();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Pauses all audio
+	*/
+	/*************************************************************************************************/
+	void PauseAudio();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Restarts all paused audio
+	*/
+	/*************************************************************************************************/
+	void RestartAudio();
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -155,23 +179,40 @@ private:
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
 
-	typedef struct Audio
-	{
-		SDL_AudioStream* stream;				// The audio stream
-		Uint8* audioData;						// The array of audio data
-		Uint32 audioLength;						// How long the array of loaded audio data is
-		int replays;							// How many more times the sound should replay. -1 is infinite loop
-	}Audio;
+	//typedef struct Audio
+	//{
+	//	std::string filename;					// The name of the audio file
+	//	MIX_Audio* audio;						// The audio data
+	//	//SDL_AudioStream* stream;				// The audio stream
+	//	//Uint8* audioData;						// The array of audio data
+	//	double audioLength;						// How long the array of loaded audio data is
+	//	double audioStarted;					// When the audio started playing
+	//	//SDL_AudioFormat format;					// The format of the audio data
+	//	int replays;							// How many more times the sound should replay. -1 is infinite loop
+	//}Audio;
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 
-	std::list<Audio> audioList;					// The list of currently playing audio
+	//std::list<Audio> audioList;								// The list of currently playing audio
+	MIX_Mixer* mixer;										// The audio mixer
+	std::vector < std::pair<bool, MIX_Track* > > trackList;	// The audio tracks. Boolean represents whether they are reserved
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns an open audio track. Will select one randomly if none are free
+
+		\return
+			The index for an open audio track
+	*/
+	/*************************************************************************************************/
+	int FindOpenTrack();
 };
 
 //-------------------------------------------------------------------------------------------------

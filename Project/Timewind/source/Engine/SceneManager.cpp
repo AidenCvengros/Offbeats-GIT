@@ -19,6 +19,7 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 #include "SceneManager.h"
+#include "cppShortcuts.h"
 
 // List of scenes
 #include "../Scenes/Sandbox.h"
@@ -27,6 +28,9 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Scenes/Level1_2.h"
 #include "../Scenes/Level1_3.h"
 #include "../Scenes/Level1_4.h"
+
+// Additional Includes
+#include "AudioManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -105,6 +109,7 @@ void SceneManager::Update(double dt)
 	{
 		// Unloads the previous scene
 		sceneList[currentSceneIndex]->UnloadScene();
+		_AudioManager->ClearMusic();
 
 		// Loads the next scene
 		sceneList[nextSceneIndex]->LoadScene();

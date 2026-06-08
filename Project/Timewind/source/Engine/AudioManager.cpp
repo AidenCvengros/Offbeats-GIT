@@ -22,6 +22,9 @@ Copyright (c) 2025 Aiden Cvengros
 #include "AudioManager.h"
 #include "../Engine/cppShortcuts.h"
 
+// Additional includes
+#include <SDL3_mixer/SDL_mixer.h>
+
 //-------------------------------------------------------------------------------------------------
 // Private Constants
 //-------------------------------------------------------------------------------------------------
@@ -46,10 +49,33 @@ Copyright (c) 2025 Aiden Cvengros
 /*************************************************************************************************/
 void AudioManager::Init()
 {
-	if (!SDL_Init(SDL_INIT_AUDIO))
+	//if (!SDL_Init(SDL_INIT_AUDIO))
+	//{
+	//	SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+	//	return;
+	//}
+
+	if (!MIX_Init())
 	{
-		SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+		SDL_Log("Couldn't initialize SDL_Mix: %s", SDL_GetError());
 		return;
+	}
+
+	// Create the mixer
+	mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+	if (!mixer)
+	{
+		SDL_Log("Couldn't create mixer on default device: %s", SDL_GetError());
+		return;
+	}
+
+	// Creates the mixer tracks
+	trackList.push_back({ true, MIX_CreateTrack(mixer) });
+	MIX_TagTrack(trackList[0].second, "Background");
+	for (int i = 1; i < 32; i++)
+	{
+		trackList.push_back({ false, MIX_CreateTrack(mixer) });
+		MIX_TagTrack(trackList[i].second, "Effect");
 	}
 }
 
@@ -64,34 +90,7 @@ void AudioManager::Init()
 /*************************************************************************************************/
 void AudioManager::Update(double dt)
 {
-	// Checks if the audio stream needs more data
-	int minAudio = (8000 * sizeof(float)) / 2; // a.k.a half empty
 
-	// Walks through the list of running audios
-	for (auto i = audioList.begin(); i != audioList.end();)
-	{
-		// If we are running low on the audio
-		int audioLeft = SDL_GetAudioStreamQueued(i->stream);
-		if (audioLeft < minAudio)
-		{
-			// Checks if the sound should be repeated
-			if (i->replays != 0)
-			{
-				// Feeds new data to the stream
-				SDL_PutAudioStreamData(i->stream, i->audioData, i->audioLength);
-				i->replays--;
-			}
-			// Checks if we are out of sound
-			else if (audioLeft <= 0)
-			{
-				SDL_DestroyAudioStream(i->stream);
-				i = audioList.erase(i);
-				continue;
-			}
-		}
-
-		i++;
-	}
 }
 
 /*************************************************************************************************/
@@ -113,12 +112,8 @@ void AudioManager::Draw()
 /*************************************************************************************************/
 void AudioManager::Shutdown()
 {
-	// Walks through the list of running audios
-	for (auto i = audioList.begin(); i != audioList.end(); i++)
-	{
-		SDL_DestroyAudioStream(i->stream);
-	}
-	audioList.clear();
+	// Clears the sdl mixer
+	MIX_Quit();
 }
 
 /*************************************************************************************************/
@@ -131,35 +126,63 @@ void AudioManager::Shutdown()
 
 	\param repeats
 		The number of times to repeat it after. -1 loops indefinitely until ClearMusic() is called.
+
+	\param channelID
+		The channel to play this audio on. If value is negative, will reserve you a channel
+
+	\param reserve
+		Whether the channel should free itself after the audio finishes playing
 */
 /*************************************************************************************************/
-void AudioManager::PlayAudio(std::string filename, int repeats)
+void AudioManager::PlayAudio(std::string filename, int repeats, int& channelID, bool reserve)
 {
 	SDL_AudioSpec spec;							// The specs we want for our audio stream
-	Audio newAudio;								// The new audio
 
-	// Sets the replay value
-	newAudio.replays = repeats;
-
-	// Loads in the wav
-	if (!SDL_LoadWAV(filename.c_str(), &spec, &newAudio.audioData, &newAudio.audioLength))
+	// Loads in the audio file
+	MIX_Audio* audio = MIX_LoadAudio(mixer, filename.c_str(), false);
+	if (!audio)
 	{
-		SDL_Log("Couldn't load .wav file: %s", SDL_GetError());
-		return;
+		SDL_Log("Couldn't load %s: %s", filename, SDL_GetError());
 	}
 
-	// Sets up the audio stream
-	newAudio.stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
-	if (!newAudio.stream)
+	// Plays the track
+	SDL_PropertiesID options = SDL_CreateProperties();
+	SDL_SetNumberProperty(options, MIX_PROP_PLAY_LOOPS_NUMBER, repeats);
+	if (channelID < 0 || channelID >= 32)
 	{
-		SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
-		return;
+		channelID = FindOpenTrack();
 	}
+	if (channelID != 0)
+	{
+		trackList[channelID].first = reserve;
+	}
+	else
+	{
+		trackList[0].first = true;
+	}
+	MIX_SetTrackAudio(trackList[channelID].second, audio);
+	MIX_PlayTrack(trackList[channelID].second, options);
+	SDL_DestroyProperties(options);
 
-	// Starts the audio stream
-	SDL_ResumeAudioStreamDevice(newAudio.stream);
-
-	audioList.push_back(newAudio);
+	//// Loads in the wav
+	//if (!SDL_LoadWAV(filename.c_str(), &spec, &newAudio.audioData, &newAudio.audioLength))
+	//{
+	//	SDL_Log("Couldn't load .wav file: %s", SDL_GetError());
+	//	return;
+	//}
+	//
+	//// Sets up the audio stream
+	//newAudio.stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
+	//if (!newAudio.stream)
+	//{
+	//	SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
+	//	return;
+	//}
+	//
+	//// Starts the audio stream
+	//SDL_ResumeAudioStreamDevice(newAudio.stream);
+	//newAudio.format = spec.format;
+	//audioList.push_back(newAudio);
 }
 
 /*************************************************************************************************/
@@ -170,22 +193,58 @@ void AudioManager::PlayAudio(std::string filename, int repeats)
 /*************************************************************************************************/
 void AudioManager::ClearMusic()
 {
+	// Stops all tracks
+	MIX_StopAllTracks(mixer, 0);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Pauses all audio
+*/
+/*************************************************************************************************/
+void AudioManager::PauseAudio()
+{
+	MIX_PauseTag(mixer, "Effect");
+	MIX_SetTagGain(mixer, "Background", 0.5f);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Restarts all paused audio
+*/
+/*************************************************************************************************/
+void AudioManager::RestartAudio()
+{
 	// Walks through the list of running audios
-	for (auto i = audioList.begin(); i != audioList.end();)
-	{
-		// Checks if it's a looping audio
-		if (i->replays < 0)
-		{
-			SDL_DestroyAudioStream(i->stream);
-			i = audioList.erase(i);
-		}
-		else
-		{
-			i++;
-		}
-	}
+	MIX_PlayTag(mixer, "Effect", 0);
+	MIX_SetTagGain(mixer, "Background", 1.0f);
 }
 
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Returns an open audio track. Will select one randomly if none are free
+
+	\return
+		The index for an open audio track
+*/
+/*************************************************************************************************/
+int AudioManager::FindOpenTrack()
+{
+	for (int i = 1; i < trackList.size(); i++)
+	{
+		if (trackList[i].first == false)
+		{
+			return i;
+		}
+	}
+
+	// Otherwise choose a random track
+	return (rand() % 31) + 1;
+}

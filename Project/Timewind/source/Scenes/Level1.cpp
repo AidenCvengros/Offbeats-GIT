@@ -160,7 +160,8 @@ void Level1::LoadScene()
     _MapMatrix->UpdatePlayerPosition(player);
 
     // Starts the music
-    _AudioManager->PlayAudio("Assets/Audio/Retrofit_Retro_Level-consolidated.wav", -1);
+    int temp = 0;
+    _AudioManager->PlayAudio("Assets/Audio/Retrofit_Retro_Level-consolidated.wav", -1, temp, false);
 }
 
 /*************************************************************************************************/

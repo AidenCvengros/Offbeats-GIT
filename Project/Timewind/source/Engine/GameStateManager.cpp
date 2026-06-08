@@ -64,7 +64,7 @@ Copyright (c) 2023 Aiden Cvengros
 		Constructor for the menu manager class
 */
 /*************************************************************************************************/
-GameStateManager::GameStateManager() : System(SystemTypes::gameStateManager), currentState(GameStates::Walking), currentMenu(NULL)
+GameStateManager::GameStateManager() : System(SystemTypes::gameStateManager), currentState(GameStates::Walking), currentMenu(NULL), paused(false)
 {
 	
 }
@@ -98,7 +98,8 @@ void GameStateManager::Update(double dt)
 		if (_InputManager->CheckInputStatus(InputManager::Inputs::Pause) == InputManager::InputStatus::Pressed)
 		{
 			SetCurrentMenu(new Menu(Menu::MenuType::Pause));
-			_AudioManager->ClearMusic();
+			_AudioManager->PauseAudio();
+			paused = true;
 		}
 		// Otherwise, if we are placing we can update the inventory menu
 		else if (currentState == GameStates::Placing)
@@ -172,6 +173,13 @@ void GameStateManager::SetGameState(GameStates newGameState)
 		previousMenus.pop();
 	}
 	currentMenu = NULL;
+
+	// If we were paused, this will leave paused
+	if (paused)
+	{
+		paused = false;
+		_AudioManager->RestartAudio();
+	}
 }
 
 /*************************************************************************************************/
@@ -235,6 +243,13 @@ void GameStateManager::TurnOffCurrentMenu()
 	{
 		currentMenu = NULL;
 		glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+		// Checks if we were paused
+		if (paused)
+		{
+			paused = false;
+			_AudioManager->RestartAudio();
+		}
 	}
 }
 

@@ -192,6 +192,7 @@ private:
 	std::stack<GameStates> previousStates;		// Tracks the previous state, useful for seamlessly entering and exiting pause menu
 	std::stack<Menu*> previousMenus;			// Saves menus we went deeper than so we go back to them on our way out
 	Menu* currentMenu;							// The current active menu
+	bool paused;								// Keeps track of whether the game is paused
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
