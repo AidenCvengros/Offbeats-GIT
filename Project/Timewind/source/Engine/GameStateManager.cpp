@@ -28,6 +28,11 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/GameObject.h"
 #include "Window.h"
 #include "AudioManager.h"
+#include "../Visuals/CameraMovement.h"
+#include "../Game_Objects/Camera.h"
+#include "SceneManager.h"
+#include "GameObjectManager.h"
+#include "../Gameplay/Inventory.h"
 
 // Includes glfw input reading functionality
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -125,6 +130,12 @@ void GameStateManager::Update(double dt)
 			}
 		}
 	}
+	// If in a cutscene
+	else if (currentState == GameStates::Cutscene)
+	{
+		// Updates the cutscene
+		UpdateCutscene(dt);
+	}
 }
 
 /*************************************************************************************************/
@@ -170,7 +181,12 @@ void GameStateManager::SetGameState(GameStates newGameState)
 	}
 	while (!previousMenus.empty())
 	{
+		previousMenus.top()->TurnOffMenu();
 		previousMenus.pop();
+	}
+	if (currentMenu)
+	{
+		currentMenu->TurnOffMenu();
 	}
 	currentMenu = NULL;
 
@@ -180,6 +196,8 @@ void GameStateManager::SetGameState(GameStates newGameState)
 		paused = false;
 		_AudioManager->RestartAudio();
 	}
+
+	glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 /*************************************************************************************************/
@@ -216,7 +234,7 @@ void GameStateManager::SetCurrentMenu(Menu* newMenu, bool isPlacing)
 		else
 		{
 			currentState = GameStates::Placing;
-			glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+			glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		}
 	}
 }
@@ -242,7 +260,7 @@ void GameStateManager::TurnOffCurrentMenu()
 	else
 	{
 		currentMenu = NULL;
-		glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		// Checks if we were paused
 		if (paused)
@@ -251,6 +269,27 @@ void GameStateManager::TurnOffCurrentMenu()
 			_AudioManager->RestartAudio();
 		}
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets the current menu
+
+	\param newGameState
+		The game state that will be after the scene refreshes
+*/
+/*************************************************************************************************/
+void GameStateManager::RefreshCurrentScene(GameStates newGameState)
+{
+	// Sets the game state to a cutscene
+	SetGameState(GameStates::Cutscene);
+
+	// Adds in transition actions
+	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.5, _Window->GetCamera()->Get3DPosition(), { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, -1.57f, 0.0f, _Window->GetCamera()->Get3DPosition().z)));
+	cutsceneScript.push(std::make_pair(CutsceneActions::RefreshScene, (void*)NULL));
+	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.5, { _Window->GetCamera()->GetLookAtPosition().x + _Window->GetCamera()->Get3DPosition().z, _Window->GetCamera()->GetLookAtPosition().y, 0.0f }, { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, -1.57f, 0.0f, _Window->GetCamera()->Get3DPosition().z)));
+	cutsceneScript.push(std::make_pair(CutsceneActions::GameStateChange, new GameStates(newGameState)));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -299,5 +338,111 @@ void GameStateManager::UpdateCurrentMenu()
 	{
 		// Otherwise runs hovering behavior
 		currentMenu->GetSelectedOption()->Hovering();
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Checks for actions in the cutscene queue
+
+	\param dt
+		The time elapsed since the previous frame.
+*/
+/*************************************************************************************************/
+void GameStateManager::UpdateCutscene(double dt)
+{
+	// Loops until either the queue is empty or we are waiting
+	while (cutsceneScript.size())
+	{
+		// Checks if we have a camera movement
+		if (cutsceneScript.front().first == CutsceneActions::CameraMovement)
+		{
+			// Gets the camera movement pointer
+			CameraMovement* currentCameraMovement = (CameraMovement*)cutsceneScript.front().second;
+
+			// Checks that the camera movement is still running
+			if (currentCameraMovement->GetRemainingTime() > 0.0)
+			{
+				_Window->GetCamera()->StartCameraMovement(currentCameraMovement);
+
+				// Now we wait for the camera movement
+				break;
+			}
+			// Otherwise we clear it out
+			else
+			{
+				delete currentCameraMovement;
+				cutsceneScript.pop();
+			}
+		}
+		// Checks if we have a wait command
+		else if (cutsceneScript.front().first == CutsceneActions::Wait)
+		{
+			// Gets the wait time
+			double* currentWait = (double*)cutsceneScript.front().second;
+
+			// Decrements the time
+			*currentWait -= dt;
+
+			// If the time has run out, clears it
+			if (*currentWait <= 0.0)
+			{
+				delete currentWait;
+				cutsceneScript.pop();
+			}
+			// Otherwise waits
+			else
+			{
+				break;
+			}
+		}
+		// Checks if we have a game state change command
+		else if (cutsceneScript.front().first == CutsceneActions::GameStateChange)
+		{
+			// Gets the new game state
+			GameStates* newGameState = (GameStates*)cutsceneScript.front().second;
+
+			// Sets the new game state
+			if (*newGameState != GameStates::Menu)
+			{
+				SetGameState(*newGameState);
+			}
+
+			// Clears the command
+			delete newGameState;
+			cutsceneScript.pop();
+		}
+		// Checks if we have a scene change command
+		else if (cutsceneScript.front().first == CutsceneActions::SceneChange)
+		{
+			// Gets the new scene id
+			int* newSceneID = (int*)cutsceneScript.front().second;
+
+			// Sets the new Scene
+			_SceneManager->ChangeScene(*newSceneID);
+
+			// Clears the command
+			delete newSceneID;
+			cutsceneScript.pop();
+		}
+		// Checks if we have a refresh scene command
+		else if (cutsceneScript.front().first == CutsceneActions::RefreshScene)
+		{
+			// Goes through refresh protocol
+			_SceneManager->GetCurrentScene()->RefreshScene();
+			_GameStateManager->SetGameState(GameStateManager::GameStates::Running);
+			_GameObjectManager->GetPlayer()->GetInventory()->PlacingMode(false);
+			_Window->GetCamera()->ResetCameraOffset();
+
+			// Clears the command
+			cutsceneScript.pop();
+		}
+		// Otherwise breaks the loop
+		else
+		{
+			cutsceneScript.pop();
+			break;
+		}
 	}
 }

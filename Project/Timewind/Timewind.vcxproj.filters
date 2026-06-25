@@ -204,6 +204,12 @@
     <ClInclude Include="source\Gameplay\MenuOptions\CreateSubmenuOption.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\Gameplay\MenuOptions\RefreshSceneOption.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Visuals\CameraMovement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine\Engine.cpp">
@@ -360,6 +366,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Gameplay\MenuOptions\CreateSubmenuOption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Gameplay\MenuOptions\RefreshSceneOption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Visuals\CameraMovement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

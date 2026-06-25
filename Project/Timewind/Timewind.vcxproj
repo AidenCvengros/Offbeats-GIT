@@ -172,6 +172,7 @@
     <ClInclude Include="source\Gameplay\MenuOptions\GoToSceneOption.h" />
     <ClInclude Include="source\Gameplay\MenuOptions\MenuOption.h" />
     <ClInclude Include="source\Gameplay\MenuOptions\QuitOption.h" />
+    <ClInclude Include="source\Gameplay\MenuOptions\RefreshSceneOption.h" />
     <ClInclude Include="source\Gameplay\MenuOptions\SubmenuOption.h" />
     <ClInclude Include="source\Game_Objects\BigCoin.h" />
     <ClInclude Include="source\Game_Objects\Camera.h" />
@@ -216,6 +217,7 @@
     <ClInclude Include="source\Engine\TextureManager.h" />
     <ClInclude Include="source\Engine\Vertex.h" />
     <ClInclude Include="source\Engine\Window.h" />
+    <ClInclude Include="source\Visuals\CameraMovement.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Engine\AudioManager.cpp" />
@@ -226,6 +228,7 @@
     <ClCompile Include="source\Gameplay\MenuOptions\GoToSceneOption.cpp" />
     <ClCompile Include="source\Gameplay\MenuOptions\MenuOption.cpp" />
     <ClCompile Include="source\Gameplay\MenuOptions\QuitOption.cpp" />
+    <ClCompile Include="source\Gameplay\MenuOptions\RefreshSceneOption.cpp" />
     <ClCompile Include="source\Gameplay\MenuOptions\SubmenuOption.cpp" />
     <ClCompile Include="source\Game_Objects\BigCoin.cpp" />
     <ClCompile Include="source\Game_Objects\Camera.cpp" />
@@ -270,6 +273,7 @@
     <ClCompile Include="source\Engine\TextureManager.cpp" />
     <ClCompile Include="source\Engine\Vertex.cpp" />
     <ClCompile Include="source\Engine\Window.cpp" />
+    <ClCompile Include="source\Visuals\CameraMovement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source\Shaders\2d_frag.spv">

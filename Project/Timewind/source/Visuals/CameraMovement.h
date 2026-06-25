@@ -1,21 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file GameStateManager.h
+\file CameraMovement.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.4.29
+\date 2026.6.23
 \brief
-    Manages what game state the player is interacting with
+    Class to hold the information for a 3d movement
 
     Functions include:
         + [FILL]
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_GameStateManager_H_
-#define Syncopatience_GameStateManager_H_
+#ifndef Syncopatience_CameraMovement_H_
+#define Syncopatience_CameraMovement_H_
 
 #pragma once
 
@@ -23,19 +23,14 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-#include "stdafx.h"
-
-// Gets the base system class
-#include "System.h"
-
-// The menu class
-#include "../Gameplay/Menu.h"
-#include <stack>
-#include <queue>
+// Base include
+#include "../Engine/stdafx.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
+
+class Menu;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -48,23 +43,21 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		Manages which game state is being used
+		The class for 3d movement tracking
 */
 /*************************************************************************************************/
-class GameStateManager : public System
+class CameraMovement
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 
-	enum class GameStates
+	enum class MovementType
 	{
-		Walking,
-		Placing,
-		Running,								// ^^ Everything Running and below is considered "normal" gameplay
-		Menu,
-		Cutscene,
+		Translation,
+		Revolution,
+		Zoom,
 		Max
 	};
 	
@@ -79,127 +72,113 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-
+	
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the menu manager class
+			Constructor for the menu class
+
+		\param _optionVisual
+			The visual representation of the menu option
+
+		\param _submenu
+			The submenu this option is interacting with
+
+		\param _interaction
+			What action this button takes on the submenu
 	*/
 	/*************************************************************************************************/
-	GameStateManager();
+	CameraMovement(MovementType _movementType, double _length, glm::vec3 _startingPosition, glm::vec3 _lookAtPosition, float xMagnitude, float yMagnitude = 0.0f, float zMagnitude = 0.0f) : movementType(_movementType), length(_length), 
+		startingPos(_startingPosition), lookAtPos(_lookAtPosition), magnitude({ xMagnitude, yMagnitude, zMagnitude }),
+		timeRemaining(_length), totalTranslationOffset({ 0.0f }) {}
 
 	/*************************************************************************************************/
 	/*!
-		\brief
-			Destructor for the menu manager class
+		 \brief
+			Destructor for menu class
 	*/
 	/*************************************************************************************************/
-	~GameStateManager() {}
+	~CameraMovement() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Initializes the menu manager
-	*/
-	/*************************************************************************************************/
-	void Init();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Updates the current menu
+			Updates the movement
 
 		\param dt
-			The time elapsed since the previous frame.
+			The time elapsed since the previous frame
 	*/
 	/*************************************************************************************************/
-	void Update(double dt);
+	virtual void Update(double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Draws the current menu (currently empty)
-	*/
-	/*************************************************************************************************/
-	void Draw();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Shuts down the scene manager and the current scene
-	*/
-	/*************************************************************************************************/
-	void Shutdown();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets a new active game state
-
-		\param newGameState
-			The id of the new scene
-	*/
-	/*************************************************************************************************/
-	void SetGameState(GameStates newGameState);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets the current menu
-
-		\param newMenu
-			The id of the new scene
-
-		\param isPlacing
-			Set true if game mode should be placing
-	*/
-	/*************************************************************************************************/
-	void SetCurrentMenu(Menu* newMenu, bool isPlacing = false);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Turns off the current menu and rolls back the game state
-	*/
-	/*************************************************************************************************/
-	void TurnOffCurrentMenu();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Gets the active game state
+			Returns the movement type
 
 		\return
-			The active game state
+			The movement type
 	*/
 	/*************************************************************************************************/
-	GameStates GetGameState() { return currentState; }
+	MovementType GetMovementType() { return movementType; }
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Sets the current menu
+			Returns the amount of time in seconds of the movement
 
-		\param newGameState
-			The game state that will be after the scene refreshes
+		\return
+			The remaining time
 	*/
 	/*************************************************************************************************/
-	void RefreshCurrentScene(GameStates newGameState);
-	
+	double GetRemainingTime() { return timeRemaining; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the magnitude of the movement
+
+		\return
+			Gets the 3d magnitude vector
+	*/
+	/*************************************************************************************************/
+	glm::vec3 GetMagnitude() { return magnitude; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the translation the movement has produced
+
+		\return
+			The translation offset
+	*/
+	/*************************************************************************************************/
+	glm::vec3 GetTranslationOffset() { return totalTranslationOffset; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the rotation the movement has produced
+
+		\return
+			Gets the rotation offset
+	*/
+	/*************************************************************************************************/
+	glm::vec3 GetPosition() { return startingPos + totalTranslationOffset; }
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	enum class CutsceneActions
-	{
-		GameStateChange,
-		SceneChange,
-		RefreshScene,
-		CameraMovement,							// ^^^ Everything < CameraMovement does not cause the cutscene to wait ^^^
-		Wait,
-		Max
-	};
+	MovementType movementType;					// The movement type
+	double length;								// The length of the movement in seconds
+	glm::vec3 magnitude;						// The magnitude of the movement (how it's used varies by movement type)
+	glm::vec3 startingPos;						// Where the camera starts
+	glm::vec3 lookAtPos;						// The point the camera is looking at
+
+	double timeRemaining;						// The amount of time remaining
+	glm::vec3 totalTranslationOffset;			// The total offset the movement has produced so far
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -208,37 +187,10 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
-
-	GameStates currentState;					// The current game state
-	std::stack<GameStates> previousStates;		// Tracks the previous state, useful for seamlessly entering and exiting pause menu
-	std::stack<Menu*> previousMenus;			// Saves menus we went deeper than so we go back to them on our way out
-	Menu* currentMenu;							// The current active menu
-	bool paused;								// Keeps track of whether the game is paused
-	
-	std::queue<std::pair<CutsceneActions, void*> > cutsceneScript;	// Holds the queue of cutscene actions
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Checks for inputs to affect the current menu
-	*/
-	/*************************************************************************************************/
-	void UpdateCurrentMenu();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Checks for actions in the cutscene queue
-
-		\param dt
-			The time elapsed since the previous frame.
-	*/
-	/*************************************************************************************************/
-	void UpdateCutscene(double dt);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -249,4 +201,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_GameStateManager_H_
+#endif // Syncopatience_CameraMovement_H_

@@ -68,7 +68,7 @@ Copyright (c) 2025 Aiden Cvengros
 		Constructor for the inventory class
 */
 /*************************************************************************************************/
-Inventory::Inventory() : keyList(), coinCount(0), bigCoinCount(0), stickerList(), inventoryObjects(), activeTeleporter(NULL)
+Inventory::Inventory() : keyList(), keyCount(0), coinCount(0), bigCoinCount(0), stickerList(), inventoryObjects(), activeTeleporter(NULL)
 {
 	// Creates the text object
 	coinText = new Text("x00", _TextureManager->GetDefaultFont(), 12, { 12.0f, 10.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
@@ -98,13 +98,13 @@ Inventory::Inventory() : keyList(), coinCount(0), bigCoinCount(0), stickerList()
 	Texture* highlightBoxTexture = _TextureManager->AddTexture("Assets/Sprites/Highlight_Box.png");
 	GameObject* highlightBox = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 95, true, highlightBoxTexture, { 0.95f, 0.3f, 0.3f, 1.0f });
 	highlightBox->SetFollowingCamera(true);
-	highlightBox->SetRender(false);
+	highlightBox->SetActive(false);
 	_GameObjectManager->AddGameObject(highlightBox);
 	stickerMenu->SetCursorObject(highlightBox, { 0.0f, 0.0f });
 	Texture* inventorySlotsTexture = _TextureManager->AddTexture("Assets/Sprites/Inventory_Boxes_Pixel.png");
 	GameObject* inventorySlots = new GameObject({ 0.0f, -8.0f }, 0.0f, { 20.0f, 2.0f }, 90, true, inventorySlotsTexture, { 1.0f, 1.0f, 1.0f, 1.0f });
 	inventorySlots->SetFollowingCamera(true);
-	inventorySlots->SetRender(false);
+	inventorySlots->SetActive(false);
 	_GameObjectManager->AddGameObject(inventorySlots);
 	stickerMenu->AddMenuObject(inventorySlots);
 }
@@ -125,7 +125,16 @@ bool Inventory::AddKey(Key* newKey)
 {
 	if (newKey)
 	{
+		// Adds in the new key
 		keyList[newKey->GetKeyValue()] = newKey;
+		keyCount++;
+
+		// Creates the key icon
+		Texture* keyTexture = _TextureManager->AddTexture("Assets/Sprites/Key.png");
+		GameObject* keyIcon = new GameObject({ 10.0f - (1.5f * keyCount), 10.4f}, 0.0f, {2.0f, 2.0f}, 90, true, keyTexture, newKey->GetColor());
+		_GameObjectManager->AddGameObject(keyIcon);
+		keyIcon->SetFollowingCamera(true);
+
 		return true;
 	}
 
@@ -157,6 +166,7 @@ bool Inventory::AddSticker(Sticker* newSticker)
 			newSticker->SetRotation(0.0f);
 			stickerList[i] = newSticker;
 			inventoryObjects[i]->SetTexture(newSticker->GetTexture());
+			inventoryObjects[i]->SetRender(1);
 			return true;
 		}
 	}
@@ -195,7 +205,7 @@ void Inventory::AddBigCoin()
 
 	// Creates the coin icon
 	Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
-	GameObject* coinIcon = new GameObject({ 9.5f, 10.4f }, 0.0f, { 2.0f, 2.0f }, 90, true, coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f });
+	GameObject* coinIcon = new GameObject({ 10.0f, 10.4f }, 0.0f, { 2.0f, 2.0f }, 90, true, coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f });
 	_GameObjectManager->AddGameObject(coinIcon);
 	coinIcon->SetFollowingCamera(true);
 }

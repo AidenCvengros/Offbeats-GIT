@@ -151,17 +151,13 @@ void Player::Update(double dt)
 		// If walking or placing, start running
 		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking || _GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
 		{
-			_SceneManager->GetCurrentScene()->RefreshScene();
-			_GameStateManager->SetGameState(GameStateManager::GameStates::Running);
-			inventory->PlacingMode(false);
+			_GameStateManager->RefreshCurrentScene(GameStateManager::GameStates::Running);
 		}
 		// Otherwise goes back to walking
 		else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
 		{
-			_GameStateManager->SetGameState(GameStateManager::GameStates::Walking);
+			_GameStateManager->RefreshCurrentScene(GameStateManager::GameStates::Walking);
 		}
-
-		_Window->GetCamera()->ResetCameraOffset();
 	}
 
 	// If the player is running
@@ -209,13 +205,23 @@ void Player::Update(double dt)
 			AcceleratePlayerHorizontal(0.0f, dt);
 		}
 
+		// If the player is floating and presses down, starts falling normally
+		if (floating && _InputManager->ReadInput(InputManager::Inputs::Down))
+		{
+			floating = false;
+		}
+
 		// Checks if the player has left the ground
 		if (UngroundedCheck())
 		{
 			// Checks if the player is in reduced gravity or not
-			if (reducedGravity <= 0.0f)
+			if (reducedGravity <= 0.0f && !floating)
 			{
 				AcceleratePlayerVertical(-65.0f, dt);
+			}
+			else if (floating)
+			{
+				AcceleratePlayerVertical(-40.0f, dt);
 			}
 			else
 			{
@@ -278,6 +284,16 @@ void Player::Update(double dt)
 					jumped = true;
 					wallJumpTimer = 0.0f;
 				}
+			}
+			// Otherwise we go into float mode
+			else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking)
+			{
+				// Jumps the player more
+				verticalVelocity = 15.0f;
+
+				// Sets that the player is now in floating
+				jumped = true;
+				floating = true;
 			}
 		}
 		// Checks if the jump input was released
@@ -407,7 +423,14 @@ void Player::AcceleratePlayerHorizontal(float accelerationAmount, double dt)
 	}
 
 	// Puts a max cap to the player's velocity
-	horizontalVelocity = std::clamp(horizontalVelocity, -maxSpeed, maxSpeed);
+	if (!floating)
+	{
+		horizontalVelocity = std::clamp(horizontalVelocity, -maxSpeed, maxSpeed);
+	}
+	else
+	{
+		horizontalVelocity = std::clamp(horizontalVelocity, -maxSpeed * 0.5f, maxSpeed * 0.5f);
+	}
 }
 
 /*************************************************************************************************/
@@ -577,6 +600,7 @@ void Player::MovePlayer(double dt)
 			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(bottomLeftSideTile).y + 2.0f;// 15625f;
 
 			grounded = true;
+			floating = false;
 
 			// Kills the player's velocity
 			verticalVelocity = 0;
@@ -718,6 +742,7 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 			verticalVelocity = cosf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
 			horizontalVelocity = sinf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
 			reducedGravity = 0.25f;
+			floating = false;
 		}
 		// Checks for a teleporter
 		else if (targetTile.tileStatus == MapMatrix::TileStatus::Teleporter)

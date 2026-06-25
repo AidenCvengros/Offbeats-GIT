@@ -1,11 +1,11 @@
 /*************************************************************************************************/
 /*!
-\file Inventory.h
+\file RefreshSceneOption.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2025.5.5
+\date 2026.6.23
 \brief
-    The player's inventory manager
+    The menu option for refreshing a scene into walking or running mode
 
     Functions include:
         + [FILL]
@@ -14,8 +14,8 @@ Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Inventory_H_
-#define Syncopatience_Inventory_H_
+#ifndef Syncopatience_RefreshSceneOption_H_
+#define Syncopatience_RefreshSceneOption_H_
 
 #pragma once
 
@@ -24,22 +24,16 @@ Copyright (c) 2025 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base include
-#include "../Engine/stdafx.h"
+#include "../../Engine/stdafx.h"
+#include "MenuOption.h"
 
-// Inventory objects are stored in an array container
-#include <array>
+// Additional includes
+#include "../../Engine/GameStateManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
-// Dependency reference
-class Key;
-class Sticker;
-class Teleporter;
-class GameObject;
-class BigCoin;
-class Text;
 class Menu;
 
 //-------------------------------------------------------------------------------------------------
@@ -53,10 +47,10 @@ class Menu;
 /*************************************************************************************************/
 /*!
 	\brief
-		The inventory manager class
+		The class for menu options to refresh the scene
 */
 /*************************************************************************************************/
-class Inventory
+class RefreshSceneOption : public MenuOption
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -78,149 +72,47 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the inventory class
+			Constructor for the menu class
+
+		\param _optionVisual
+			The visual representation of the menu option
+
+		\param newGameState
+			The game state the game will be in after resetting
 	*/
 	/*************************************************************************************************/
-	Inventory();
+	RefreshSceneOption(GameObject* _optionVisual, GameStateManager::GameStates newGameState) : MenuOption(_optionVisual), gameState(newGameState) {}
 
 	/*************************************************************************************************/
 	/*!
 		 \brief
-			Destructor for inventory class
+			Destructor for menu class
 	*/
 	/*************************************************************************************************/
-	~Inventory() {}
+	~RefreshSceneOption() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Adds the given key to the inventory
-
-		\param newKey
-			The new key to be added into the inventory
-
-		\return
-			Returns true if the key was added. False if not
+			Performs the hovering behavior
 	*/
 	/*************************************************************************************************/
-	bool AddKey(Key* newKey);
+	virtual void Hovering();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Adds the given sticker to the inventory
-
-		\param newSticker
-			The new sticker to be added into the inventory
-
-		\return
-			Returns true if the sticker was added. False if not
+			Performs the behavior when this option is selected
 	*/
 	/*************************************************************************************************/
-	bool AddSticker(Sticker* newSticker);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Adds the given key to the inventory
-	*/
-	/*************************************************************************************************/
-	void AddCoin();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Adds a big coin to the inventory
-	*/
-	/*************************************************************************************************/
-	void AddBigCoin();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Checks whether the player has a key of the given index
-
-		\param keyIndex
-			The index of the key being checked
-
-		\return
-			Whether the player has the key
-	*/
-	/*************************************************************************************************/
-	bool HaveKey(int keyIndex) { return keyList[keyIndex] != NULL; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the sticker at the selected index
-
-		\return
-			The chosen sticker
-	*/
-	/*************************************************************************************************/
-	Sticker* GetSelectedSticker();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Clears the sticker at the selected index
-	*/
-	/*************************************************************************************************/
-	void ClearSelectedSticker();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets a new active teleporter
-
-		\param newActiveTeleporter
-			The new active teleporter
-	*/
-	/*************************************************************************************************/
-	void SetActiveTeleporter(Teleporter* newActiveTeleporter);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Teleports the given object to the teleporter if one is active
-
-		\param gameObject
-			The object to be teleported
-
-		\return
-			If the object was teleported
-	*/
-	/*************************************************************************************************/
-	bool Teleport(GameObject* gameObject);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Turns on or off placing mode
-
-		\param isPlacing
-			Whether placing mode is on or off
-	*/
-	/*************************************************************************************************/
-	void PlacingMode(bool isPlacing);
+	virtual void Selected();
 
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	std::array<Key*, 56> keyList;					// The list of keys the player has collected
-	int keyCount;									// The number of keys the player has collected in this level
-	int coinCount;									// The number of coins the player has collected
-	int bigCoinCount;								// The number of big coins the player has collected
-
-	std::array<Sticker*, 10> stickerList;			// The list of stickers the player has currently
-	std::array<GameObject*, 10> inventoryObjects;	// The list of inventory objects
-	Menu* stickerMenu;								// The visual menu for sticker ui
-
-	Teleporter* activeTeleporter;					// The most recently active teleporter to send the player to
-
-	Text* coinText;									// Text object showing the player how many coins they have collected
+	GameStateManager::GameStates gameState;		// What game state to refresh to
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
@@ -243,4 +135,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Inventory_H_
+#endif // Syncopatience_RefreshSceneOption_H_

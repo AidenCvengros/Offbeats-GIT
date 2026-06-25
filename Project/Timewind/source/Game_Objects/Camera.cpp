@@ -29,6 +29,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Engine/InputManager.h"
 #include "../Engine/Window.h"
 #include "../Engine/GameStateManager.h"
+#include "../Visuals/CameraMovement.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -94,7 +95,8 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 	aspectRatio(aspectRatio_),
 	fov(fieldOfView),
 	lookAtOffset(0.0f, 0.0f), maxOffsetDistance(6.0f), useOffset(true), cameraSensitivity(4.0f),
-	cameraOffset({ 0.0f, 0.0f })
+	cameraOffset({ 0.0f, 0.0f }),
+	currentCameraMovement(NULL)
 {
 	// If there is a centered object, starts the camera centered on that object
 	if (centeredObject)
@@ -196,6 +198,27 @@ void Camera::Update(double dt)
 		//	zDist = 15.5f - (15.5f - zDist) / (1.0f + dt);
 		//	lookAtOffset.x = lookAtOffset.x * (1.0f - 0.9 * dt);
 		//}
+	}
+	else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Cutscene)
+	{
+		// Checks that there is an unfinished camera movement
+		if (currentCameraMovement)
+		{
+			if (currentCameraMovement->GetRemainingTime() > 0.0)
+			{
+				// Updates the camera movement
+				currentCameraMovement->Update(dt);
+
+				// Updates camera position in accordance
+				SetPosition(currentCameraMovement->GetPosition());
+				zDist = currentCameraMovement->GetPosition().z;
+			}
+			else
+			{
+				// If the movement has finished, clears the camera movement
+				currentCameraMovement = NULL;
+			}
+		}
 	}
 }
 
@@ -343,6 +366,20 @@ void Camera::SetCenteredObject(Player* object)
 	centeredObject = object;
 	cameraBoxPos = centeredObject->GetPosition();
 	SetPosition(centeredObject->GetPosition());
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Starts the given camera movement
+
+	\param newCameraMovement
+		The new camera movement
+*/
+/*************************************************************************************************/
+void Camera::StartCameraMovement(CameraMovement* newCameraMovement)
+{
+	currentCameraMovement = newCameraMovement;
 }
 
 //-------------------------------------------------------------------------------------------------

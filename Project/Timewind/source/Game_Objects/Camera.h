@@ -39,6 +39,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
+class CameraMovement;
+
 //-------------------------------------------------------------------------------------------------
 // Public Constants
 //-------------------------------------------------------------------------------------------------
@@ -212,6 +214,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void SetCenteredObject(Player* object);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Starts the given camera movement
+
+		\param newCameraMovement
+			The new camera movement
+	*/
+	/*************************************************************************************************/
+	void StartCameraMovement(CameraMovement* newCameraMovement);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -254,6 +267,8 @@ private:
 	float cameraSensitivity;					// Multiplier for the mouse
 
 	glm::vec2 cameraOffset;						// How far to the side/up from the camera box position that camera is
+
+	CameraMovement* currentCameraMovement;		// The current camera movement
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

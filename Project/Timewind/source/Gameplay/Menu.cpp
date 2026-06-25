@@ -32,6 +32,8 @@ Copyright (c) 2025 Aiden Cvengros
 #include "../Engine/GameObjectManager.h"
 #include "MenuOptions/CreateSubmenuOption.h"
 #include "MenuOptions/GoToSceneOption.h"
+#include "../Engine/SceneManager.h"
+#include "MenuOptions/RefreshSceneOption.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -84,18 +86,28 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 		// Creates the pause menu
 		Text* resumeOptionText = new Text("RESUME", _TextureManager->GetDefaultFont(), 18, { -4.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		Text* optionsOptionText = new Text("OPTIONS", _TextureManager->GetDefaultFont(), 18, { -4.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Text* quitOptionText = new Text("MAIN MENU", _TextureManager->GetDefaultFont(), 18, { -4.0f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* restartWalkingText = new Text("RESTART LEVEL", _TextureManager->GetDefaultFont(), 18, { -4.0f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* restartRunningText = new Text("SPEED RESTART", _TextureManager->GetDefaultFont(), 18, { -4.0f, -4.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* quitOptionText = new Text("MAIN MENU", _TextureManager->GetDefaultFont(), 18, { -4.0f, -6.0f }, 0.0f, { 0.1f, 0.1f }, 90, { 1.0f, 1.0f, 1.0f, 1.0f });
 		resumeOptionText->SetFollowingCamera(true);
 		optionsOptionText->SetFollowingCamera(true);
+		restartWalkingText->SetFollowingCamera(true);
+		restartRunningText->SetFollowingCamera(true);
 		quitOptionText->SetFollowingCamera(true);
 		SubmenuOption* resumeOption = new SubmenuOption(resumeOptionText, this, SubmenuOption::SubmenuInteraction::Close);
 		CreateSubmenuOption* optionsOption = new CreateSubmenuOption(optionsOptionText, MenuType::Options);
+		RefreshSceneOption* restartWalkingOption = new RefreshSceneOption(restartWalkingText, GameStateManager::GameStates::Walking);
+		RefreshSceneOption* restartRunningOption = new RefreshSceneOption(restartRunningText, GameStateManager::GameStates::Running);
 		GoToSceneOption* quitOption = new GoToSceneOption(quitOptionText, 0);
 		_GameObjectManager->AddGameObject(resumeOptionText);
 		_GameObjectManager->AddGameObject(optionsOptionText);
+		_GameObjectManager->AddGameObject(restartWalkingText);
+		_GameObjectManager->AddGameObject(restartRunningText);
 		_GameObjectManager->AddGameObject(quitOptionText);
 		AddOption(resumeOption);
 		AddOption(optionsOption);
+		AddOption(restartWalkingOption);
+		AddOption(restartRunningOption);
 		AddOption(quitOption);
 		active = false;
 		fragile = true;
@@ -331,10 +343,10 @@ void Menu::TurnOnMenu()
 		// Turns on the option's visual
 		(*i)->GetVisual()->SetActive(true);
 		// Checks that the object can be rendered
-		if ((*i)->GetVisual()->GetTexture())
-		{
-			(*i)->GetVisual()->SetRender(true);
-		}
+		//if ((*i)->GetVisual()->GetTexture())
+		//{
+		//	(*i)->GetVisual()->SetRender(true);
+		//}
 	}
 
 	// Loops through the objects list
@@ -342,7 +354,7 @@ void Menu::TurnOnMenu()
 	{
 		// Turns on the objects
 		(*i)->SetActive(true);
-		(*i)->SetRender(true);
+		//(*i)->SetRender(true);
 	}
 
 	// Sets the menu to on
@@ -352,7 +364,7 @@ void Menu::TurnOnMenu()
 	if (cursorObject)
 	{
 		cursorObject->SetActive(true);
-		cursorObject->SetRender(true);
+		//cursorObject->SetRender(true);
 		cursorObject->SetPosition(optionList[optionIndex]->GetVisual()->GetPosition() + cursorOffset);
 	}
 }
@@ -379,7 +391,7 @@ bool Menu::TurnOffMenu(bool resetIndex)
 		{
 			// Turns off the option's visual
 			(*i)->GetVisual()->SetActive(false);
-			(*i)->GetVisual()->SetRender(false);
+			//(*i)->GetVisual()->SetRender(false);
 		}
 
 		// Loops through the objects list
@@ -387,7 +399,7 @@ bool Menu::TurnOffMenu(bool resetIndex)
 		{
 			// Turns off the objects
 			(*i)->SetActive(false);
-			(*i)->SetRender(false);
+			//(*i)->SetRender(false);
 		}
 
 		// Resets the index if requested
@@ -400,7 +412,7 @@ bool Menu::TurnOffMenu(bool resetIndex)
 		if (cursorObject)
 		{
 			cursorObject->SetActive(false);
-			cursorObject->SetRender(false);
+			//cursorObject->SetRender(false);
 		}
 
 		// Sets the menu to off
