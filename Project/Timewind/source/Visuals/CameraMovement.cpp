@@ -73,21 +73,29 @@ void CameraMovement::Update(double dt)
 		if (movementType == MovementType::Translation)
 		{
 			totalTranslationOffset += (float)(dt / length) * magnitude;
+			totalLookAtOffset += (float)(dt / length) * magnitude;
 		}
 		else if (movementType == MovementType::Revolution)
 		{
 			// Gets the relative vector
-			glm::vec3 relativeVec = GetPosition() - lookAtPos;
+			glm::vec3 relativeVec = glm::normalize(GetPosition() - lookAtPos);
 
 			// Calculates current angle
-			float horizAngle = atan(relativeVec.z / relativeVec.x);
+			
+			//float horizAngle = acosf(glm::dot(relativeVec, { 1, 0, 0 }));
+			float horizAngle = atanf(relativeVec.z / relativeVec.x);
+			if (relativeVec.x >= 0.0f)
+			{
+				horizAngle += glm::pi<float>();
+			}
 			//float vertAngle = acos(relativeVec.y / relativeVec)
 
 			// Calculates the new positions based on how much time has elapsed since the previous frame
 			double timeElapsedPercentage = dt / length;
-			totalTranslationOffset.x += cosf(horizAngle + timeElapsedPercentage * magnitude.x) * magnitude.z;
+			float newAngle = horizAngle + timeElapsedPercentage * magnitude.x;
+			totalTranslationOffset.x = (cosf(newAngle) * magnitude.z) + lookAtPos.x - startingPos.x;
 			//totalTranslationOffset.y = sinf(timeElapsedPercentage * magnitude.y) * magnitude.z;
-			totalTranslationOffset.z += sinf(horizAngle + timeElapsedPercentage * magnitude.x) * magnitude.z;
+			totalTranslationOffset.z = (sinf(newAngle) * magnitude.z) + lookAtPos.z - startingPos.z;
 		}
 	}
 }

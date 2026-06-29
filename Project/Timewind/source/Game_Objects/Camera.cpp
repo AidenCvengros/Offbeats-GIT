@@ -81,21 +81,12 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_, float aspectRatio_, float fieldOfView) :
 	GameObject(pos, rot, sca),
-	//rotationChanged(true),
-	perspectiveChanged(true),
-	inCutscene(false),
-	upVector(glm::vec3(0.0f, 1.0f, 0.0f)),
-	centeredObject(centeredObject_),
-	zDist(15.0f),
-	cameraBoxPos(pos),
-	cameraBoxLeft(0.5f), cameraBoxRight(0.5f), cameraBoxUp(4.0f), cameraBoxDown(1.0f),
-	justGrounded(false),
-	viewMat(glm::mat4(0.0f)),
-	perspMat(glm::mat4(0.0f)),
-	aspectRatio(aspectRatio_),
-	fov(fieldOfView),
-	lookAtOffset(0.0f, 0.0f), maxOffsetDistance(6.0f), useOffset(true), cameraSensitivity(4.0f),
-	cameraOffset({ 0.0f, 0.0f }),
+	perspectiveChanged(true), viewMat(glm::mat4(0.0f)), perspMat(glm::mat4(0.0f)),
+	upVector(glm::vec3(0.0f, 1.0f, 0.0f)), aspectRatio(aspectRatio_), fov(fieldOfView),
+	centeredObject(centeredObject_), cameraBoxPos(pos), zDist(15.0f),
+	lookAtOffset({ 0.0f }), cameraOffset({ 0.0f }), usePerspective(0.0f),
+	cameraBoxRight(0.5f), cameraBoxLeft(0.5f), cameraBoxUp(4.0f), cameraBoxDown(1.0f), justGrounded(false),
+	maxOffsetDistance(6.0f), useOffset(true), cameraSensitivity(4.0f),
 	currentCameraMovement(NULL)
 {
 	// If there is a centered object, starts the camera centered on that object
@@ -117,87 +108,62 @@ Camera::Camera(glm::vec2 pos, float rot, glm::vec2 sca, Player* centeredObject_,
 /*************************************************************************************************/
 void Camera::Update(double dt)
 {
-	// Checks if the player can move the camera
-	if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking || _GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
+	// Checks if we are in normal gameplay
+	if (_GameStateManager->GetGameState() <= GameStateManager::GameStates::Running)
 	{
-		// Updates camera view positioning
-		UpdateRelativePosition();
+		// Updates the camera box in case the player has moved
 		UpdateCameraBox(dt);
 
-		// Updates the camera's position
-		SetPosition(glm::vec2(cameraBoxPos.x, cameraBoxPos.y));
-		zDist = 15.5f;
-	}
-	// Checks if the player is using the running camera
-	else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
-	{
-		// Updates the Camera Box
-		UpdateCameraBox(dt);
-
-		// Sets the camera based on what direction the player is holding
-		if (_InputManager->ReadInput(InputManager::Inputs::Right))
+		// Checks if the player can move the camera
+		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking || _GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
 		{
-			if (cameraOffset.x > 0.0f)
+			// Updates camera view positioning
+			UpdatePlayerCameraMovements();
+
+			// Updates the camera's variables
+			zDist = 15.5f;
+			usePerspective = 0.0f;
+		}
+		// Checks if the player is using the running camera
+		else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
+		{
+			// Sets the camera based on what direction the player is holding
+			if (_InputManager->ReadInput(InputManager::Inputs::Right))
 			{
-				cameraOffset.x = cameraOffset.x - 16.0f * dt;
-				lookAtOffset.x = lookAtOffset.x + 4.0f * dt;
+				if (cameraOffset.x > 0.0f)
+				{
+					cameraOffset.x = cameraOffset.x - 16.0f * dt;
+					lookAtOffset.x = lookAtOffset.x + 4.0f * dt;
+				}
+				else
+				{
+					cameraOffset.x = std::max(cameraOffset.x - (16.0f + cameraOffset.x * 1.5f) * dt, -8.0);
+					lookAtOffset.x = std::min(lookAtOffset.x + (4.0f - lookAtOffset.x * 1.5f) * dt, 2.0);
+				}
+			}
+			else if (_InputManager->ReadInput(InputManager::Inputs::Left))
+			{
+				if (cameraOffset.x < 0.0f)
+				{
+					cameraOffset.x = cameraOffset.x + 16.0f * dt;
+					lookAtOffset.x = lookAtOffset.x - 4.0f * dt;
+				}
+				else
+				{
+					cameraOffset.x = std::min(cameraOffset.x + (16.0f - cameraOffset.x * 1.5f) * dt, 8.0);
+					lookAtOffset.x = std::max(lookAtOffset.x - (4.0f + lookAtOffset.x * 1.5f) * dt, -2.0);
+				}
 			}
 			else
 			{
-				cameraOffset.x = std::max(cameraOffset.x - (16.0f + cameraOffset.x * 1.5f) * dt, -8.0);
-				lookAtOffset.x = std::min(lookAtOffset.x + (4.0f - lookAtOffset.x * 1.5f) * dt, 2.0);
+				cameraOffset /= 1.0f + 0.5f * dt;
 			}
-		}
-		else if (_InputManager->ReadInput(InputManager::Inputs::Left))
-		{
-			if (cameraOffset.x < 0.0f)
-			{
-				cameraOffset.x = cameraOffset.x + 16.0f * dt;
-				lookAtOffset.x = lookAtOffset.x - 4.0f * dt;
-			}
-			else
-			{
-				cameraOffset.x = std::min(cameraOffset.x + (16.0f - cameraOffset.x * 1.5f) * dt, 8.0);
-				lookAtOffset.x = std::max(lookAtOffset.x - (4.0f + lookAtOffset.x * 1.5f) * dt, -2.0);
-			}
-		}
-		else
-		{
-			cameraOffset /= 1.0f + 0.5f * dt;
-		}
 
-		SetPosition(cameraBoxPos + cameraOffset);
-		zDist = 15.5f - (cameraOffset.x * cameraOffset.x / 12.0f);
-
-		// Updates movements if any are active
-		if (GetMoving())
-		{
-			MoveToUpdate(dt);
+			// Updates the camera's variables
+			zDist = 15.5f;
+			cameraOffset.z = -(cameraOffset.x * cameraOffset.x / 12.0f);
+			usePerspective = 1.0f;
 		}
-
-		//// Sets the camera behind the player
-		//float velocityOffset = centeredObject->GetVelocity().first;
-		//if (abs(velocityOffset) > 0.5f)
-		//{
-		//	SetPosition(glm::vec2(cameraBoxPos.x - (velocityOffset / 2.0f), cameraBoxPos.y - (abs(velocityOffset) / 10.0f)));
-		//	zDist = 15.5f - (velocityOffset * velocityOffset / 100.0f);
-		//	lookAtOffset.x = (cameraBoxPos.x - GetPosition().x) / 5.0f;
-		//}
-		//// If the player is almost stopped, smooths the camera back to start
-		//else
-		//{
-		//	MoveTo(cameraBoxPos, 0.5f, 0.0f);
-		//
-		//	// Updates movements if any are active
-		//	if (GetMoving())
-		//	{
-		//		MoveToUpdate(dt);
-		//	}
-		//
-		//	// Calculates the distance from cameraboxpos
-		//	zDist = 15.5f - (15.5f - zDist) / (1.0f + dt);
-		//	lookAtOffset.x = lookAtOffset.x * (1.0f - 0.9 * dt);
-		//}
 	}
 	else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Cutscene)
 	{
@@ -209,9 +175,9 @@ void Camera::Update(double dt)
 				// Updates the camera movement
 				currentCameraMovement->Update(dt);
 
-				// Updates camera position in accordance
-				SetPosition(currentCameraMovement->GetPosition());
-				zDist = currentCameraMovement->GetPosition().z;
+				// Updates offsets in accordance
+				lookAtOffset = currentCameraMovement->GetLookAtOffset();
+				cameraOffset = currentCameraMovement->GetTranslationOffset();
 			}
 			else
 			{
@@ -219,18 +185,28 @@ void Camera::Update(double dt)
 				currentCameraMovement = NULL;
 			}
 		}
+
+		// Updates the camera's variables
+		usePerspective = 1.0f;
+
+		FixCameraPosition();
+		std::cout << Get3DPosition().x << ", " << Get3DPosition().y << ", " << Get3DPosition().z << std::endl;
 	}
+
+	// Corrects the camera position given all offset changes made this frame
+	FixCameraPosition();
 }
 
 /*************************************************************************************************/
 /*!
 	\brief
-		Resets the camera offset to (0, 0)
+		Resets the camera offsets to (0, 0)
 */
 /*************************************************************************************************/
 void Camera::ResetCameraOffset()
 {
-	lookAtOffset = { 0.0f, 0.0f };
+	lookAtOffset = { 0.0f, 0.0f, 0.0f };
+	cameraOffset = { 0.0f, 0.0f, 0.0f };
 }
 
 /*************************************************************************************************/
@@ -244,21 +220,8 @@ void Camera::ResetCameraOffset()
 /*************************************************************************************************/
 glm::mat4 Camera::GetViewMatrix()
 {
-	// If the rotation of the camera has changed since the last check
-	if (centeredObject)
-	{
-		// Update and return the view matrix
-		//float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
-		//float zCoord = -sqrt(abs(zDist * zDist - distanceFromPlayer * distanceFromPlayer));
-		viewMat = glm::lookAt(glm::vec3(GetPosition(), -zDist), glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, 0.0), upVector);
-	}
-	else
-	{
-		// If there's not a centered object, default to (0, 0, 0)
-		viewMat = glm::lookAt(glm::vec3(GetPosition(), -zDist), glm::vec3(0.0f, 0.0f, 0.0f), upVector);
-	}
-	
-	// Then return the view matrix
+	// Update and return the view matrix
+	viewMat = glm::lookAt(glm::vec3(Get3DPosition()), glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, lookAtOffset.z), upVector);
 	return viewMat;
 }
 
@@ -276,16 +239,12 @@ glm::mat4 Camera::GetPerspectiveMatrix()
 	// Checks that the perspective matrix has been adjusted
 	if (perspectiveChanged)
 	{
-		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
-		{
-			// Calculates the new perspective matrix
-			perspMat = glm::perspective(fov, aspectRatio, 0.1f, 100.0f);
-		}
-		else
-		{
-			// Calculates the orthogonal matrix
-			perspMat = glm::ortho(-16.0f, 16.0f, -16.0f / aspectRatio, 16.0f / aspectRatio, -1000.0f, 1000.0f);
-		}
+		// Calculates the new perspective and orthogonal matrix
+		glm::mat4 perspective = glm::perspective(fov, aspectRatio, 0.1f, 100.0f);
+		glm::mat4 orthogonal = glm::ortho(-16.0f, 16.0f, -16.0f / aspectRatio, 16.0f / aspectRatio, -1000.0f, 1000.0f);
+
+		// Combines the two matrices
+		perspMat = (perspective * usePerspective) + (orthogonal * (1.0f - usePerspective));
 
 		// Flips the screen upside down
 		perspMat[1][1] *= -1.0;
@@ -306,7 +265,8 @@ glm::mat4 Camera::GetPerspectiveMatrix()
 /*************************************************************************************************/
 glm::vec4 Camera::GetLookAtVector()
 {
-	return glm::vec4(cameraBoxPos - GetPosition(), -zDist, 1.0f);
+	FixCameraPosition();
+	return glm::vec4(GetLookAtPosition() - GetPosition(), -zDist, 1.0f);
 }
 
 /*************************************************************************************************/
@@ -320,7 +280,8 @@ glm::vec4 Camera::GetLookAtVector()
 /*************************************************************************************************/
 glm::vec4 Camera::Get3DPosition()
 {
-	return glm::vec4(GetPosition(), zDist, 1.0f);
+	FixCameraPosition();
+	return glm::vec4(GetPosition(), -zDist + cameraOffset.z, 1.0f);
 }
 
 /*************************************************************************************************/
@@ -340,7 +301,7 @@ glm::vec2 Camera::GetLookAtPosition()
 		// Calculates the vector that the camera is looking at
 		//float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
 		//float zCoord = -sqrt(abs(zDist * zDist - distanceFromPlayer * distanceFromPlayer));
-		glm::vec3 lookAtVector = glm::normalize(glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, 0.0f) - glm::vec3(GetPosition(), -zDist));
+		glm::vec3 lookAtVector = glm::normalize(glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, lookAtOffset.z) - glm::vec3(GetPosition(), -zDist));
 
 		// Calculates and returns what point in world space the camera is pointed at
 		return (-glm::vec2(lookAtVector.x, lookAtVector.y) * (-zDist / lookAtVector.z)) + GetPosition();
@@ -361,11 +322,11 @@ glm::vec2 Camera::GetLookAtPosition()
 		The new centered object
 */
 /*************************************************************************************************/
-void Camera::SetCenteredObject(Player* object)
+void Camera::SetCenteredObject(GameObject* object)
 {
 	centeredObject = object;
 	cameraBoxPos = centeredObject->GetPosition();
-	SetPosition(centeredObject->GetPosition());
+	FixCameraPosition();
 }
 
 /*************************************************************************************************/
@@ -389,10 +350,22 @@ void Camera::StartCameraMovement(CameraMovement* newCameraMovement)
 /*************************************************************************************************/
 /*!
 	\brief
-		Updates the relative camera position
+		Updates the camera position given all offsets
 */
 /*************************************************************************************************/
-void Camera::UpdateRelativePosition()
+void Camera::FixCameraPosition()
+{
+	// Calculates the x,y pos using all offsets
+	SetPosition({ cameraBoxPos.x + cameraOffset.x, cameraBoxPos.y + cameraOffset.y });
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Update function to move the camera offsets in tune with player inputs
+*/
+/*************************************************************************************************/
+void Camera::UpdatePlayerCameraMovements()
 {
 	// Centers the camera when asked
 	if (_InputManager->CheckInputStatus(InputManager::Inputs::CenterCamera) == InputManager::InputStatus::Pressed)
@@ -413,7 +386,10 @@ void Camera::UpdateRelativePosition()
 	}
 
 	// Sets the look at offset
-	lookAtOffset = mouseDelta;
+	lookAtOffset.x = mouseDelta.x;
+	lookAtOffset.y = mouseDelta.y;
+	cameraOffset.x = mouseDelta.x;
+	cameraOffset.y = mouseDelta.y;
 }
 
 /*************************************************************************************************/
@@ -429,32 +405,32 @@ void Camera::UpdateCameraBox(double dt)
 {
 	// Gets the centered object's position
 	glm::vec2 coPos = centeredObject->CalculateRelativePositions(GameObject::Positions::Center);
-	std::pair<float, float> coVel = centeredObject->GetVelocity();
+	glm::vec2 coVel = ((Player*)centeredObject)->GetVelocity();
 
 	// Checks if player has gone too far to the right
 	if (coPos.x - cameraBoxPos.x > cameraBoxRight)
 	{
 		cameraBoxPos.x = coPos.x - cameraBoxRight;
 	}
-	else if (coPos.x - cameraBoxPos.x > 0.0f && coVel.first > 4.0f)
+	else if (coPos.x - cameraBoxPos.x > 0.0f && coVel.x > 4.0f)
 	{
-		cameraBoxPos.x += coVel.first * (float)dt * 0.5f;
+		cameraBoxPos.x += coVel.x * (float)dt * 0.5f;
 	}
 	// Checks if the player has gone too far left
 	else if (cameraBoxPos.x - coPos.x > cameraBoxLeft)
 	{
 		cameraBoxPos.x = coPos.x + cameraBoxLeft;
 	}
-	else if (cameraBoxPos.x - coPos.x > 0.0f && coVel.first < -4.0f)
+	else if (cameraBoxPos.x - coPos.x > 0.0f && coVel.x < -4.0f)
 	{
-		cameraBoxPos.x += coVel.first * (float)dt * 0.5f;
+		cameraBoxPos.x += coVel.x * (float)dt * 0.5f;
 	}
 
-	if (!centeredObject->GetIsGrounded())
+	if (!((Player*)centeredObject)->GetIsGrounded())
 	{
 		justGrounded = false;
 	}
-	else if (justGrounded == false && centeredObject->GetIsGrounded())
+	else if (justGrounded == false && ((Player*)centeredObject)->GetIsGrounded())
 	{
 		cameraBoxPos.y += (coPos.y - cameraBoxPos.y) * 8.0f * (float)dt;
 

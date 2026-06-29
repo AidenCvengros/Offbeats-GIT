@@ -430,9 +430,8 @@ void GameStateManager::UpdateCutscene(double dt)
 		else if (cutsceneScript.front().first == CutsceneActions::RefreshScene)
 		{
 			// Goes through refresh protocol
-			_SceneManager->GetCurrentScene()->RefreshScene();
-			_GameStateManager->SetGameState(GameStateManager::GameStates::Running);
 			_GameObjectManager->GetPlayer()->GetInventory()->PlacingMode(false);
+			_SceneManager->GetCurrentScene()->RefreshScene();
 			_Window->GetCamera()->ResetCameraOffset();
 
 			// Clears the command

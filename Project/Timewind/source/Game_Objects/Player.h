@@ -133,7 +133,7 @@ public:
 			The player's current velocity (x, y)
 	*/
 	/*************************************************************************************************/
-	std::pair<float, float> GetVelocity() { return std::make_pair(horizontalVelocity, verticalVelocity); }
+	glm::vec2 GetVelocity() { return { horizontalVelocity, verticalVelocity }; }
 
 	/*************************************************************************************************/
 	/*!

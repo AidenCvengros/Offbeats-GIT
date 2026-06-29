@@ -90,7 +90,7 @@ public:
 	/*************************************************************************************************/
 	CameraMovement(MovementType _movementType, double _length, glm::vec3 _startingPosition, glm::vec3 _lookAtPosition, float xMagnitude, float yMagnitude = 0.0f, float zMagnitude = 0.0f) : movementType(_movementType), length(_length), 
 		startingPos(_startingPosition), lookAtPos(_lookAtPosition), magnitude({ xMagnitude, yMagnitude, zMagnitude }),
-		timeRemaining(_length), totalTranslationOffset({ 0.0f }) {}
+		timeRemaining(_length), totalLookAtOffset({ 0.0f }), totalTranslationOffset({ 0.0f }) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -147,6 +147,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns how far the look at position has moved
+
+		\return
+			The look at offset
+	*/
+	/*************************************************************************************************/
+	glm::vec3 GetLookAtOffset() { return totalLookAtOffset; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the translation the movement has produced
 
 		\return
@@ -178,6 +189,7 @@ private:
 	glm::vec3 lookAtPos;						// The point the camera is looking at
 
 	double timeRemaining;						// The amount of time remaining
+	glm::vec3 totalLookAtOffset;				// The total offset of where the camera should be looking
 	glm::vec3 totalTranslationOffset;			// The total offset the movement has produced so far
 	
 	//---------------------------------------------------------------------------------------------

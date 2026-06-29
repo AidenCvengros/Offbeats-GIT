@@ -122,7 +122,7 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Resets the camera offset to (0, 0)
+			Resets the camera offsets to (0, 0)
 	*/
 	/*************************************************************************************************/
 	void ResetCameraOffset();
@@ -213,7 +213,7 @@ public:
 			The new centered object
 	*/
 	/*************************************************************************************************/
-	void SetCenteredObject(Player* object);
+	void SetCenteredObject(GameObject* object);
 
 	/*************************************************************************************************/
 	/*!
@@ -239,36 +239,40 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	//bool rotationChanged;						// Boolean for updating camera rotation				THIS VARIABLE NEEDS TO TRACK WHETHER THE TARGET GO HAS CHANGED BEFORE IT WORKS
+	// Basic camera operation variables
 	bool perspectiveChanged;					// Boolean for updating camera perspective matrix
-
-	bool inCutscene;							// Cutscenes hijack the normal gameplay camera
-
+	glm::mat4 viewMat;							// The view matrix for the camera
+	glm::mat4 perspMat;							// The perspective matrix for the camera
 	glm::vec3 upVector;							// The up vector for the camera
-	Player* centeredObject;						// The game object that the camera is focusing on (probably the player)
-	float zDist;								// How far in the z direction the camera is
+	float aspectRatio;							// The aspect ratio of the camera view
+	float fov;									// The field of view of the camera view
 
+	// By default the camera has an object confined within a camera box and the camera follows the camera box at zDist away.
+	// This can be changed in two ways:
+	// - The look at offset moves the point the camera is looking at. This offset is in reference to (cameraBoxPos.x, cameraBoxPos.y, 0.0).
+	// - The camera offset moves where the camera eye is positioned. This offset is in reference to (cameraBoxPos.x, cameraBoxPos.y, zDist).
+	GameObject* centeredObject;					// The game object that the camera is focusing on (probably the player)
+	bool centeredObjectIsPlayer;				// Tracks whether the centered object is the player
 	glm::vec2 cameraBoxPos;						// The position of the camera box
+	float zDist;								// How far in the z direction the camera is
+	glm::vec3 lookAtOffset;						// How far to the side/up the camera is looking
+	glm::vec3 cameraOffset;						// How far to the side/up from the camera box position that camera is
+	float usePerspective;						// How much perspective vs orthogonal to use (0 is orthogonal, 1 is perspective)
+
+	// Variables for calculating default camera box position
 	float cameraBoxRight;						// How far right the camera box extends
 	float cameraBoxLeft;						// How far left the camera box extends
 	float cameraBoxUp;							// How far up the camera box extends
 	float cameraBoxDown;						// How far down the camera box extends
 	bool justGrounded;							// Whether the player object just became grounded
 
-	glm::mat4 viewMat;							// The view matrix for the camera
-	glm::mat4 perspMat;							// The perspective matrix for the camera
-
-	float aspectRatio;							// The aspect ratio of the camera view
-	float fov;									// The field of view of the camera view
-
-	glm::vec2 lookAtOffset;						// How far to the side/up the camera is looking
+	// Variables for calculating default camera eye offset position
 	float maxOffsetDistance;					// How far to the side/up the camera can look
 	bool useOffset;								// Whether to use the offset
 	float cameraSensitivity;					// Multiplier for the mouse
 
-	glm::vec2 cameraOffset;						// How far to the side/up from the camera box position that camera is
-
-	CameraMovement* currentCameraMovement;		// The current camera movement
+	// Cutscene variables
+	CameraMovement* currentCameraMovement;		// The current camera movement. Only used for cutscenes.
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -277,10 +281,18 @@ private:
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the relative camera position
+			Updates the camera position given all offsets
 	*/
 	/*************************************************************************************************/
-	void UpdateRelativePosition();
+	void FixCameraPosition();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Update function to move the camera offsets in tune with player inputs
+	*/
+	/*************************************************************************************************/
+	void UpdatePlayerCameraMovements();
 
 	/*************************************************************************************************/
 	/*!
