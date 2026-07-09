@@ -100,6 +100,24 @@ void CameraMovement::Update(double dt)
 	}
 }
 
+/*************************************************************************************************/
+/*!
+	\brief
+		Returns the current perspective ratio
+
+	\return
+		Gets the perspective ratio
+*/
+/*************************************************************************************************/
+float CameraMovement::GetPerspective()
+{
+	// Calculates the ratio of the time elapsed
+	double timeElapsedPercentage = timeRemaining / length;
+
+	// Calculates the perspective ratio
+	return abs(startingPerspective * timeElapsedPercentage + endingPerspective * (1.0 - timeElapsedPercentage));
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------

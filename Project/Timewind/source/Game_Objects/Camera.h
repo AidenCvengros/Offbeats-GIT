@@ -207,6 +207,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the aspect ratio of the game window
+
+		\return
+			The aspect ratio (height/width)
+	*/
+	/*************************************************************************************************/
+	float GetPerspective() { return usePerspective; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets a game object for the camera to center on
 
 		\param object

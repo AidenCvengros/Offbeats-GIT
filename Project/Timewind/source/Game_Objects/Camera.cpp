@@ -177,7 +177,8 @@ void Camera::Update(double dt)
 
 				// Updates offsets in accordance
 				lookAtOffset = currentCameraMovement->GetLookAtOffset();
-				cameraOffset = currentCameraMovement->GetTranslationOffset();
+				cameraOffset = currentCameraMovement->GetPosition() - glm::vec3(cameraBoxPos.x, cameraBoxPos.y, -zDist);
+				usePerspective = currentCameraMovement->GetPerspective();
 			}
 			else
 			{
@@ -185,12 +186,6 @@ void Camera::Update(double dt)
 				currentCameraMovement = NULL;
 			}
 		}
-
-		// Updates the camera's variables
-		usePerspective = 1.0f;
-
-		FixCameraPosition();
-		std::cout << Get3DPosition().x << ", " << Get3DPosition().y << ", " << Get3DPosition().z << std::endl;
 	}
 
 	// Corrects the camera position given all offset changes made this frame
@@ -239,12 +234,15 @@ glm::mat4 Camera::GetPerspectiveMatrix()
 	// Checks that the perspective matrix has been adjusted
 	if (perspectiveChanged)
 	{
+		// Reformats use perspective
+		float perspectiveRatio = usePerspective * usePerspective;
+
 		// Calculates the new perspective and orthogonal matrix
 		glm::mat4 perspective = glm::perspective(fov, aspectRatio, 0.1f, 100.0f);
 		glm::mat4 orthogonal = glm::ortho(-16.0f, 16.0f, -16.0f / aspectRatio, 16.0f / aspectRatio, -1000.0f, 1000.0f);
 
 		// Combines the two matrices
-		perspMat = (perspective * usePerspective) + (orthogonal * (1.0f - usePerspective));
+		perspMat = (perspective * perspectiveRatio) + (orthogonal * (1.0f - perspectiveRatio));
 
 		// Flips the screen upside down
 		perspMat[1][1] *= -1.0;

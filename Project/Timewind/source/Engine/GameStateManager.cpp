@@ -286,9 +286,16 @@ void GameStateManager::RefreshCurrentScene(GameStates newGameState)
 	SetGameState(GameStates::Cutscene);
 
 	// Adds in transition actions
-	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.5, _Window->GetCamera()->Get3DPosition(), { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, -1.57f, 0.0f, _Window->GetCamera()->Get3DPosition().z)));
+	glm::vec3 relativeVec = glm::normalize(_Window->GetCamera()->GetLookAtVector());
+	float horizAngle = atanf(relativeVec.z / relativeVec.x);
+	if (relativeVec.x >= 0.0f)
+	{
+		horizAngle += glm::pi<float>();
+	}
+	horizAngle = glm::pi<float>() - horizAngle;
+	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.5, _Window->GetCamera()->Get3DPosition(), { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, { -horizAngle, 0.0f, _Window->GetCamera()->Get3DPosition().z }, _Window->GetCamera()->GetPerspective(), 1.0f - _Window->GetCamera()->GetPerspective())));
 	cutsceneScript.push(std::make_pair(CutsceneActions::RefreshScene, (void*)NULL));
-	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.5, { _Window->GetCamera()->GetLookAtPosition().x + _Window->GetCamera()->Get3DPosition().z, _Window->GetCamera()->GetLookAtPosition().y, 0.0f }, { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, -1.57f, 0.0f, _Window->GetCamera()->Get3DPosition().z)));
+	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.5, { _Window->GetCamera()->GetLookAtPosition().x - _Window->GetCamera()->Get3DPosition().z, _Window->GetCamera()->GetLookAtPosition().y, 0.0f }, { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, { -glm::pi<float>() / 2.0f, 0.0f, _Window->GetCamera()->Get3DPosition().z }, 1.0f - _Window->GetCamera()->GetPerspective(), 1.0f - _Window->GetCamera()->GetPerspective())));
 	cutsceneScript.push(std::make_pair(CutsceneActions::GameStateChange, new GameStates(newGameState)));
 }
 

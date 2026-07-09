@@ -88,8 +88,9 @@ public:
 			What action this button takes on the submenu
 	*/
 	/*************************************************************************************************/
-	CameraMovement(MovementType _movementType, double _length, glm::vec3 _startingPosition, glm::vec3 _lookAtPosition, float xMagnitude, float yMagnitude = 0.0f, float zMagnitude = 0.0f) : movementType(_movementType), length(_length), 
-		startingPos(_startingPosition), lookAtPos(_lookAtPosition), magnitude({ xMagnitude, yMagnitude, zMagnitude }),
+	CameraMovement(MovementType _movementType, double _length, glm::vec3 _startingPosition, glm::vec3 _lookAtPosition, glm::vec3 _magnitude, float _startingPerspective, float _endingPerspective) : movementType(_movementType), length(_length), 
+		startingPos(_startingPosition), lookAtPos(_lookAtPosition), magnitude(_magnitude),
+		startingPerspective(_startingPerspective), endingPerspective(_endingPerspective),
 		timeRemaining(_length), totalLookAtOffset({ 0.0f }), totalTranslationOffset({ 0.0f }) {}
 
 	/*************************************************************************************************/
@@ -177,6 +178,17 @@ public:
 	/*************************************************************************************************/
 	glm::vec3 GetPosition() { return startingPos + totalTranslationOffset; }
 
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns the current perspective ratio
+
+		\return
+			Gets the perspective ratio
+	*/
+	/*************************************************************************************************/
+	float GetPerspective();
+
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
@@ -187,6 +199,8 @@ private:
 	glm::vec3 magnitude;						// The magnitude of the movement (how it's used varies by movement type)
 	glm::vec3 startingPos;						// Where the camera starts
 	glm::vec3 lookAtPos;						// The point the camera is looking at
+	float startingPerspective;					// The perspective ratio the camera starts at
+	float endingPerspective;					// The perspective ratio the camera ends at
 
 	double timeRemaining;						// The amount of time remaining
 	glm::vec3 totalLookAtOffset;				// The total offset of where the camera should be looking
