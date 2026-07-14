@@ -79,7 +79,7 @@ Menu::Menu() : menuType(MenuType::Other), optionList(), menuObjects(), optionInd
 		The default menu type to build
 */
 /*************************************************************************************************/
-Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(), optionIndex(0), active(true), vertical(true), fragile(false)
+Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(), optionIndex(0), active(true), vertical(true), fragile(false), cursorObject(NULL), cursorOffset()
 {
 	if (_menuType == MenuType::Pause)
 	{

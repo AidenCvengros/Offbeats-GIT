@@ -63,6 +63,7 @@ public:
 		Pause,
 		Options,
 		QuitConfirmation,
+		EndOfLevel,
 		Max
 	};
 	
@@ -154,6 +155,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void SetIsVertical(bool newVertical) { vertical = newVertical; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets whether the menu will be destroyed the next time it is turned off
+
+		\param newFragile
+			The new fragile value. True means the menu will be destroyed next time it is turned off.
+	*/
+	/*************************************************************************************************/
+	void SetIsFragile(bool newFragile) { fragile = newFragile; }
 
 	/*************************************************************************************************/
 	/*!
