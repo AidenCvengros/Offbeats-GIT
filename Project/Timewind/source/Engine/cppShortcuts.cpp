@@ -59,9 +59,9 @@ Copyright (c) 2023 Aiden Cvengros
 		The corresponding location in world coordinates
 */
 /*************************************************************************************************/
-double ConvertMapCoordToWorldCoord(int mapCoordinate)
+float ConvertMapCoordToWorldCoord(int mapCoordinate)
 {
-	return (double)mapCoordinate * 2.0;
+	return (float)mapCoordinate * 2.0f;
 }
 
 /*************************************************************************************************/
@@ -116,10 +116,10 @@ glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates, glm:
 		The corresponding location in map coordinates
 */
 /*************************************************************************************************/
-int ConvertWorldCoordToMapCoord(double worldCoordinate)
-{
-	return (int)std::floor((worldCoordinate + 1.0) / 2.0);
-}
+//int ConvertWorldCoordToMapCoord(double worldCoordinate)
+//{
+//	return (int)std::floor((worldCoordinate + 1.0) / 2.0);
+//}
 int ConvertWorldCoordToMapCoord(float worldCoordinate)
 {
 	return (int)std::floor((worldCoordinate + 1.0) / 2.0f);
@@ -140,7 +140,7 @@ int ConvertWorldCoordToMapCoord(float worldCoordinate)
 		The corresponding location in map coordinates
 */
 /*************************************************************************************************/
-std::pair<int, int> ConvertWorldCoordsToMapCoords(double worldXCoordinate, double worldYCoordinate)
+std::pair<int, int> ConvertWorldCoordsToMapCoords(float worldXCoordinate, float worldYCoordinate)
 {
 	return std::make_pair(ConvertWorldCoordToMapCoord(worldXCoordinate), ConvertWorldCoordToMapCoord(worldYCoordinate));
 }

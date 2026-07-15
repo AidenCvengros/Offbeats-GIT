@@ -64,7 +64,7 @@ Copyright (c) 2023 Aiden Cvengros
 		The corresponding location in world coordinates
 */
 /*************************************************************************************************/
-double ConvertMapCoordToWorldCoord(int mapCoordinate);
+float ConvertMapCoordToWorldCoord(int mapCoordinate);
 
 /*************************************************************************************************/
 /*!
@@ -112,7 +112,7 @@ glm::vec2 ConvertMapCoordsToWorldCoords(std::pair<int, int> mapCoordinates, glm:
 		The corresponding location in map coordinates
 */
 /*************************************************************************************************/
-int ConvertWorldCoordToMapCoord(double worldCoordinate);
+int ConvertWorldCoordToMapCoord(float worldCoordinate);
 
 /*************************************************************************************************/
 /*!
@@ -129,7 +129,7 @@ int ConvertWorldCoordToMapCoord(double worldCoordinate);
 		The corresponding location in map coordinates
 */
 /*************************************************************************************************/
-std::pair<int, int> ConvertWorldCoordsToMapCoords(double worldXCoordinate, double worldYCoordinate);
+std::pair<int, int> ConvertWorldCoordsToMapCoords(float worldXCoordinate, float worldYCoordinate);
 
 /*************************************************************************************************/
 /*!

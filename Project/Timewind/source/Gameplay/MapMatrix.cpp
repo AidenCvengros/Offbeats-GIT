@@ -519,6 +519,7 @@ std::pair<int, int> MapMatrix::CalculateOffsetTile(int xCoord, int yCoord, bool 
 void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< char, std::pair< int, int > > >& specialTileList, bool clear)
 {
 	// Opens the file
+	currentMapFilename = filename;
 	std::ifstream fileInput(filename);
 	if (fileInput)
 	{
@@ -565,6 +566,7 @@ void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< ch
 				else if (newChar == 'p')
 				{
 					SetPlayerPosition(j, i);
+					playerStartingPos = playerPos;
 					SetTile(j, i, MapMatrix::TileStatus::Player);
 				}
 				else if (newChar != '0' && newChar != '/')
@@ -580,6 +582,24 @@ void MapMatrix::ReadMapFromFile(std::string filename, std::vector< std::pair< ch
 	{
 		throw std::runtime_error("Failed to read in scene map");
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Reads in a map from the given file
+
+	\param specialTileList
+		The list of all nonstandard tiles that need filling
+
+	\param clear
+		Whether the map should be cleared before overwriting (defaults to true, only set false if refreshing map)
+*/
+/*************************************************************************************************/
+void MapMatrix::ReloadMap(std::vector< std::pair< char, std::pair< int, int > > >& specialTileList, bool clear)
+{
+	// Loads the map using the saved filename
+	ReadMapFromFile(currentMapFilename, specialTileList, clear);
 }
 
 /*************************************************************************************************/

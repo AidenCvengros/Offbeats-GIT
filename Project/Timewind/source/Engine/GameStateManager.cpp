@@ -33,6 +33,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "SceneManager.h"
 #include "GameObjectManager.h"
 #include "../Gameplay/Inventory.h"
+#include "../Gameplay/MapMatrix.h"
 
 // Includes glfw input reading functionality
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -293,9 +294,9 @@ void GameStateManager::RefreshCurrentScene(GameStates newGameState)
 		horizAngle += glm::pi<float>();
 	}
 	horizAngle = glm::pi<float>() - horizAngle;
-	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.5, _Window->GetCamera()->Get3DPosition(), { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, { -horizAngle, 0.0f, _Window->GetCamera()->Get3DPosition().z }, _Window->GetCamera()->GetPerspective(), 1.0f - _Window->GetCamera()->GetPerspective())));
+	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.75, _Window->GetCamera()->Get3DPosition(), { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, { -horizAngle, 0.0f, _Window->GetCamera()->Get3DPosition().z }, _Window->GetCamera()->GetPerspective(), 1.0f - _Window->GetCamera()->GetPerspective())));
 	cutsceneScript.push(std::make_pair(CutsceneActions::RefreshScene, (void*)NULL));
-	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.5, { _Window->GetCamera()->GetLookAtPosition().x - _Window->GetCamera()->Get3DPosition().z, _Window->GetCamera()->GetLookAtPosition().y, 0.0f }, { _Window->GetCamera()->GetLookAtPosition(), 0.0f }, { -glm::pi<float>() / 2.0f, 0.0f, _Window->GetCamera()->Get3DPosition().z }, 1.0f - _Window->GetCamera()->GetPerspective(), 1.0f - _Window->GetCamera()->GetPerspective())));
+	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.75, { ConvertMapCoordToWorldCoord(_MapMatrix->GetPlayerStartingPosition().first) - _Window->GetCamera()->Get3DPosition().z, ConvertMapCoordToWorldCoord(_MapMatrix->GetPlayerStartingPosition().second), 0.0f }, { ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerStartingPosition()), 0.0f}, {-glm::pi<float>() / 2.0f, 0.0f, _Window->GetCamera()->Get3DPosition().z}, 1.0f - _Window->GetCamera()->GetPerspective(), 1.0f - _Window->GetCamera()->GetPerspective())));
 	cutsceneScript.push(std::make_pair(CutsceneActions::GameStateChange, new GameStates(newGameState)));
 }
 

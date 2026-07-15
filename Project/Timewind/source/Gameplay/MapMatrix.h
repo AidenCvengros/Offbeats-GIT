@@ -369,6 +369,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the player's position
+
+		\return
+			The position of the player in the map grid
+	*/
+	/*************************************************************************************************/
+	std::pair<int, int> GetPlayerStartingPosition() { return playerStartingPos; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns that maximum width of the map grid
 
 		\return
@@ -472,6 +483,23 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Reads in a map from the given file
+
+		\param filename
+			The file to build the map from
+
+		\param specialTileList
+			The list of all nonstandard tiles that need filling
+
+		\param clear
+			Whether the map should be cleared before overwriting (defaults to true, only set false if refreshing map)
+	*/
+	/*************************************************************************************************/
+	void ReloadMap(std::vector< std::pair< char, std::pair< int, int > > >& specialTileList, bool clear);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Updates the player's position to the map's version.
 
 		\param playerObject
@@ -530,8 +558,10 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	std::vector<std::vector<MapTile>> mapMatrix;	// The map grid
+	std::string currentMapFilename;					// The file name of the current map
 
 	std::pair<int, int> playerPos;					// The position of the player
+	std::pair<int, int> playerStartingPos;			// The starting position of the player
 
 	bool debugDraw;									// Boolean denoting whether the debug view of the map matrix should be drawn
 
