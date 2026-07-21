@@ -98,7 +98,7 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Texture* texture_, std::pair<int, int> mapCoords) :
 	GameObject(pos, rot, sca, drawPriority_, true, texture_, { 1.0f, 1.0f, 1.0f, 1.0f }, mapCoords),
-	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(15.0f), reducedGravity(0.0f), wallJumpTimer(0.0f),
+	horizontalVelocity(0.0f), verticalVelocity(0.0f), grounded(true), jumped(false), againstWall(0), goingMaxSpeed(false), maxSpeed(15.0f), reducedGravity(0.0f), wallJumpTimer(0.0f), wallJumpRight(false), floating(false),
 	lowerInnerGap(sca.x * 0.0625f), upperInnerGap(sca.x * 0.125f), actionManager(), inventory(NULL)
 {
 	_MapMatrix->SetPlayerPosition(mapCoords);
