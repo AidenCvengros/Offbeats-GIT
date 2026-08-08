@@ -430,6 +430,7 @@ void RenderPass::SetSwapChainFramebuffers(VkDevice& vkDevice, std::vector<VkFram
 		framebufferInfo.layers = 1;
 
 		_Window->CheckVulkanSuccess(vkCreateFramebuffer(vkDevice, &framebufferInfo, nullptr, &swapChainFramebuffers[i]), "failed to create framebuffer!");
+		_Debug->Print(Debug::MessageType::Debug, "Render Pass: Created swap chain pass framebuffer");
 	}
 }
 
@@ -447,6 +448,13 @@ void RenderPass::SetSwapChainFramebuffers(VkDevice& vkDevice, std::vector<VkFram
 /*************************************************************************************************/
 void RenderPass::SetFramebuffers(VkDevice& vkDevice, VkExtent2D extent)
 {
+	// If we already have framebuffers, deletes them
+	for (size_t i = 0; i < framebuffers.size(); i++)
+	{
+		vkDestroyFramebuffer(vkDevice, framebuffers[i], NULL);
+		_Debug->Print(Debug::MessageType::Debug, "Render Pass: Destroyed framebuffer");
+	}
+
 	// Sets the number of frame buffers																!!! Currently Hardcoded to 1
 	framebuffers.resize(1);
 
@@ -461,6 +469,7 @@ void RenderPass::SetFramebuffers(VkDevice& vkDevice, VkExtent2D extent)
 	framebufferInfo.layers = 1;
 
 	_Window->CheckVulkanSuccess(vkCreateFramebuffer(vkDevice, &framebufferInfo, nullptr, &framebuffers[0]), "failed to create framebuffer!");
+	_Debug->Print(Debug::MessageType::Debug, "Render Pass: Created framebuffer");
 }
 
 /*************************************************************************************************/
@@ -647,6 +656,7 @@ void RenderPass::DestroyRenderPass(VkDevice& vkDevice)
 	for (size_t i = 0; i < framebuffers.size(); i++)
 	{
 		vkDestroyFramebuffer(vkDevice, framebuffers[i], NULL);
+		_Debug->Print(Debug::MessageType::Debug, "Render Pass: Destroyed framebuffer");
 	}
 
 	// Destroys the descriptor sets

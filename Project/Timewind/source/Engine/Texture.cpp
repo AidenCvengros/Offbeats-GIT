@@ -112,6 +112,11 @@ Texture::Texture(std::string filename_)
 
 	// Creates descriptor sets for the texture
 	CreateTextureDescriptorSet();
+
+	// Debug text
+	std::stringstream debugString;
+	debugString << "Texture: New texture loaded " << filename_;
+	_Debug->Print(Debug::MessageType::Debug, debugString.str());
 }
 
 /*************************************************************************************************/
@@ -157,6 +162,10 @@ Texture::Texture(int textureWidth, int textureHeight, VkFormat imageFormat)
 
 	// Now that the texture has been created, turns off the freed flag
 	freed = false;
+
+	std::stringstream debugString;
+	debugString << "Texture: New texture loaded " << textureWidth << "x" << textureHeight;
+	_Debug->Print(Debug::MessageType::Debug, debugString.str());
 }
 
 /*************************************************************************************************/
@@ -209,6 +218,10 @@ Texture::Texture(int textureWidth, int textureHeight, uint8_t* buffer)
 
 	// Creates descriptor sets for the texture
 	CreateTextureDescriptorSet();
+
+	std::stringstream debugString;
+	debugString << "Texture: New texture loaded " << textureWidth << "x" << textureHeight;
+	_Debug->Print(Debug::MessageType::Debug, debugString.str());
 }
 
 
@@ -255,7 +268,7 @@ void Texture::Free()
 
 		// Announces that this texture has been freed
 		std::stringstream debugString;
-		debugString << "Texture deleted: " << filename;
+		debugString << "Texture: Deleted " << filename;
 		_Debug->Print(Debug::MessageType::Debug, debugString.str());
 	}
 }

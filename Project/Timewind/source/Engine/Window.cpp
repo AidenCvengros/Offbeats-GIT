@@ -645,7 +645,7 @@ VkResult Window::CheckVulkanSuccess(VkResult functionResult, std::string errorMe
 	if (functionResult != VK_SUCCESS)
 	{
 		// If it did, throws the error message
-		throw std::runtime_error(errorMessage + " Error code: " + std::to_string(functionResult));
+		_Debug->Print(Debug::MessageType::Error, errorMessage + " Error code: " + std::to_string(functionResult));
 	}
 
 	// Otherwise passes along the function result
@@ -1103,6 +1103,7 @@ void Window::CleanupSwapChain()
 	for (size_t i = 0; i < swapChainFramebuffers.size(); i++)
 	{
 		vkDestroyFramebuffer(logicalDevice, swapChainFramebuffers[i], nullptr);
+		_Debug->Print(Debug::MessageType::Debug, "Window: Destroyed swap chain framebuffers");
 	}
 
 	// Destroys the swap chain
