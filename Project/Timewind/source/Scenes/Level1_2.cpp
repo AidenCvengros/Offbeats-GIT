@@ -38,6 +38,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Stickers/Teleporter.h"
 #include "../Game_Objects/BigCoin.h"
 #include "../Game_Objects/FinishFlag.h"
+#include "../Game_Objects/Text.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -102,7 +103,7 @@ void Level1_2::LoadScene()
     finishFlag->SetScale({ 4.0f, 12.0f });
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject(camera);
-    _GameObjectManager->AddGameObject(player);
+    _GameObjectManager->AddPlayerObject(player);
     _GameObjectManager->AddGameObject(finishFlag);
     _GameObjectManager->AddGameObject(newDefaultSquare);
     _Window->SetCamera(camera);
@@ -185,6 +186,9 @@ void Level1_2::LoadScene()
             _GameObjectManager->AddGameObject(newObject);
         }
     }
+
+    // Puts in tutorial text
+    _GameObjectManager->AddGameObject(new Text("E USES KEYS", _TextureManager->GetDefaultFont(), 18, { 2.0f, -4.0f }, 0.0f, { 0.1f, 0.1f }, 95, { 1.0f, 1.0f, 1.0f, 1.0f }));
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);

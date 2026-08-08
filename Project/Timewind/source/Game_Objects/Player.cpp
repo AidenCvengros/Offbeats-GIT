@@ -103,6 +103,7 @@ Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Textu
 {
 	_MapMatrix->SetPlayerPosition(mapCoords);
 	inventory = new Inventory();
+	_Debug->Print(Debug::MessageType::Debug, "Player: Created");
 }
 
 /*************************************************************************************************/
@@ -113,6 +114,7 @@ Player::Player(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, Textu
 /*************************************************************************************************/
 Player::~Player()
 {
+	_Debug->Print(Debug::MessageType::Debug, "Player: Deleted");
 	delete inventory;
 }
 
@@ -146,18 +148,9 @@ void Player::Update(double dt)
 		}
 	}
 	// Starts running
-	if (_InputManager->CheckInputStatus(InputManager::Inputs::StartRun) == InputManager::InputStatus::Pressed)
+	if (_SceneManager->GetCurrentScene()->GetIsRunning() && _InputManager->CheckInputStatus(InputManager::Inputs::StartRun) == InputManager::InputStatus::Pressed)
 	{
-		// If walking or placing, start running
-		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking || _GameStateManager->GetGameState() == GameStateManager::GameStates::Placing)
-		{
-			_GameStateManager->RefreshCurrentScene(GameStateManager::GameStates::Running);
-		}
-		// Otherwise goes back to walking
-		else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
-		{
-			_GameStateManager->RefreshCurrentScene(GameStateManager::GameStates::Walking);
-		}
+		_GameStateManager->RefreshCurrentScene(GameStateManager::GameStates::Running);
 	}
 
 	// If the player is running
@@ -181,7 +174,7 @@ void Player::Update(double dt)
 			else
 			{
 				// Accelerates the player to the left more slowly in the air
-				AcceleratePlayerHorizontal(-8.0f, dt);
+				AcceleratePlayerHorizontal(-12.0f, dt);
 			}
 		}
 		// Checks if the player is trying to move right
@@ -196,7 +189,7 @@ void Player::Update(double dt)
 			else
 			{
 				// Accelerates the player to the right more slowly in the air
-				AcceleratePlayerHorizontal(8.0f, dt);
+				AcceleratePlayerHorizontal(12.0f, dt);
 			}
 		}
 		// Otherwise doesn't accelerate the player

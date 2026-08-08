@@ -113,6 +113,17 @@ public:
 	*/
 	/*********************************************************************************************/
 	const std::vector<char>& GetReadData() { return fileData; }
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Writes the given string to this file
+
+		\param newString
+			The given string
+	*/
+	/*********************************************************************************************/
+	void WriteStringToFile(std::string newString);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -125,6 +136,7 @@ private:
 	std::vector<char> fileData;					// The read in data from the file
 
 	bool writingFile;							// Whether the file is being written to
+	std::ofstream* openFile;						// The open file to be written to
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

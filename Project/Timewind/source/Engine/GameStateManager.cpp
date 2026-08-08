@@ -199,6 +199,28 @@ void GameStateManager::SetGameState(GameStates newGameState)
 	}
 
 	glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	// Logs that the game state has changed
+	switch (newGameState)
+	{
+	case GameStateManager::GameStates::Walking:
+		_Debug->Print(Debug::MessageType::Debug, "Set game state: Walking");
+		break;
+	case GameStateManager::GameStates::Placing:
+		_Debug->Print(Debug::MessageType::Debug, "Set game state: Placing");
+		break;
+	case GameStateManager::GameStates::Running:
+		_Debug->Print(Debug::MessageType::Debug, "Set game state: Running");
+		break;
+	case GameStateManager::GameStates::Menu:
+		_Debug->Print(Debug::MessageType::Debug, "Set game state: Menu");
+		break;
+	case GameStateManager::GameStates::Cutscene:
+		_Debug->Print(Debug::MessageType::Debug, "Set game state: Cutscene");
+		break;
+	default:
+		break;
+	}
 }
 
 /*************************************************************************************************/
@@ -231,11 +253,13 @@ void GameStateManager::SetCurrentMenu(Menu* newMenu, bool isPlacing)
 		{
 			currentState = GameStates::Menu;
 			glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			_Debug->Print(Debug::MessageType::Debug, "Set game state: Menu");
 		}
 		else
 		{
 			currentState = GameStates::Placing;
 			glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			_Debug->Print(Debug::MessageType::Debug, "Set game state: Placing");
 		}
 	}
 }
@@ -438,7 +462,9 @@ void GameStateManager::UpdateCutscene(double dt)
 		else if (cutsceneScript.front().first == CutsceneActions::RefreshScene)
 		{
 			// Goes through refresh protocol
-			_GameObjectManager->GetPlayer()->GetInventory()->PlacingMode(false);
+			auto player = _GameObjectManager->GetPlayer();
+			auto inventory = player->GetInventory();
+			inventory->PlacingMode(false);
 			_SceneManager->GetCurrentScene()->RefreshScene();
 			_Window->GetCamera()->ResetCameraOffset();
 

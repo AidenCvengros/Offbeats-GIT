@@ -45,6 +45,7 @@ Copyright (c) 2023 Aiden Cvengros
 class Window;
 class Scene;
 class MapMatrix;
+class Debug;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -186,9 +187,11 @@ private:
 
 	std::map<System::SystemTypes, System *> systemList;	// Holds a list of all systems that need to be managed
 	Window* gameWindow;									// Points to the window so the engine can communicate directly with the window
+	Debug* debugSystem;									// The debug system that tracks system messages. Handled separately since messages are sent on inits and shutdowns
 
 	double lastTime;									// Tracks the last recorded time for calculating dt
 	double totalTime;									// Tracks the total amount of simulation time that has elapsed
+	unsigned long long frameCount;						// Tracks the number of frames passed
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

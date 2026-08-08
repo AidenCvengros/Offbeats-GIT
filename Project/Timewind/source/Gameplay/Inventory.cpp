@@ -107,6 +107,19 @@ Inventory::Inventory() : keyList(), keyCount(0), coinCount(0), bigCoinCount(0), 
 	inventorySlots->SetActive(false);
 	_GameObjectManager->AddGameObject(inventorySlots);
 	stickerMenu->AddMenuObject(inventorySlots);
+
+	_Debug->Print(Debug::MessageType::Debug, "Inventory: Initialized");
+}
+
+/*************************************************************************************************/
+/*!
+	 \brief
+		Destructor for inventory class
+*/
+/*************************************************************************************************/
+Inventory::~Inventory()
+{
+	_Debug->Print(Debug::MessageType::Debug, "Inventory: Deleted");
 }
 
 /*************************************************************************************************/
@@ -134,6 +147,11 @@ bool Inventory::AddKey(Key* newKey)
 		GameObject* keyIcon = new GameObject({ 10.0f - (1.5f * keyCount), 10.4f}, 0.0f, {2.0f, 2.0f}, 90, true, keyTexture, newKey->GetColor());
 		_GameObjectManager->AddGameObject(keyIcon);
 		keyIcon->SetFollowingCamera(true);
+		
+		// Outputs that a key was added
+		std::stringstream debugString;
+		debugString << "Inventory: Added key no. " << newKey->GetKeyValue();
+		_Debug->Print(Debug::MessageType::Debug, debugString.str());
 
 		return true;
 	}

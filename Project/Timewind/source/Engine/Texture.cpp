@@ -29,6 +29,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 // Includes the window class to get vulkan access to make texture objects
 #include "Window.h"
+#include <sstream>
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -251,6 +252,11 @@ void Texture::Free()
 
 		// Sets the freed flag
 		freed = true;
+
+		// Announces that this texture has been freed
+		std::stringstream debugString;
+		debugString << "Texture deleted: " << filename;
+		_Debug->Print(Debug::MessageType::Debug, debugString.str());
 	}
 }
 

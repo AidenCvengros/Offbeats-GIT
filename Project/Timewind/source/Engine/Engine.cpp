@@ -45,12 +45,12 @@ Copyright (c) 2023 Aiden Cvengros
 #include "EffectManager.h"
 #include "AudioManager.h"
 #include "GameStateManager.h"
+#include "Debug.h"
 
-// Adds the camera class so a starting camera can be set
+// Additional includes
 #include "../Game_Objects/Camera.h"
-
-// Adds the scene class so we can find the current scene from the engine
 #include "../Scenes/Scene.h"
+#include <sstream>
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -124,6 +124,10 @@ Engine::~Engine()
 /*********************************************************************************************/
 void Engine::Init()
 {
+	// Creates the debug system. The init needs to happen first so we can start storing messages
+	debugSystem = new Debug();
+	debugSystem->Init();
+
 	// Creates and initializes the game window
 	gameWindow = new Window(1200, 900, "Retrofit");
 	gameWindow->Init();
@@ -166,6 +170,14 @@ void Engine::Update()
 	// Creates the game loop until the window is closed
 	while (!glfwWindowShouldClose(_Window->GetVulkanWindowPtr()))
 	{
+		// Updates the frame count
+		frameCount++;
+
+		// Announces the frame count
+		std::stringstream frameCountString;
+		frameCountString << "Start of frame " << frameCount;
+		_Debug->Print(Debug::MessageType::Debug, frameCountString.str());
+
 		// Tracks how long it has been since the previous frame
 		double newTime = glfwGetTime();
 		double dt = std::min(newTime - lastTime, 0.1);
@@ -177,8 +189,9 @@ void Engine::Update()
 		//std::cout << 1 / dt << std::endl;
 #endif // _DEBUG
 
-		// Updates the window
+		// Updates the window and debug system
 		_Window->Update(dt);
+		_Debug->Update(dt);
 
 		// Loops through, updating each system
 		for (const auto& [key, system] : systemList)
@@ -203,6 +216,7 @@ void Engine::Draw()
 	_Window->Draw();
 
 	// Loops through, drawing each system
+	_Debug->Draw();
 	for (const auto& [key, system] : systemList)
 	{
 		system->Draw();
@@ -224,6 +238,8 @@ void Engine::Draw()
 /*********************************************************************************************/
 void Engine::Shutdown()
 {
+	_Debug->Print(Debug::MessageType::Debug, "Engine: Shutting down systems");
+
 	// Loops through, shutting down each system
 	for (const auto& [key, system] : systemList)
 	{
@@ -232,6 +248,9 @@ void Engine::Shutdown()
 
 	// Closes the window
 	_Window->Shutdown();
+
+	// Closes the debug system
+	_Debug->Shutdown();
 }
 
 /*********************************************************************************************/
@@ -249,6 +268,11 @@ System* Engine::GetSystem(System::SystemTypes systemType)
 	if (systemType == System::SystemTypes::window)
 	{
 		return (System*)gameWindow;
+	}
+	// Checks for the debug system
+	else if (systemType == System::SystemTypes::debugManager)
+	{
+		return (Debug*)debugSystem;
 	}
 	// Otherwise returns the system
 	else
@@ -281,7 +305,7 @@ Scene* Engine::GetCurrentScene()
 		Engine class initializer.
 */
 /*********************************************************************************************/
-Engine::Engine() : systemList(), gameWindow(NULL), lastTime(0.0), totalTime(0.0)
+Engine::Engine() : systemList(), gameWindow(NULL), debugSystem(NULL), lastTime(0.0), totalTime(0.0), frameCount(0)
 {
 	
 }

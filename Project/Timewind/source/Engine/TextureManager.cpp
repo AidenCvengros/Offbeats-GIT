@@ -23,9 +23,10 @@ Copyright (c) 2023 Aiden Cvengros
 #include "TextureManager.h"
 #include "cppShortcuts.h"
 
-// Includes the texture class to be managed
+// Additional includes
 #include "Texture.h"
 #include "Font.h"
+#include <sstream>
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -112,6 +113,8 @@ void TextureManager::Clear()
 	textureList.clear();
 	fontList.clear();
 	defaultFont = NULL;
+
+	_Debug->Print(Debug::MessageType::Debug, "Texture manager cleared");
 }
 
 /*************************************************************************************************/
@@ -163,6 +166,9 @@ Texture* TextureManager::AddTexture(std::string filename_)
 	{
 		// Creates the new texture
 		Texture* newTexture = new Texture(filename_);
+		std::stringstream debugString;
+		debugString << "New texture loaded: " << filename_;
+		_Debug->Print(Debug::MessageType::Debug, debugString.str());
 
 		// Puts the new texture on the list
 		textureList.push_back(newTexture);

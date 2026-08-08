@@ -175,6 +175,7 @@ void GameObjectManager::Shutdown()
 
 	// Clears the game object list
 	gameObjectList.clear();
+	player = NULL;
 }
 
 /*************************************************************************************************/

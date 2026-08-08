@@ -60,6 +60,7 @@ public:
 	enum class SystemTypes
 	{
 		window,
+		debugManager,
 		inputManager,
 		audioManager,
 		mapMatrix,

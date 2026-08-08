@@ -25,6 +25,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Includes game object manager and texture manager for creating new game objects in the scene
 #include "../Engine/GameObjectManager.h"
 #include "../Engine/TextureManager.h"
+#include "../Game_Objects/Text.h"
 #include "../Game_Objects/Enemy.h"
 #include "../Game_Objects/DestructibleWall.h"
 #include "../Game_Objects/Key.h"
@@ -158,6 +159,9 @@ void Level1::LoadScene()
 
     // Updates the player position for the map
     _MapMatrix->UpdatePlayerPosition(player);
+
+    // Puts in tutorial text
+    _GameObjectManager->AddGameObject(new Text("WASD + SPACE", _TextureManager->GetDefaultFont(), 18, { 2.0f, -4.0f }, 0.0f, { 0.1f, 0.1f }, 95, { 1.0f, 1.0f, 1.0f, 1.0f }));
 
     // Starts the music
     int temp = 0;

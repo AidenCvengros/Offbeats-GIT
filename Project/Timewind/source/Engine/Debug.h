@@ -1,21 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file Scene.h
+\file Debug.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2026.8.8
 \brief
-    The base scene class to facilitate scene functionality
-
-    Functions include:
-        + [FILL]
+    Manages debug messages
+		
+	Private Functions:
+		+ FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Scene_H_
-#define Syncopatience_Scene_H_
+#ifndef Syncopatience_Debug_H_
+#define Syncopatience_Debug_H_
 
 #pragma once
 
@@ -23,14 +23,16 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
-// Base include
-#include "../Engine/stdafx.h"
+#include "stdafx.h"
+
+// Includes the base system class, window class, and glfw functions
+#include "System.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
-class GameObject;								// Game object class reference to hold default square
+class File;
 
 //-------------------------------------------------------------------------------------------------
 // Public Constants
@@ -43,16 +45,24 @@ class GameObject;								// Game object class reference to hold default square
 /*************************************************************************************************/
 /*!
 	\brief
-		The base scene class
+		Debug manager
 */
 /*************************************************************************************************/
-class Scene
+class Debug : public System
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
 	
+	enum class MessageType
+	{
+		Fatal,
+		Error,
+		Debug,
+		Max
+	};
+
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
@@ -64,110 +74,71 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the input manager class
+	*/
+	/*************************************************************************************************/
+	Debug() : System(SystemTypes::debugManager), outputFile(NULL) {}
+	
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Destructor for FILL class
+	*/
+	/*************************************************************************************************/
+	~Debug() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Constructor for the base scene class
-
-		\param _sceneID
-			The id for this scene
-
-		\param isRunning
-			Whether this scene has a running mode
+			Initializes the system.
 	*/
 	/*************************************************************************************************/
-	Scene(int _sceneID, bool isRunning);
+	void Init();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Deconstructor for the base scene class
+			Updates the system.
+
+		\param
+			The time elapsed since the previous frame.
 	*/
 	/*************************************************************************************************/
-	~Scene();
+	void Update(double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Loads in all the objects of the scene
+			Draws the system to the screen.
 	*/
 	/*************************************************************************************************/
-	virtual void LoadScene() = 0;
+	void Draw();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the scene
-
-		\param dt
-			Time elapsed since previous frame
+			Shuts down the system.
 	*/
 	/*************************************************************************************************/
-	virtual void Update(double dt) {}
+	void Shutdown();
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Refreshes the scene
+			Add message to debug log
+
+		\param messageType
+			The type of message being sent
+
+		\param message
+			The message
 	*/
 	/*************************************************************************************************/
-	virtual void RefreshScene();
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Unloads all the objects of the scene
-	*/
-	/*************************************************************************************************/
-	virtual void UnloadScene() = 0;
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Sets the default square
-
-		\param newDefaultSquare
-			The new default quare
-	*/
-	/*************************************************************************************************/
-	void SetDefaultSquare(GameObject* newDefaultSquare) { defaultSquare = newDefaultSquare; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Draws a square of the given color at the given tile
-
-		\param tileCoords
-			The coordinates of the tile being drawn.
-
-		\param color
-			The color of square to draw
-	*/
-	/*************************************************************************************************/
-	void DrawTile(std::pair<int, int> coords, glm::vec4 color);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Gets the scene id
-
-		\return
-			The scene's id
-	*/
-	/*************************************************************************************************/
-	int GetSceneID() { return sceneID; }
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Gets whether this scene is running
-
-		\return
-			The scene's running variable
-	*/
-	/*************************************************************************************************/
-	bool GetIsRunning() { return hasRunningMode; }
+	void Print(MessageType messageType, std::string message);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -182,12 +153,8 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 	
-	bool inUse;									// Determines whether the scene is in use
-	int sceneID;								// The id for the scene
-	bool hasRunningMode;						// Whether this scene has running mode
+	File* outputFile;							// The output file the trace log gets posted to
 
-	GameObject* defaultSquare;					// Default square used for coloring in an important tile
-	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
@@ -201,4 +168,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Scene_H_
+#endif // Syncopatience_Debug_H_

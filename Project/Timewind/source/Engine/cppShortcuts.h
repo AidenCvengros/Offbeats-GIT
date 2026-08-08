@@ -21,6 +21,7 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 #include "Engine.h"
+#include "Debug.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -39,6 +40,7 @@ Copyright (c) 2023 Aiden Cvengros
 #define _InputManager ((InputManager*)Engine::createEngine()->GetSystem(System::SystemTypes::inputManager))					// Gets the input manager
 #define _GameStateManager ((GameStateManager*)Engine::createEngine()->GetSystem(System::SystemTypes::gameStateManager))		// Gets the menu manager
 #define _AudioManager ((AudioManager*)Engine::createEngine()->GetSystem(System::SystemTypes::audioManager))					// Gets the audio manager
+#define _Debug ((Debug*)Engine::createEngine()->GetSystem(System::SystemTypes::debugManager))								// Gets the debug system
 
 //-------------------------------------------------------------------------------------------------
 // Public Classes

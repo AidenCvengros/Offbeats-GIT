@@ -1,14 +1,14 @@
 /*************************************************************************************************/
 /*!
-\file Scene.cpp
+\file Debug.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2024.5.22
+\date 2026.8.8
 \brief
-    The base scene class to facilitate scene functionality
+    Manages debug messages
 
     Functions include:
-        + [FILL]
+        + FILL
 
 Copyright (c) 2023 Aiden Cvengros
 */
@@ -19,23 +19,12 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "Scene.h"
-#include "../Engine/cppShortcuts.h"
+#include "Debug.h"
+#include "cppShortcuts.h"
 
-// Includes game object class to draw default square
-#include "../Game_Objects/GameObject.h"
-
-// Additional includes
-#include <vector>
-#include "../Gameplay/MapMatrix.h"
-#include "../Engine/SceneManager.h"
-//#include "../Engine/TextureManager.h"
-//#include "../Engine/GameObjectManager.h"
-//#include "../Game_Objects/Player.h"
-//#include "../Game_Objects/FinishFlag.h"
-//#include "../Game_Objects/DestructibleWall.h"
-//#include "../Game_Objects/Coin.h"
-//#include "../Game_Objects/BigCoin.h"
+// Additional Includes
+#include "File.h"
+#include <sstream>
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -64,16 +53,25 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The Scene constructor
-
-	\param _sceneID
-		The id for this scene
-
-	\param isRunning
-		Whether this scene has a running mode
+		Initializes the system.
 */
 /*************************************************************************************************/
-Scene::Scene(int _sceneID, bool isRunning) : inUse(false), sceneID(_sceneID), hasRunningMode(isRunning), defaultSquare(NULL)
+void Debug::Init()
+{
+	// Opens the output file for writing
+	outputFile = new File("Retrofit.log", false, true);
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Updates the system.
+
+	\param
+		The time elapsed since the previous frame.
+*/
+/*************************************************************************************************/
+void Debug::Update(double dt)
 {
 	
 }
@@ -81,10 +79,10 @@ Scene::Scene(int _sceneID, bool isRunning) : inUse(false), sceneID(_sceneID), ha
 /*************************************************************************************************/
 /*!
 	\brief
-		Deconstructor for the base scene class
+		Draws the system to the screen.
 */
 /*************************************************************************************************/
-Scene::~Scene()
+void Debug::Draw()
 {
 
 }
@@ -92,35 +90,57 @@ Scene::~Scene()
 /*************************************************************************************************/
 /*!
 	\brief
-		Refreshes the scene
+		Shuts down the system.
 */
 /*************************************************************************************************/
-void Scene::RefreshScene()
+void Debug::Shutdown()
 {
-    _SceneManager->ChangeScene(sceneID);
+	delete outputFile;
 }
 
 /*************************************************************************************************/
 /*!
 	\brief
-		Draws a square of the given color at the given tile
+		Add message to debug log
 
-	\param tileCoords
-		The coordinates of the tile being drawn.
+	\param messageType
+		The type of message being sent
 
-	\param color
-		The color of square to draw
+	\param message
+		The message
 */
 /*************************************************************************************************/
-void Scene::DrawTile(std::pair<int, int> coords, glm::vec4 color)
+void Debug::Print(MessageType messageType, std::string message)
 {
-	// Checks that there is a default square to draw
-	if (defaultSquare)
+	// Reformats the message
+	std::stringstream outputMessage;
+	
+	// Determines message type
+	switch (messageType)
 	{
-		defaultSquare->SetPosition(ConvertMapCoordsToWorldCoords(coords));
-		defaultSquare->SetColor(color);
-		defaultSquare->DrawThisFrame(true);
+	case Debug::MessageType::Fatal:
+		outputMessage << "FATAL: ";
+		break;
+	case Debug::MessageType::Error:
+		outputMessage << "Error: ";
+		break;
+	case Debug::MessageType::Debug:
+		outputMessage << "Debug: ";
+		break;
+	default:
+		outputMessage << "Invalid Message Type: ";
+		break;
 	}
+
+	// Adds the message
+	outputMessage << message;
+
+	// Prints the output message to the screen and log file
+	if (messageType <= Debug::MessageType::Error)
+	{
+		std::cout << outputMessage.str();
+	}
+	outputFile->WriteStringToFile(outputMessage.str());
 }
 
 //-------------------------------------------------------------------------------------------------

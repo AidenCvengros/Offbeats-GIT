@@ -75,7 +75,7 @@ public:
 			Constructor for the base scene class
 	*/
 	/*************************************************************************************************/
-	MainMenu() : Scene(0), mainMenu(NULL), menuCursor(NULL) {}
+	MainMenu() : Scene(0, false), mainMenu(NULL), menuCursor(NULL) {}
 
 	/*************************************************************************************************/
 	/*!

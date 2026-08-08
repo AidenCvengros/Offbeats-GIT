@@ -144,6 +144,8 @@ void Window::Init()
 
 	// Creates a blank texture as a default option for objects without sprites
 	blankTexture = new Texture("Assets/Sprites/Blank.png");
+
+	_Debug->Print(Debug::MessageType::Debug, "Window initialized");
 }
 
 /*********************************************************************************************/
@@ -169,6 +171,8 @@ void Window::Update(double dt)
 /*********************************************************************************************/
 void Window::Draw()
 {
+	_Debug->Print(Debug::MessageType::Debug, "Window::Draw start");
+
 	// Makes sure that the previous frame has finished before drawing the next one
 	vkWaitForFences(logicalDevice, 1, &inFlightFence[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -232,6 +236,8 @@ void Window::Draw()
 
 	// Binds the descriptor sets
 	vkCmdBindDescriptorSets(commandBuffer[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, baseScenePass.GetGraphicsPipelineLayout(), 0, 1, &baseScenePass.GetDescriptorSets()[0], 0, NULL);
+
+	_Debug->Print(Debug::MessageType::Debug, "Window::Draw end");
 }
 
 /*********************************************************************************************/

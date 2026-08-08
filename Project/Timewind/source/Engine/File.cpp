@@ -71,6 +71,7 @@ File::File(const std::string& _filename, bool read, bool write)
 	// Sets the internal booleans
 	readingFile = read;
 	writingFile = write;
+	openFile = NULL;
 
 	// Checks if we are both reading and writing the file
 	if (read && write)
@@ -78,9 +79,13 @@ File::File(const std::string& _filename, bool read, bool write)
 		
 	}
 	// Otherwise reads in the file
-	if (read)
+	else if (read)
 	{
 		fileData = ReadFile(filename);
+	}
+	else if (write)
+	{
+		openFile = new std::ofstream(filename);
 	}
 }
 
@@ -92,7 +97,12 @@ File::File(const std::string& _filename, bool read, bool write)
 /*************************************************************************************************/
 File::~File()
 {
-
+	// If there is an open file being written to, closes it
+	if (openFile)
+	{
+		openFile->close();
+		delete openFile;
+	}
 }
 
 /*********************************************************************************************/
@@ -109,27 +119,50 @@ File::~File()
 /*********************************************************************************************/
 std::vector<char> File::ReadFile(const std::string& filename)
 {
-	// Opens the file
-	std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-	// If the file opened correctly
-	if (!file.is_open())
+	if (readingFile)
 	{
-		throw std::runtime_error("failed to open file!");
+		// Opens the file
+		std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+		// If the file opened correctly
+		if (!file.is_open())
+		{
+			_Debug->Print(Debug::MessageType::Error, "failed to open file!");
+		}
+
+		// Gets the file size
+		size_t fileSize = (size_t)file.tellg();
+		std::vector<char> buffer(fileSize);
+
+		// Reads the file from the start
+		file.seekg(0);
+		file.read(buffer.data(), fileSize);
+
+		// Closes the file
+		file.close();
+
+		return buffer;
 	}
 
-	// Gets the file size
-	size_t fileSize = (size_t)file.tellg();
-	std::vector<char> buffer(fileSize);
+}
 
-	// Reads the file from the start
-	file.seekg(0);
-	file.read(buffer.data(), fileSize);
+/*********************************************************************************************/
+/*!
+	\brief
+		Writes the given string to this file
 
-	// Closes the file
-	file.close();
-
-	return buffer;
+	\param newString
+		The given string
+*/
+/*********************************************************************************************/
+void File::WriteStringToFile(std::string newString)
+{
+	// Checks that we are writing
+	if (writingFile)
+	{
+		// Writes the string to the file
+		*openFile << newString << std::endl;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

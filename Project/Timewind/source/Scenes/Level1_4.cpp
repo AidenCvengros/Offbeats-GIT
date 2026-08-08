@@ -38,6 +38,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Game_Objects/Stickers/Teleporter.h"
 #include "../Game_Objects/BigCoin.h"
 #include "../Game_Objects/FinishFlag.h"
+#include "../Game_Objects/Text.h"
 
 // Includes the map matrix class
 #include "../Gameplay/MapMatrix.h"
@@ -145,6 +146,8 @@ void Level1_4::LoadScene()
             finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second, finishFlag->GetScale()));
             finishFlag->SetMapCoords(i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
+            // Puts in tutorial text
+            _GameObjectManager->AddGameObject(new Text("IF BROKEN PRESS ENTER", _TextureManager->GetDefaultFont(), 18, ConvertMapCoordsToWorldCoords(i->second) + glm::vec2{ -2.0f, 4.0f }, 0.0f, { 0.1f, 0.1f }, 95, { 1.0f, 1.0f, 1.0f, 1.0f }));
             break;
         case 'f':
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::FinishFlag, finishFlag);
