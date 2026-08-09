@@ -106,6 +106,9 @@ void Sandbox::LoadScene()
     std::vector< std::pair< char, std::pair< int, int > > > specialTileList;
     _MapMatrix->ReadMapFromFile("Assets/Maps/Sandbox.csv", specialTileList);
 
+    // Refreshes the game object manager
+    _GameObjectManager->RefreshScene();
+
     // Adds in all special tiles
     for (auto i = specialTileList.begin(); i != specialTileList.end(); i++)
     {

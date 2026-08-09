@@ -210,6 +210,31 @@ void GameObjectManager::DrawGlitches()
 	}
 }
 
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Destroys all game objects that get cleared on scene refresh
+*/
+/*************************************************************************************************/
+void GameObjectManager::RefreshScene()
+{
+	// Walks through the game object list
+	for (std::multimap<int, GameObject*>::iterator it = gameObjectList.begin(); it != gameObjectList.end();)
+	{
+		// Destroys objects that don't make it through the refresh
+		if (it->second->GetDestroyOnRefresh())
+		{
+			delete (*it).second;
+			it = gameObjectList.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
+}
+
 /*************************************************************************************************/
 /*!
 	\brief

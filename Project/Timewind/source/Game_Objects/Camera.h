@@ -247,6 +247,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	void StartCameraMovement(CameraMovement* newCameraMovement);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets a new look at position
+
+		\param newLookAtPosition
+			The new look at position
+	*/
+	/*************************************************************************************************/
+	void SetLookAtPosition(glm::vec3 newLookAtPosition) { lookAtPosition = newLookAtPosition; }
 	
 private:
 	//---------------------------------------------------------------------------------------------

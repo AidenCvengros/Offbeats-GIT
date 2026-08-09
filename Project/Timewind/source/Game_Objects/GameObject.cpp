@@ -63,11 +63,11 @@ Copyright (c) 2023 Aiden Cvengros
 */
 /*************************************************************************************************/
 GameObject::GameObject(std::pair<int, int> mapCoords_) :
-	active(true), toBeDestroyed(false),
+	active(true), toBeDestroyed(false), destroyOnRefresh(false),
 	rotation(0.0f), scale({ 2.0f, 2.0f }),
-	drawPriority(-100), facingRight(true), followingCamera(false),
-	moving(false),
-	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+	drawPriority(-100), drawPriorityChanged(false), facingRight(true), followingCamera(false),
+	moving(false), moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
+	scaleOriginal(1.0f, 1.0f), scaleNew(1.0f, 1.0f),
 	render(0), texture(NULL), color(0.0f),
 	inMap(true), mapCoords(mapCoords_)
 {
@@ -92,10 +92,11 @@ GameObject::GameObject(std::pair<int, int> mapCoords_) :
 */
 /*************************************************************************************************/
 GameObject::GameObject(int drawPriority_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
-	active(true), toBeDestroyed(false),
+	active(true), toBeDestroyed(false), destroyOnRefresh(false),
 	rotation(0.0f), scale({ 2.0f, 2.0f }),
-	drawPriority(drawPriority_), facingRight(true), followingCamera(false),
+	drawPriority(drawPriority_), drawPriorityChanged(false), facingRight(true), followingCamera(false),
 	moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
+	scaleOriginal(0.0f, 0.0f), scaleNew(0.0f, 0.0f),
 	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 	render(0), texture(NULL), color(color_),
 	inMap(true), mapCoords(mapCoords_)
@@ -124,10 +125,11 @@ GameObject::GameObject(int drawPriority_, glm::vec4 color_, std::pair<int, int> 
 */
 /*************************************************************************************************/
 GameObject::GameObject(int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
-	active(true), toBeDestroyed(false),
+	active(true), toBeDestroyed(false), destroyOnRefresh(false),
 	rotation(0.0f), scale({ 2.0f, 2.0f }),
-	drawPriority(drawPriority_), facingRight(true), followingCamera(false),
+	drawPriority(drawPriority_), drawPriorityChanged(false), facingRight(true), followingCamera(false),
 	moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
+	scaleOriginal(1.0f, 1.0f), scaleNew(1.0f, 1.0f),
 	moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 	render(1), texture(texture_), color(color_),
 	inMap(true), mapCoords(mapCoords_)
@@ -440,6 +442,32 @@ void GameObject::MoveTo(glm::vec2 newPosition, double time, bool smooth)
 /*************************************************************************************************/
 /*!
 	\brief
+		Sets a new scale
+
+	\param newPosition
+		The game object's new scale
+
+	\param time
+		How long it takes the object to arrive there
+
+	\param smooth
+		Whether to move linearly of smooth into/out of the motion
+*/
+/*************************************************************************************************/
+void GameObject::ScaleTo(glm::vec2 newScale, double time, bool smooth)
+{
+	// Sets the variable for the new scale shift
+	moving = true;
+	scaleOriginal = scale;
+	scaleNew = newScale;
+	moveTime = time;
+	moveTimeLeft = time;
+	moveSmooth = smooth;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Updates an object's active movement
 
 	\param dt
@@ -456,6 +484,7 @@ void GameObject::MoveToUpdate(double dt)
 	{
 		// Moves the object
 		SetPosition((moveNewPosition - moveOriginalPosition) * (float)(1 - (moveTimeLeft / moveTime)) + moveOriginalPosition);
+		SetScale((scaleNew - scaleOriginal) * (float)(1 - (moveTimeLeft / moveTime)) + scaleOriginal);
 	}
 	// Otherwise sets the position to the final position and ends the movement
 	else

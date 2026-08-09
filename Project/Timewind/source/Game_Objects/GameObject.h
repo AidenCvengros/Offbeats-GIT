@@ -96,10 +96,11 @@ public:
 	*/
 	/*************************************************************************************************/
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca) :
-		active(true), toBeDestroyed(false),
+		active(true), toBeDestroyed(false), destroyOnRefresh(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(-100), facingRight(false), followingCamera(false),
+		drawPriority(-100), drawPriorityChanged(false), facingRight(false), followingCamera(false),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
+		scaleOriginal(1.0f, 1.0f), scaleNew(1.0f, 1.0f),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(0), texture(NULL), color(0.0f), drawThisFrame(false),
 		inMap(false), mapCoords({-1, -1}) {}
@@ -132,10 +133,11 @@ public:
 	*/
 	/*************************************************************************************************/
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, glm::vec4 color_) :
-		active(true), toBeDestroyed(false),
+		active(true), toBeDestroyed(false), destroyOnRefresh(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_), facingRight(facingRight_), followingCamera(false),
+		drawPriority(drawPriority_), drawPriorityChanged(false), facingRight(facingRight_), followingCamera(false),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
+		scaleOriginal(1.0f, 1.0f), scaleNew(1.0f, 1.0f),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(1), texture(NULL), color(color_), drawThisFrame(false),
 		inMap(false), mapCoords({-1, -1}) {}
@@ -159,10 +161,11 @@ public:
 	*/
 	/*************************************************************************************************/
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, std::pair<int, int> mapCoords_) :
-		active(true), toBeDestroyed(false),
+		active(true), toBeDestroyed(false), destroyOnRefresh(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(-100), facingRight(true), followingCamera(false),
+		drawPriority(-100), drawPriorityChanged(false), facingRight(true), followingCamera(false),
 		moving(false), moveOriginalPosition(pos), moveNewPosition(pos),
+		scaleOriginal(1.0f, 1.0f), scaleNew(1.0f, 1.0f),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(0), texture(NULL), color(0.0f), drawThisFrame(false),
 		inMap(true), mapCoords(mapCoords_) {}
@@ -206,10 +209,11 @@ public:
 	*/
 	/*************************************************************************************************/
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
-		active(true), toBeDestroyed(false),
+		active(true), toBeDestroyed(false), destroyOnRefresh(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_), facingRight(facingRight_), followingCamera(false),
+		drawPriority(drawPriority_), drawPriorityChanged(false), facingRight(facingRight_), followingCamera(false),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
+		scaleOriginal(1.0f, 1.0f), scaleNew(1.0f, 1.0f),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(0), texture(NULL), color(color_), drawThisFrame(false),
 		inMap(true), mapCoords(mapCoords_) {}
@@ -262,10 +266,11 @@ public:
 	*/
 	/*************************************************************************************************/
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_) :
-		active(true), toBeDestroyed(false),
+		active(true), toBeDestroyed(false), destroyOnRefresh(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_), facingRight(facingRight_), followingCamera(false),
+		drawPriority(drawPriority_), drawPriorityChanged(false), facingRight(facingRight_), followingCamera(false),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
+		scaleOriginal(1.0f, 1.0f), scaleNew(1.0f, 1.0f),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(1), texture(texture_), color(color_), drawThisFrame(false),
 		inMap(false), mapCoords({-1, -1}) {}
@@ -301,10 +306,11 @@ public:
 	*/
 	/*************************************************************************************************/
 	GameObject(glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) :
-		active(true), toBeDestroyed(false),
+		active(true), toBeDestroyed(false), destroyOnRefresh(false),
 		position(pos), rotation(rot), scale(sca),
-		drawPriority(drawPriority_), facingRight(facingRight_), followingCamera(false),
+		drawPriority(drawPriority_), drawPriorityChanged(false), facingRight(facingRight_), followingCamera(false),
 		moving(false), moveOriginalPosition(glm::vec2(0.0f, 0.0f)), moveNewPosition(glm::vec2(0.0f, 0.0f)),
+		scaleOriginal(1.0f, 1.0f), scaleNew(1.0f, 1.0f),
 		moveTime(0.0), moveTimeLeft(0.0), moveSmooth(false),
 		render(1), texture(texture_), color(color_), drawThisFrame(false),
 		inMap(true), mapCoords(mapCoords_) {}
@@ -380,6 +386,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	bool GetToBeDestroyed() { return toBeDestroyed; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Returns whether the object is to be destroyed on scene refresh
+
+		\return
+			True if the object is to be destroyed on scene refresh, false if not
+	*/
+	/*************************************************************************************************/
+	bool GetDestroyOnRefresh() { return destroyOnRefresh; }
 
 	/*************************************************************************************************/
 	/*!
@@ -582,6 +599,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Sets whether the game object should be destroyed on refresh
+
+		\param newDestroyOnRefresh
+			Whether the game object should be destroyed on scene refresh
+	*/
+	/*************************************************************************************************/
+	void SetDestroyOnRefresh(bool newDestroyOnRefresh) { destroyOnRefresh = newDestroyOnRefresh; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets the position of the game object
 
 		\param newPosition
@@ -720,6 +748,23 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Sets a new scale
+
+		\param newPosition
+			The game object's new scale
+
+		\param time
+			How long it takes the object to arrive there
+
+		\param smooth
+			Whether to move linearly of smooth into/out of the motion
+	*/
+	/*************************************************************************************************/
+	void ScaleTo(glm::vec2 newScale, double time, bool smooth);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Sets the position of the game object
 
 		\param dt
@@ -757,6 +802,7 @@ private:
 
 	bool active;								// Is the game object on and being updated
 	bool toBeDestroyed;							// Boolean for the game object manager to delete the object
+	bool destroyOnRefresh;						// Whether this object should be destroyed when the scene is refreshed
 	
 	glm::vec2 position;							// The position of the game object
 	float rotation;								// The rotation (in 2d space) of the game object
@@ -769,6 +815,8 @@ private:
 	bool moving;								// Whether the move-to action is active
 	glm::vec2 moveOriginalPosition;				// The starting position of the movement
 	glm::vec2 moveNewPosition;					// The position the object is moving to
+	glm::vec2 scaleOriginal;					// The starting scale of the object
+	glm::vec2 scaleNew;							// The scale the object is shifting to
 	double moveTime;							// How long the whole move should take
 	double moveTimeLeft;						// How much longer the move has
 	bool moveSmooth;							// Should the movement be smooth

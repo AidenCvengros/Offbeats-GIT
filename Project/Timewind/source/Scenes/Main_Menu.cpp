@@ -92,6 +92,7 @@ void MainMenu::LoadScene()
     _GameObjectManager->AddGameObject(player);
     _GameObjectManager->AddGameObject(newDefaultSquare);
     _Window->SetCamera(camera);
+    camera->SetLookAtPosition({ 4.0f, 4.5f, 0.0f });
     SetDefaultSquare(newDefaultSquare);
 
     // Adds in all special tiles

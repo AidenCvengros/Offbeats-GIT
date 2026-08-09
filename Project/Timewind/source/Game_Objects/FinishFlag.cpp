@@ -74,6 +74,12 @@ void FinishFlag::Update(double dt)
 			SetDrawPriority(150);
 			SetColor({ 0.9f, 0.0f, 0.5f, 0.7f });
 			SetRotation(180.0f);
+
+			// Creates a global effect that expands
+			GameObject* newGameObject = new GameObject(GetPosition(), 45.0f, { 0.1f, 0.1f }, 110, true, { 1.0f, 0.2f, 0.2f, 1.0f });
+			_GameObjectManager->AddGameObject(newGameObject);
+			newGameObject->ScaleTo({ 1000.0f, 1000.0f }, 5.0f, false);
+			newGameObject->SetDestroyOnRefresh(true);
 		}
 	}
 }

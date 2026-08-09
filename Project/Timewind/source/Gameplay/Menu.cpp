@@ -144,18 +144,33 @@ Menu::Menu(MenuType _menuType) : menuType(_menuType), optionList(), menuObjects(
 	else if (_menuType == MenuType::Options)
 	{
 		// Creates the main main menu menu
-		Text* yesOptionText = new Text("PLACEHOLDER", _TextureManager->GetDefaultFont(), 24, { -8.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
-		Text* noOptionText = new Text("CLOSE", _TextureManager->GetDefaultFont(), 24, { -8.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* level11OptionText = new Text("Level 1-1", _TextureManager->GetDefaultFont(), 24, { -8.0f, 4.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* level12OptionText = new Text("Level 1-2", _TextureManager->GetDefaultFont(), 24, { -8.0f, 2.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* level13OptionText = new Text("Level 1-3", _TextureManager->GetDefaultFont(), 24, { -8.0f, 0.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* level14OptionText = new Text("Level 1-4", _TextureManager->GetDefaultFont(), 24, { -8.0f, -2.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
+		Text* noOptionText = new Text("CLOSE", _TextureManager->GetDefaultFont(), 24, { -8.0f, -4.0f }, 0.0f, { 0.1f, 0.1f }, 91, { 1.0f, 1.0f, 1.0f, 1.0f });
 		GameObject* background = new GameObject({ 0.0f, 0.0f }, 0.0f, { 24.0f, 12.0f }, 90, true, { 0.0f, 0.0f, 0.0f, 0.5f });
-		yesOptionText->SetFollowingCamera(true);
+		level11OptionText->SetFollowingCamera(true);
+		level12OptionText->SetFollowingCamera(true);
+		level13OptionText->SetFollowingCamera(true);
+		level14OptionText->SetFollowingCamera(true);
 		noOptionText->SetFollowingCamera(true);
 		background->SetFollowingCamera(true);
-		MenuOption* quitOption = new MenuOption(yesOptionText);
+		GoToSceneOption* level11Option = new GoToSceneOption(level11OptionText, 101);
+		GoToSceneOption* level12Option = new GoToSceneOption(level12OptionText, 102);
+		GoToSceneOption* level13Option = new GoToSceneOption(level13OptionText, 103);
+		GoToSceneOption* level14Option = new GoToSceneOption(level14OptionText, 104);
 		SubmenuOption* noOption = new SubmenuOption(noOptionText, this, SubmenuOption::SubmenuInteraction::Close);
-		_GameObjectManager->AddGameObject(yesOptionText);
+		_GameObjectManager->AddGameObject(level11OptionText);
+		_GameObjectManager->AddGameObject(level12OptionText);
+		_GameObjectManager->AddGameObject(level13OptionText);
+		_GameObjectManager->AddGameObject(level14OptionText);
 		_GameObjectManager->AddGameObject(noOptionText);
 		_GameObjectManager->AddGameObject(background);
-		AddOption(quitOption);
+		AddOption(level11Option);
+		AddOption(level12Option);
+		AddOption(level13Option);
+		AddOption(level14Option);
 		AddOption(noOption);
 		AddMenuObject(background);
 		active = false;

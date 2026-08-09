@@ -29,6 +29,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include <vector>
 #include "../Gameplay/MapMatrix.h"
 #include "../Engine/SceneManager.h"
+#include "../Engine/GameObjectManager.h"
 //#include "../Engine/TextureManager.h"
 //#include "../Engine/GameObjectManager.h"
 //#include "../Game_Objects/Player.h"
@@ -97,6 +98,7 @@ Scene::~Scene()
 /*************************************************************************************************/
 void Scene::RefreshScene()
 {
+	// Starts the new scene
     _SceneManager->ChangeScene(sceneID);
 }
 

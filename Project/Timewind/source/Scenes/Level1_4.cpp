@@ -223,6 +223,9 @@ void Level1_4::RefreshScene()
     finishFlag->SetTimer(20.0f);
     _GameObjectManager->AddGameObject(finishFlag);
 
+    // Refreshes the game object manager
+    _GameObjectManager->RefreshScene();
+
     // Adds in all special tiles
     for (auto i = specialTileList.begin(); i != specialTileList.end(); i++)
     {
