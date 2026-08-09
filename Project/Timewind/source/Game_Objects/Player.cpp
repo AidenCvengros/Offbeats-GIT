@@ -132,7 +132,7 @@ void Player::Update(double dt)
 	// Checks that the game is in a state where the player is being controlled
 	
 	// Flips the player state
-	if (grounded && _InputManager->CheckInputStatus(InputManager::Inputs::TogglePlacing) == InputManager::InputStatus::Pressed)
+	if (_InputManager->CheckInputStatus(InputManager::Inputs::TogglePlacing) == InputManager::InputStatus::Pressed)
 	{
 		// If running set to placing
 		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking)
@@ -146,11 +146,6 @@ void Player::Update(double dt)
 			_GameStateManager->SetGameState(GameStateManager::GameStates::Walking);
 			inventory->PlacingMode(false);
 		}
-	}
-	// Starts running
-	if (_SceneManager->GetCurrentScene()->GetIsRunning() && _InputManager->CheckInputStatus(InputManager::Inputs::StartRun) == InputManager::InputStatus::Pressed)
-	{
-		_GameStateManager->RefreshCurrentScene(GameStateManager::GameStates::Running);
 	}
 
 	// If the player is running

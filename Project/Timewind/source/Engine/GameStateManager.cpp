@@ -107,6 +107,19 @@ void GameStateManager::Update(double dt)
 			_AudioManager->PauseAudio();
 			paused = true;
 		}
+		// Starts running
+		else if (_SceneManager->GetCurrentScene()->GetIsRunning() && _InputManager->CheckInputStatus(InputManager::Inputs::StartRun) == InputManager::InputStatus::Pressed)
+		{
+			// If we aren't running, start running
+			if (currentState != GameStates::Running)
+			{
+				RefreshCurrentScene(GameStateManager::GameStates::Running);
+			}
+			else
+			{
+				RefreshCurrentScene(GameStateManager::GameStates::Walking);
+			}
+		}
 		// Otherwise, if we are placing we can update the inventory menu
 		else if (currentState == GameStates::Placing)
 		{
@@ -253,13 +266,13 @@ void GameStateManager::SetCurrentMenu(Menu* newMenu, bool isPlacing)
 		{
 			currentState = GameStates::Menu;
 			glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			_Debug->Print(Debug::MessageType::Debug, "Set game state: Menu");
+			_Debug->Print(Debug::MessageType::Debug, "Game State Manager: Set game state: Menu");
 		}
 		else
 		{
 			currentState = GameStates::Placing;
 			glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			_Debug->Print(Debug::MessageType::Debug, "Set game state: Placing");
+			_Debug->Print(Debug::MessageType::Debug, "Game State Manager: Set game state: Placing");
 		}
 	}
 }
@@ -281,11 +294,22 @@ void GameStateManager::TurnOffCurrentMenu()
 	{
 		currentMenu = previousMenus.top();
 		previousMenus.pop();
+
+		if (currentState == GameStates::Menu)
+		{
+			_Debug->Print(Debug::MessageType::Debug, "Game State Manager: Set game state: Menu");
+		}
+		else
+		{
+			_Debug->Print(Debug::MessageType::Debug, "Game State Manager: Set game state: Placing");
+		}
 	}
 	else
 	{
 		currentMenu = NULL;
 		glfwSetInputMode(_Window->GetVulkanWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		_Debug->Print(Debug::MessageType::Debug, "Game State Manager: Popping game state");			//// !! Should make a helper function that just prints the game state !! ////
 
 		// Checks if we were paused
 		if (paused)
@@ -322,6 +346,9 @@ void GameStateManager::RefreshCurrentScene(GameStates newGameState)
 	cutsceneScript.push(std::make_pair(CutsceneActions::RefreshScene, (void*)NULL));
 	cutsceneScript.push(std::make_pair(CutsceneActions::CameraMovement, new CameraMovement(CameraMovement::MovementType::Revolution, 0.75, { ConvertMapCoordToWorldCoord(_MapMatrix->GetPlayerStartingPosition().first) - _Window->GetCamera()->Get3DPosition().z, ConvertMapCoordToWorldCoord(_MapMatrix->GetPlayerStartingPosition().second), 0.0f }, { ConvertMapCoordsToWorldCoords(_MapMatrix->GetPlayerStartingPosition()), 0.0f}, {-glm::pi<float>() / 2.0f, 0.0f, _Window->GetCamera()->Get3DPosition().z}, 1.0f - _Window->GetCamera()->GetPerspective(), 1.0f - _Window->GetCamera()->GetPerspective())));
 	cutsceneScript.push(std::make_pair(CutsceneActions::GameStateChange, new GameStates(newGameState)));
+	std::stringstream debugString;
+	debugString << "Game State Manager: Refreshing current scene " << horizAngle;
+	_Debug->Print(Debug::MessageType::Debug, debugString.str());
 }
 
 //-------------------------------------------------------------------------------------------------

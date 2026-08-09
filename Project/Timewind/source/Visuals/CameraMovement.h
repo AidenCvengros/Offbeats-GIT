@@ -159,6 +159,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns how far the look at position has moved
+
+		\return
+			The look at offset
+	*/
+	/*************************************************************************************************/
+	glm::vec3 GetLookAtPosition() { return lookAtPos; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the translation the movement has produced
 
 		\return

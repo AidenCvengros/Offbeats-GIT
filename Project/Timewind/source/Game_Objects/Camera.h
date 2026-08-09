@@ -185,6 +185,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Returns the point on the map the player is looking at
+	
+		\return
+			The point the player is looking at
+	*/
+	/*************************************************************************************************/
+	glm::vec3 GetLookAt3DPosition();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Returns the point the camera is orientated around
 
 		\return
@@ -264,6 +275,7 @@ private:
 	// - The camera offset moves where the camera eye is positioned. This offset is in reference to (cameraBoxPos.x, cameraBoxPos.y, zDist).
 	GameObject* centeredObject;					// The game object that the camera is focusing on (probably the player)
 	bool centeredObjectIsPlayer;				// Tracks whether the centered object is the player
+	glm::vec3 lookAtPosition;					// If the centered object isn't the player, the camera is looking here
 	glm::vec2 cameraBoxPos;						// The position of the camera box
 	float zDist;								// How far in the z direction the camera is
 	glm::vec3 lookAtOffset;						// How far to the side/up the camera is looking

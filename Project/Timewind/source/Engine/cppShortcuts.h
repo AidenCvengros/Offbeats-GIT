@@ -22,6 +22,7 @@ Copyright (c) 2023 Aiden Cvengros
 
 #include "Engine.h"
 #include "Debug.h"
+#include <sstream>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References

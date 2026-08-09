@@ -112,6 +112,7 @@ void Camera::Update(double dt)
 	if (_GameStateManager->GetGameState() <= GameStateManager::GameStates::Running)
 	{
 		// Updates the camera box in case the player has moved
+		centeredObjectIsPlayer = true;
 		UpdateCameraBox(dt);
 
 		// Checks if the player can move the camera
@@ -216,7 +217,7 @@ void Camera::ResetCameraOffset()
 glm::mat4 Camera::GetViewMatrix()
 {
 	// Update and return the view matrix
-	viewMat = glm::lookAt(glm::vec3(Get3DPosition()), glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, lookAtOffset.z), upVector);
+	viewMat = glm::lookAt(glm::vec3(Get3DPosition()), GetLookAt3DPosition(), upVector);
 	return viewMat;
 }
 
@@ -294,20 +295,39 @@ glm::vec4 Camera::Get3DPosition()
 glm::vec2 Camera::GetLookAtPosition()
 {
 	// Checks that there's a player
-	if (centeredObject)
+	if (centeredObjectIsPlayer && centeredObject)
 	{
-		// Calculates the vector that the camera is looking at
-		//float distanceFromPlayer = glm::distance(cameraBoxPos, GetPosition());
-		//float zCoord = -sqrt(abs(zDist * zDist - distanceFromPlayer * distanceFromPlayer));
-		glm::vec3 lookAtVector = glm::normalize(glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, lookAtOffset.z) - glm::vec3(GetPosition(), -zDist));
-
 		// Calculates and returns what point in world space the camera is pointed at
-		return (-glm::vec2(lookAtVector.x, lookAtVector.y) * (-zDist / lookAtVector.z)) + GetPosition();
+		return glm::vec2(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y);
 	}
 	else
 	{
-		// Otherwise returns the origin point
-		return glm::vec3(0.0f, 0.0f, 0.0f);
+		// Calculates and returns what point in world space the camera is pointed at
+		return lookAtPosition + lookAtOffset;
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Returns the point on the map the player is looking at
+
+	\return
+		The point the player is looking at
+*/
+/*************************************************************************************************/
+glm::vec3 Camera::GetLookAt3DPosition()
+{
+	// Checks that there's a player
+	if (centeredObjectIsPlayer && centeredObject)
+	{
+		// Calculates and returns what point in world space the camera is pointed at
+		return glm::vec3(cameraBoxPos.x + lookAtOffset.x, cameraBoxPos.y + lookAtOffset.y, lookAtOffset.z);
+	}
+	else
+	{
+		// Calculates and returns what point in world space the camera is pointed at
+		return lookAtPosition + lookAtOffset;
 	}
 }
 
@@ -338,7 +358,11 @@ void Camera::SetCenteredObject(GameObject* object)
 /*************************************************************************************************/
 void Camera::StartCameraMovement(CameraMovement* newCameraMovement)
 {
+	// Sets the new camera movement and starts the camera at the position and lookat determined by the movement
 	currentCameraMovement = newCameraMovement;
+	centeredObjectIsPlayer = false;
+	lookAtPosition = newCameraMovement->GetLookAtPosition();
+	cameraBoxPos = newCameraMovement->GetPosition();
 }
 
 //-------------------------------------------------------------------------------------------------
