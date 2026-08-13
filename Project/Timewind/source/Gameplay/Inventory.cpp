@@ -125,6 +125,19 @@ Inventory::~Inventory()
 /*************************************************************************************************/
 /*!
 	\brief
+		Function that refreshes what's in the inventory when the scene refreshes
+*/
+/*************************************************************************************************/
+void Inventory::RefreshInventory()
+{
+	// Resets the values for the key list
+	keyList.fill(NULL);
+	keyCount = 0;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
 		Adds the given key to the inventory
 
 	\param newKey

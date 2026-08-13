@@ -241,11 +241,11 @@ void Level1_4::RefreshScene()
                 _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
                 break;
                 // Generic coin
-            case 'c':
-                newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
-                newObject->SetScale(glm::vec2(1.25, 1.25));
-                _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Coin, newObject);
-                break;
+            //case 'c':
+            //    newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+            //    newObject->SetScale(glm::vec2(1.25, 1.25));
+            //    _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Coin, newObject);
+            //    break;
             case 'F':
                 finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second, finishFlag->GetScale()));
                 finishFlag->SetMapCoords(i->second);
@@ -269,10 +269,9 @@ void Level1_4::RefreshScene()
                 newObject = new DestructibleWall(NULL, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
                 _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
                 break;
-                // This is a coin hidden in a block
+                // This was a coin hidden in a block
             case 'D':
-                newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
-                newObject = new DestructibleWall((Item*)newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+                newObject = new DestructibleWall(NULL, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
                 _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
                 break;
             default:

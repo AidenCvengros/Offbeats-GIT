@@ -260,11 +260,18 @@ void Player::Update(double dt)
 					AcceleratePlayerVertical(24.0f, 1.0f);
 					if (wallJumpRight)
 					{
-						horizontalVelocity = maxSpeed;
+						// If the player is holding towards the wall, doesn't reverse momentum
+						if (!_InputManager->ReadInput(InputManager::Inputs::Left))
+						{
+							horizontalVelocity = maxSpeed;
+						}
 					}
 					else
 					{
-						horizontalVelocity = -maxSpeed;
+						if (!_InputManager->ReadInput(InputManager::Inputs::Right))
+						{
+							horizontalVelocity = -maxSpeed;
+						}
 					}
 
 					// Sets the jumping variables
@@ -274,7 +281,7 @@ void Player::Update(double dt)
 				}
 			}
 			// Otherwise we go into float mode
-			else if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Walking)
+			else
 			{
 				// Jumps the player more
 				verticalVelocity = 15.0f;
@@ -474,9 +481,18 @@ void Player::MovePlayer(double dt)
 	{
 		SetIsFacingRight(true);
 
-		// Checks if the right side of the player has moved into an object
+		// Calculates the tiles the player might be moving into
 		std::pair<int, int> rightBottomSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomRightIn);
 		std::pair<int, int> rightTopSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn);
+
+		// If we are being launched, we break through destructibles
+		if (reducedGravity > 0.0f)
+		{
+			InteractWithTile(rightBottomSideTile, true, false);
+			InteractWithTile(rightTopSideTile, true, false);
+		}
+
+		// Checks if the right side of the player has moved into an object
 		if (_MapMatrix->GetTile(rightBottomSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(rightTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
@@ -506,9 +522,18 @@ void Player::MovePlayer(double dt)
 	{
 		SetIsFacingRight(false);
 
-		// Checks if the left side of the player has moved into an object
+		// Calculates which tiles the player is moving into
 		std::pair<int, int> leftBottomSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomLeftIn);
 		std::pair<int, int> leftTopSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn);
+
+		// If we are being launched, we break through destructibles
+		if (reducedGravity > 0.0f)
+		{
+			InteractWithTile(leftBottomSideTile, true, false);
+			InteractWithTile(leftTopSideTile, true, false);
+		}
+
+		// Checks if the right side of the player has moved into an object
 		if (_MapMatrix->GetTile(leftBottomSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(leftTopSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
@@ -540,13 +565,30 @@ void Player::MovePlayer(double dt)
 	// Checks if the player is moving up or down
 	if (verticalMovement > 0.0f)
 	{
-		// Checks if the right side of the player has moved into an object
+		// Calculates which tiles the player is moving into
 		std::pair<int, int> topLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopLeftIn);
 		std::pair<int, int> topRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopRightIn);
 		std::pair<int, int> topCenter = CalculatePlayerMapPositions(playerWorldPosition, Positions::TopCenter);
+
+		// If we are being launched, we break through destructibles
+		if (reducedGravity > 0.0f)
+		{
+			InteractWithTile(topLeftSideTile, true, false);
+			InteractWithTile(topRightSideTile, true, false);
+			InteractWithTile(topCenter, true, false);
+		}
+
+		// Checks if the right side of the player has moved into an object
 		if (_MapMatrix->GetTile(topLeftSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(topRightSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{
+			// If we are being launched, we break through destructibles
+			if (reducedGravity > 0.0f)
+			{
+				InteractWithTile(topLeftSideTile, true, false);
+				InteractWithTile(topRightSideTile, true, false);
+			}
+
 			// Checks if the center is clear and if so moves the player towards the opening
 			if (_MapMatrix->GetTile(topCenter).tileStatus < MapMatrix::TileStatus::Player)
 			{
@@ -579,9 +621,18 @@ void Player::MovePlayer(double dt)
 	}
 	else if (verticalMovement < 0.0f)
 	{
-		// Checks if the right side of the player has moved into an object
+		// Calculates the tiles the player is moving into
 		std::pair<int, int> bottomLeftSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomLeftIn);
 		std::pair<int, int> bottomRightSideTile = CalculatePlayerMapPositions(playerWorldPosition, Positions::BottomRightIn);
+
+		// If we are being launched, we break through destructibles
+		if (reducedGravity > 0.0f)
+		{
+			InteractWithTile(bottomRightSideTile, true, false);
+			InteractWithTile(bottomLeftSideTile, true, false);
+		}
+
+		// Checks if the right side of the player has moved into an object
 		if (_MapMatrix->GetTile(bottomLeftSideTile).tileStatus > MapMatrix::TileStatus::Player ||
 			_MapMatrix->GetTile(bottomRightSideTile).tileStatus > MapMatrix::TileStatus::Player)
 		{

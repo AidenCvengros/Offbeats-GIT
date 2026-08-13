@@ -86,13 +86,13 @@ void MainMenu::LoadScene()
 
     // Creates essential game objects (player, camera, and default square)
     Player* player = new Player({ 6.0f, 4.0f }, 0.0f, { 2.0f, 2.0f }, 50, playerTexture, { 3, 2 });
-    Camera* camera = new Camera(glm::vec2(4.0f, 4.5f), 0.0f, glm::vec2(1.0f, 1.0f), player, 4.0f / 3.0f, glm::radians(50.0f));
+    Camera* camera = new Camera(glm::vec2(7.0f, 6.5f), 0.0f, glm::vec2(1.0f, 1.0f), player, 4.0f / 3.0f, glm::radians(50.0f));
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 0, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject(camera);
     _GameObjectManager->AddGameObject(player);
     _GameObjectManager->AddGameObject(newDefaultSquare);
     _Window->SetCamera(camera);
-    camera->SetLookAtPosition({ 4.0f, 4.5f, 0.0f });
+    camera->SetLookAtPosition({ 8.0f, 6.5f, 0.0f });
     SetDefaultSquare(newDefaultSquare);
 
     // Adds in all special tiles
@@ -141,7 +141,7 @@ void MainMenu::LoadScene()
     menuCursor = new GameObject({ -0.5f, 0.5f }, 0.0f, { 1.0f, 1.0f }, 90, true, { 1.0f, 1.0f, 1.0f, 1.0f });
     _GameObjectManager->AddGameObject(menuCursor);
     mainMenu->SetCursorObject(menuCursor, { -1.0f, 1.0f });
-    GameObject* newUIObject = new GameObject({ 0.0f, 0.0f }, 0.0f, { 32.0f, 32.0f / camera->GetAspectRatio() }, 80, true, { 0.1f, 0.1f, 0.1f, 0.4f });
+    GameObject* newUIObject = new GameObject({ 0.0f, 0.0f }, 0.0f, { 42.0f, 42.0f / camera->GetAspectRatio() }, 80, true, { 0.1f, 0.1f, 0.1f, 0.4f });
     _GameObjectManager->AddGameObject(newUIObject);
     mainMenu->AddMenuObject(newUIObject);
     newUIObject->SetFollowingCamera(true);
