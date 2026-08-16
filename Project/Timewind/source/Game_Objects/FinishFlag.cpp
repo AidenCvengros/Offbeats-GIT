@@ -73,13 +73,14 @@ void FinishFlag::Update(double dt)
 			// Makes like a dark, fucked up version of the finish flag haha. Just a glimpse into my dark reality. A full stare into my twisted perspective would make most simply go insane lmao
 			SetDrawPriority(150);
 			SetColor({ 0.9f, 0.0f, 0.5f, 0.7f });
-			SetRotation(180.0f);
+			SetRotation(157.0f);
 
 			// Creates a global effect that expands
 			GameObject* newGameObject = new GameObject(GetPosition(), 45.0f, { 0.1f, 0.1f }, 110, true, { 1.0f, 0.2f, 0.2f, 1.0f });
 			_GameObjectManager->AddGameObject(newGameObject);
 			newGameObject->ScaleTo({ 1000.0f, 1000.0f }, 5.0f, false);
 			newGameObject->SetDestroyOnRefresh(true);
+			_GameObjectManager->AddGameObject(new Text("ENTER", _TextureManager->GetDefaultFont(), 18, GetPosition() + glm::vec2{-2.0f, 4.0f}, 0.0f, {0.1f, 0.1f}, 95, {1.0f, 1.0f, 1.0f, 1.0f}));
 		}
 	}
 }

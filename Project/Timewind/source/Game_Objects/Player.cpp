@@ -213,7 +213,7 @@ void Player::Update(double dt)
 			}
 			else
 			{
-				AcceleratePlayerVertical(-15.0f, dt);
+				AcceleratePlayerVertical(-5.0f, dt);
 			}
 
 			// If the player can wall jump but would be falling otherwise, hangs on the wall during the wall jump window
@@ -780,7 +780,7 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 			float bumperStrength = ((Bumper*)targetTile.tileObject)->GetBumperStrength();
 			verticalVelocity = cosf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
 			horizontalVelocity = sinf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
-			reducedGravity = 0.25f;
+			reducedGravity = 0.3f;
 			floating = false;
 		}
 		// Checks for a teleporter
