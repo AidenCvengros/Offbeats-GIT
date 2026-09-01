@@ -29,7 +29,12 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
+// Base includes
+#include "../../Engine/stdafx.h"
 #include "Sticker.h"
+
+// Additional Includes
+#include "../../Engine/Timer.h"
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -92,8 +97,8 @@ public:
 			The map coordinates that the game object is in
 	*/
 	/*************************************************************************************************/
-	Bumper(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Sticker(Item::ItemType::Bumper, pos, rot, sca, facingRight_, texture_, color_, mapCoords_), bumperStrength(30.0f) {}
-	Bumper(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Sticker(Item::ItemType::Bumper, texture_, color_, mapCoords_), bumperStrength(30.0f) {}
+	Bumper(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Sticker(Item::ItemType::Bumper, pos, rot, sca, facingRight_, texture_, color_, mapCoords_), bumperStrength(30.0f), bumperTimer(NULL) {}
+	Bumper(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : Sticker(Item::ItemType::Bumper, texture_, color_, mapCoords_), bumperStrength(30.0f), bumperTimer(NULL) {}
 
 	/*************************************************************************************************/
 	/*!
@@ -102,6 +107,31 @@ public:
 	*/
 	/*************************************************************************************************/
 	~Bumper() {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Updates the game object. Can be overwritten by derived classes
+
+		\param dt
+			The time elapsed since the previous frame
+
+		\param inputManager
+			Allows the game objects to check inputs
+	*/
+	/*************************************************************************************************/
+	virtual void Update(double dt, InputManager* inputManager);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Lets the bumper know it got hit.
+
+		\return
+			Returns true if this is the first contact
+	*/
+	/*************************************************************************************************/
+	bool Hit();
 
 	/*************************************************************************************************/
 	/*!
@@ -133,8 +163,6 @@ private:
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 
-	float bumperStrength;
-
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
@@ -142,6 +170,9 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+
+	float bumperStrength;
+	Timer* bumperTimer;
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations

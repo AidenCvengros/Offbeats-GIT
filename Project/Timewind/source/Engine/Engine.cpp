@@ -134,23 +134,23 @@ void Engine::Init()
 
 	// Adds essential game systems to the system list
 	InputManager* inputManager = new InputManager();
+	GameStateManager* gameStateManager = new GameStateManager();
 	AudioManager* audioManager = new AudioManager();
 	GameObjectManager* objectManager = new GameObjectManager();
 	TextureManager* texManager = new TextureManager();
 	SceneManager* sceneManager = new SceneManager();
 	MapMatrix* mapMatrix = new MapMatrix(100, 50);
 	EffectManager* effectManager = new EffectManager();
-	GameStateManager* gameStateManager = new GameStateManager();
 
 	// Creates and pushes back systems
 	systemList[System::SystemTypes::inputManager] = inputManager;
+	systemList[System::SystemTypes::gameStateManager] = gameStateManager;
 	systemList[System::SystemTypes::audioManager] = audioManager;
 	systemList[System::SystemTypes::mapMatrix] = mapMatrix;
 	systemList[System::SystemTypes::gameObjectManager] = objectManager;
 	systemList[System::SystemTypes::textureManager] = texManager;
 	systemList[System::SystemTypes::sceneManager] = sceneManager;
 	systemList[System::SystemTypes::effectManager] = effectManager;
-	systemList[System::SystemTypes::gameStateManager] = gameStateManager;
 
 	// Loops through, initializing each system
 	for (const auto& [key, system] : systemList)
@@ -184,6 +184,10 @@ void Engine::Update()
 		lastTime = newTime;
 		dt = fmin(dt, 0.1);
 		totalTime += dt;
+		if (_GameStateManager->GetGameState() <= GameStateManager::GameStates::Running)
+		{
+			unpausedTime += dt;
+		}
 #ifdef _DEBUG
 		// Prints out the framerate. Debug only
 		//std::cout << 1 / dt << std::endl;
@@ -305,7 +309,7 @@ Scene* Engine::GetCurrentScene()
 		Engine class initializer.
 */
 /*********************************************************************************************/
-Engine::Engine() : systemList(), gameWindow(NULL), debugSystem(NULL), lastTime(0.0), totalTime(0.0), frameCount(0)
+Engine::Engine() : systemList(), gameWindow(NULL), debugSystem(NULL), lastTime(0.0), totalTime(0.0), unpausedTime(0.0), frameCount(0)
 {
 	
 }

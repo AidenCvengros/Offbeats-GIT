@@ -169,6 +169,14 @@ public:
 	*/
 	/*********************************************************************************************/
 	double GetTotalTime() { return totalTime; }
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Gets the total amount of unpaused simulation time since the game started running
+	*/
+	/*********************************************************************************************/
+	double GetUnpausedTime() { return unpausedTime; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -191,6 +199,7 @@ private:
 
 	double lastTime;									// Tracks the last recorded time for calculating dt
 	double totalTime;									// Tracks the total amount of simulation time that has elapsed
+	double unpausedTime;								// Tracks the total amount of unpaused simulation time that has elapsed
 	unsigned long long frameCount;						// Tracks the number of frames passed
 
 	//---------------------------------------------------------------------------------------------

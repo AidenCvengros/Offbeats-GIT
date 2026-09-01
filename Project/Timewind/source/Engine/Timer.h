@@ -1,28 +1,21 @@
 /*************************************************************************************************/
 /*!
-\file System.h
+\file Timer.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2023.9.9
+\date 2025.9.1
 \brief
-    Creates the base system class that can be run by the game engine
+    Class for creating a timer
 
-    Public Functions:
-        + System
-		+ ~System
-		+ Init
-		+ Update
-		+ Draw
-		+ Shutdown
-		
-	Private Functions:
+    Functions include:
+        + FILL
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_System_H_
-#define Syncopatience_System_H_
+#ifndef Syncopatience_Timer_H_
+#define Syncopatience_Timer_H_
 
 #pragma once
 
@@ -30,6 +23,7 @@ Copyright (c) 2023 Aiden Cvengros
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
 
+// Base include
 #include "stdafx.h"
 
 //-------------------------------------------------------------------------------------------------
@@ -47,30 +41,15 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The base class for game engine systems
+		The timer class
 */
 /*************************************************************************************************/
-class System
+class Timer
 {
 public:
 	//---------------------------------------------------------------------------------------------
 	// Public Consts
 	//---------------------------------------------------------------------------------------------
-
-	enum class SystemTypes
-	{
-		window,
-		debugManager,
-		inputManager,
-		gameStateManager,
-		audioManager,
-		mapMatrix,
-		gameObjectManager,
-		textureManager,
-		sceneManager,
-		effectManager,
-		max
-	};
 	
 	//---------------------------------------------------------------------------------------------
 	// Public Structures
@@ -83,71 +62,64 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
+  
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Constructor for the Timer class
+
+		\param _length
+			The length of the timer
+
+		\param _canBePaused
+			Whether the timer pauses when the player is paused
+	*/
+	/*************************************************************************************************/
+	Timer(double _length, bool _canBePaused);
 	
 	/*************************************************************************************************/
 	/*!
-		\brief
-			Constructor for base system class
-
-		\param _systemType
-			The type of this system
+	  \brief
+	    Destructor for FILL class
 	*/
 	/*************************************************************************************************/
-	System(SystemTypes _systemType);
-	
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Destructor for System class
-	*/
-	/*************************************************************************************************/
-	~System();
+	~Timer() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Initializes the system. Virtual function that must be overwritten by derived class
+			Restarts the timer with the given length and paused status
+
+		\param _length
+			The length of the timer
+
+		\param _canBePaused
+			Whether the timer pauses when the player is paused
 	*/
 	/*************************************************************************************************/
-	virtual void Init() = 0;
+	void RestartTimer(double _length, bool _canBePaused);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Updates the system. Virtual function that must be overwritten by derived class
-
-		\param
-			The time elapsed since the previous frame.
-	*/
-	/*************************************************************************************************/
-	virtual void Update(double dt) = 0;
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Draws the system to the screen. Virtual function that must be overwritten by derived class
-	*/
-	/*************************************************************************************************/
-	virtual void Draw() = 0;
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Shuts down the system. Virtual function that must be overwritten by derived class
-	*/
-	/*************************************************************************************************/
-	virtual void Shutdown() = 0;
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Gets the system type
+			Gets the time remaining on the timer
 
 		\return
-			The system type
+			The time remaining on the timer
 	*/
 	/*************************************************************************************************/
-	SystemTypes GetSystemType() { return systemType; }
+	double GetTimeRemaining();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets whether the timer finished
+
+		\return
+			Whether the timer finished
+	*/
+	/*************************************************************************************************/
+	bool Finished();
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -162,7 +134,9 @@ private:
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
 
-	SystemTypes systemType;						// The type of this system
+	double startingTime;						// When the timer was started
+	double length;								// How long the timer runs for
+	bool canBePaused;							// Whether the timer is only used during regular gameplay
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -177,4 +151,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_System_H_
+#endif // Syncopatience_Timer_H_

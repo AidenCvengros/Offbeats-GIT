@@ -30,6 +30,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "Player.h"
 #include "../Gameplay/MenuOptions/GoToSceneOption.h"
 #include "../Gameplay/MenuOptions/RefreshSceneOption.h"
+#include "../Engine/GameStateManager.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -59,9 +60,16 @@ Copyright (c) 2023 Aiden Cvengros
 void FinishFlag::Update(double dt)
 {
 	// Checks if this flag is timed
-	if (timed)
+	if (timed && _GameStateManager->GetGameState() <= GameStateManager::GameStates::Running)
 	{
-		timer -= dt;
+		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
+		{
+			timer -= dt;
+		}
+		else
+		{
+			timer = 0.0f;
+		}
 
 		// Checks if the timer has run out
 		if (timer <= 0.0f)
@@ -69,6 +77,7 @@ void FinishFlag::Update(double dt)
 			// Stops running the timer
 			timed = false;
 			flagActive = false;
+			_Debug->Print(Debug::MessageType::Debug, "FinishFlag: Flag Broken");
 
 			// Makes like a dark, fucked up version of the finish flag haha. Just a glimpse into my dark reality. A full stare into my twisted perspective would make most simply go insane lmao
 			SetDrawPriority(150);
@@ -76,7 +85,7 @@ void FinishFlag::Update(double dt)
 			SetRotation(157.0f);
 
 			// Creates a global effect that expands
-			GameObject* newGameObject = new GameObject(GetPosition(), 45.0f, { 0.1f, 0.1f }, 110, true, { 1.0f, 0.2f, 0.2f, 1.0f });
+			GameObject* newGameObject = new GameObject(GetPosition(), 45.0f, { 0.1f, 0.1f }, 180, true, { 1.0f, 0.2f, 0.2f, 1.0f });
 			_GameObjectManager->AddGameObject(newGameObject);
 			newGameObject->ScaleTo({ 1000.0f, 1000.0f }, 5.0f, false);
 			newGameObject->SetDestroyOnRefresh(true);
@@ -161,7 +170,7 @@ void FinishFlag::JumpToTargetScene()
 /*************************************************************************************************/
 void FinishFlag::SetTimer(double timerLength)
 {
-	// Sets the timer and starts it
+	// Set the timer and starts it
 	timer = timerLength;
 	timed = true;
 }

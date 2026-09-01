@@ -1,16 +1,16 @@
 /*************************************************************************************************/
 /*!
-\file Bumper.cpp
+\file Timer.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2026.1.30
+\date 2025.9.1
 \brief
-    The bumper object class
+    Class to create timers
 
     Functions include:
         + FILL
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
@@ -19,8 +19,8 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 // Base includes
-#include "Bumper.h"
-#include "../../Engine/cppShortcuts.h"
+#include "Timer.h"
+#include "../Engine/cppShortcuts.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -35,82 +35,109 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
-// Public Function Declarations
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-// Private Function Declarations
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
 
 /*************************************************************************************************/
 /*!
 	\brief
-		Updates the game object. Can be overwritten by derived classes
+		Constructor for the Timer class
 
-	\param dt
-		The time elapsed since the previous frame
+	\param _length
+		The length of the timer
 
-	\param inputManager
-		Allows the game objects to check inputs
+	\param _canBePaused
+		Whether the timer pauses when the player is paused
 */
 /*************************************************************************************************/
-void Bumper::Update(double dt, InputManager* inputManager)
+Timer::Timer(double _length, bool _canBePaused) : length(_length), canBePaused(_canBePaused)
 {
-
-}
-
-/*************************************************************************************************/
-/*!
-	\brief
-		Lets the bumper know it got hit.
-
-	\return
-		Returns true if this is the first contact
-*/
-/*************************************************************************************************/
-bool Bumper::Hit()
-{
-	// Checks if we don't have a bumper timer or if the old one ran out
-	if (bumperTimer == NULL || bumperTimer->Finished())
+	// Checks if we are using the true time or unpaused time
+	if (canBePaused)
 	{
-		// Sets up a new timer
-		if (bumperTimer)
-		{
-			bumperTimer->RestartTimer(0.4, true);
-		}
-		else
-		{
-			bumperTimer = new Timer(0.4, true);
-		}
-
-		// Returns that it was a new hit
-		return true;
+		// Fetches the starting time
+		startingTime = Engine::createEngine()->GetUnpausedTime();
 	}
-
-	// Otherwise returns that this is a continuous hit
-	return false;
+	else
+	{
+		// Fetches the starting time
+		startingTime = Engine::createEngine()->GetTotalTime();
+	}
 }
 
 /*************************************************************************************************/
 /*!
 	\brief
-		Place this object in the scene at the target location
+		Restarts the timer with the given length and paused status
 
-	\param tileCoords
-		The tile the player is hovering over
+	\param _length
+		The length of the timer
 
-	\return
-		Whether the sticker was succesfully placed
+	\param _canBePaused
+		Whether the timer pauses when the player is paused
 */
 /*************************************************************************************************/
-bool Bumper::Place(std::pair<int, int> tileCoords)
+void Timer::RestartTimer(double _length, bool _canBePaused)
 {
-	// Uses simple place
-	return SimplePlace(tileCoords, MapMatrix::TileStatus::Bumper);
+	// Sets the new variables
+	length = _length;
+	canBePaused = _canBePaused;
+
+	// Checks if we are using the true time or unpaused time
+	if (canBePaused)
+	{
+		// Fetches the starting time
+		startingTime = Engine::createEngine()->GetUnpausedTime();
+	}
+	else
+	{
+		// Fetches the starting time
+		startingTime = Engine::createEngine()->GetTotalTime();
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Gets the time remaining on the timer
+
+	\return
+		The time remaining on the timer
+*/
+/*************************************************************************************************/
+double Timer::GetTimeRemaining()
+{
+	// Checks whether we are checking against paused or unpaused time
+	if (canBePaused)
+	{
+		return std::max(0.0, Engine::createEngine()->GetUnpausedTime() - startingTime + length);
+	}
+	else
+	{
+		return std::max(0.0, Engine::createEngine()->GetTotalTime() - startingTime + length);
+	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Gets whether the timer finished
+
+	\return
+		Whether the timer finished
+*/
+/*************************************************************************************************/
+bool Timer::Finished()
+{
+	// Checks whether we are checking against paused or unpaused time
+	if (canBePaused)
+	{
+		return startingTime + length >= Engine::createEngine()->GetUnpausedTime();
+	}
+	else
+	{
+		return startingTime + length >= Engine::createEngine()->GetTotalTime();
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

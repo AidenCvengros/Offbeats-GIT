@@ -777,6 +777,10 @@ void Player::InteractWithTile(std::pair<int, int> targetTileCoords, bool destruc
 		// Checks for bumper
 		else if (targetTile.tileStatus == MapMatrix::TileStatus::Bumper)
 		{
+			if (((Bumper*)targetTile.tileObject)->Hit())
+			{
+				SetPosition(targetTile.tileObject->GetPosition());
+			}
 			float bumperStrength = ((Bumper*)targetTile.tileObject)->GetBumperStrength();
 			verticalVelocity = cosf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
 			horizontalVelocity = sinf(glm::radians(targetTile.tileObject->GetRotation())) * bumperStrength;
