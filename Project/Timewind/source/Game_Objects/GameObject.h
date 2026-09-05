@@ -594,7 +594,7 @@ public:
 			Whether the game object should be destroyed
 	*/
 	/*************************************************************************************************/
-	void SetToBeDestroyed(bool newToBeDestroyed) { toBeDestroyed = newToBeDestroyed; }
+	virtual void SetToBeDestroyed(bool newToBeDestroyed) { toBeDestroyed = newToBeDestroyed; }
 
 	/*************************************************************************************************/
 	/*!

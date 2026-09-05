@@ -99,8 +99,47 @@ public:
 			The map coordinates that the game object is in
 	*/
 	/*********************************************************************************************/
-	LockedWall(int keyValue_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), keyValue(keyValue_) {}
-	LockedWall(int keyValue_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), keyValue(keyValue_) {}
+	LockedWall(int keyValue_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(pos, rot, sca, drawPriority_, facingRight_, texture_, color_, mapCoords_), keyValue(keyValue_), linked(false) {}
+	LockedWall(int keyValue_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_) : GameObject(drawPriority_, texture_, color_, mapCoords_), keyValue(keyValue_), linked(false) {}
+
+	/*********************************************************************************************/
+	/*!
+		\brief
+			Constructor for the linked locked wall game object class
+
+		\param keyValue_
+			The value of the key needed to open the lock
+
+		\param insideObject_
+			The object inside the wall that will pop out when destroyed. Set to null if nothing is supposed to pop out.
+
+		\param pos
+			The position of the game object
+
+		\param rot
+			The rotation of the game object
+
+		\param sca
+			The scale of the game object
+
+		\param drawPriority_
+			Higher draw priorities are drawn in front of objects with lower priority
+
+		\param inMap_
+			Whether this game object is in the map
+
+		\param color_
+			The color of the game object, defaults to clear
+
+		\param mapCoords_
+			The map coordinates that the game object is in
+
+		\param linkedWall
+			Lets the program know this is a linked wall
+	*/
+	/*********************************************************************************************/
+	LockedWall(int keyValue_, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority_, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, bool linkedWall);
+	LockedWall(int keyValue_, int drawPriority_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, bool linkedWall);
   
 	/*********************************************************************************************/
 	/*!
@@ -108,7 +147,7 @@ public:
 			Destructor for locked wall game object class
 	*/
 	/*********************************************************************************************/
-	virtual ~LockedWall() {}
+	~LockedWall() {}
 
 	/*************************************************************************************************/
 	/*!
@@ -134,6 +173,17 @@ public:
 	*/
 	/*************************************************************************************************/
 	virtual int GetKeyValue() { return keyValue; }
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets whether the game object should be destroyed
+
+		\param newToBeDestroyed
+			Whether the game object should be destroyed
+	*/
+	/*************************************************************************************************/
+	virtual void SetToBeDestroyed(bool newToBeDestroyed);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -141,6 +191,7 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	int keyValue;								// The key needed to unlock the door
+	bool linked;								// Whether this is a linked door
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Structures

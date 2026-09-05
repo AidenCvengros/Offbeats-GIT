@@ -194,7 +194,7 @@ Menu::~Menu()
 	// Destroys each option
 	for (auto i = optionList.begin(); i != optionList.end(); i++)
 	{
-		delete (*i);
+		delete (*i);																				// !!!! Crashed on exit 1 times. Second delete? !!!!
 	}
 
 	// Marks all the objects for destruction

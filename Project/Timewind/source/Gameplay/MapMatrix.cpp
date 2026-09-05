@@ -378,12 +378,15 @@ bool MapMatrix::MoveTile(int prevXCoord, int prevYCoord, int newXCoord, int newY
 
 	\param yCoord
 		The y coordinate of the tile to be cleared
+		
+	\param deleteObject
+		Whether to delete the object. Is true by default
 */
 /*************************************************************************************************/
-void MapMatrix::ClearTile(int xCoord, int yCoord)
+void MapMatrix::ClearTile(int xCoord, int yCoord, bool deleteObject)
 {
 	// Checks that the tile has a game object
-	if (mapMatrix[xCoord][yCoord].tileObject)
+	if (deleteObject && mapMatrix[xCoord][yCoord].tileObject)
 	{
 		// Destroys the game object
 		mapMatrix[xCoord][yCoord].tileObject->SetToBeDestroyed(true);

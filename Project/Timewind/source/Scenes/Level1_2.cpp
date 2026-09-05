@@ -84,6 +84,7 @@ void Level1_2::LoadScene()
     Texture* destructibleWallTexture = _TextureManager->AddTexture("Assets/Sprites/Wall_Cracked.png");
     Texture* keyTexture = _TextureManager->AddTexture("Assets/Sprites/Key.png");
     Texture* lockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LockedWall.png");
+    Texture* linkedLockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LinkedLockedWall.png");
     Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
     Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
     Texture* flagTexture = _TextureManager->AddTexture("Assets/Sprites/Flag.png");
@@ -121,6 +122,12 @@ void Level1_2::LoadScene()
             newObject = new DestructibleWall(NULL, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
             break;
+        case 'D':
+            newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
+            newObject->SetScale(glm::vec2(1.25, 1.25));
+            newObject = new DestructibleWall((Coin*)newObject, 0, destructibleWallTexture, { 0.4f, 0.075f, 0.0f, 1.0f }, i->second);
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Destructible, newObject);
+            break;
             // Generic coin
         case 'c':
             newObject = new Coin(coinTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, i->second);
@@ -149,7 +156,7 @@ void Level1_2::LoadScene()
             break;
             // Key 3 is a free key
         case '3':
-            newObject = new Key(13, keyTexture, { 0.286f, 0.667f, 0.063f, 1.0f }, i->second);
+            newObject = new Key(44, keyTexture, { 0.156f, 0.0f, 0.727f, 1.0f }, i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Key, newObject);
             break;
             // Door ! is the lock for key 1
@@ -164,8 +171,24 @@ void Level1_2::LoadScene()
             break;
             // Door # is the lock for key 3
         case '#':
-            newObject = new LockedWall(13, 40, lockedWallTexture, { 0.286f, 0.667f, 0.063f, 1.0f }, i->second);
+            newObject = new LockedWall(44, 40, lockedWallTexture, { 0.156f, 0.0f, 0.727f, 1.0f }, i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            break;
+        case '(':
+            newObject = new LockedWall(18, 40, linkedLockedWallTexture, { 0.604f, 0.922f, 0.0f, 1.0f }, i->second, true);
+            newObject->SetScale({ 2.0f, 8.0f });
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 1, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 2, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 3, MapMatrix::TileStatus::LockedDoor, newObject);
+            break;
+        case '*':
+            newObject = new LockedWall(44, 40, linkedLockedWallTexture, { 0.156f, 0.0f, 0.727f, 1.0f }, i->second, true);
+            newObject->SetScale({ 2.0f, 8.0f });
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 1, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 2, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 3, MapMatrix::TileStatus::LockedDoor, newObject);
             break;
         case 'F':
             finishFlag->SetPosition(ConvertMapCoordsToWorldCoords(i->second, finishFlag->GetScale()));

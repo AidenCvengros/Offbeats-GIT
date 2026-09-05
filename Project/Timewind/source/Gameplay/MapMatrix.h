@@ -322,9 +322,12 @@ public:
 
 		\param yCoord
 			The y coordinate of the tile to be cleared
+
+		\param deleteObject
+			Whether to delete the object in this tile. Defaults to true
 	*/
 	/*************************************************************************************************/
-	void ClearTile(int xCoord, int yCoord);
+	void ClearTile(int xCoord, int yCoord, bool deleteObject = true);
 
 	/*************************************************************************************************/
 	/*!
