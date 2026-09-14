@@ -147,10 +147,10 @@ void Engine::Init()
 	systemList[System::SystemTypes::gameStateManager] = gameStateManager;
 	systemList[System::SystemTypes::audioManager] = audioManager;
 	systemList[System::SystemTypes::mapMatrix] = mapMatrix;
-	systemList[System::SystemTypes::gameObjectManager] = objectManager;
-	systemList[System::SystemTypes::textureManager] = texManager;
 	systemList[System::SystemTypes::sceneManager] = sceneManager;
 	systemList[System::SystemTypes::effectManager] = effectManager;
+	systemList[System::SystemTypes::gameObjectManager] = objectManager;
+	systemList[System::SystemTypes::textureManager] = texManager;
 
 	// Loops through, initializing each system
 	for (const auto& [key, system] : systemList)

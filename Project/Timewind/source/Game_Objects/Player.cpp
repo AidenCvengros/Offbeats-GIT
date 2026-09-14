@@ -145,6 +145,9 @@ void Player::Update(double dt)
 		{
 			_GameStateManager->SetGameState(GameStateManager::GameStates::Walking);
 			inventory->PlacingMode(false);
+
+			// Also checks if the player is on a sticker to be interacted with (in case they placed one on top of themselves)
+			InteractWithTile(CalculatePlayerMapPositions(GetPosition(), Positions::Center), false, true);
 		}
 	}
 

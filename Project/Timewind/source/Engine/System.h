@@ -65,10 +65,10 @@ public:
 		gameStateManager,
 		audioManager,
 		mapMatrix,
-		gameObjectManager,
-		textureManager,
 		sceneManager,
 		effectManager,
+		gameObjectManager,
+		textureManager,
 		max
 	};
 	

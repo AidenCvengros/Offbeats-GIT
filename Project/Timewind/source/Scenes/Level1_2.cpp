@@ -174,6 +174,14 @@ void Level1_2::LoadScene()
             newObject = new LockedWall(44, 40, lockedWallTexture, { 0.156f, 0.0f, 0.727f, 1.0f }, i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
             break;
+        case ')':
+            newObject = new LockedWall(33, 40, linkedLockedWallTexture, { 0.859f, 0.255f, 0.380f, 1.0f }, i->second, true);
+            newObject->SetScale({ 2.0f, 8.0f });
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 1, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 2, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 3, MapMatrix::TileStatus::LockedDoor, newObject);
+            break;
         case '(':
             newObject = new LockedWall(18, 40, linkedLockedWallTexture, { 0.604f, 0.922f, 0.0f, 1.0f }, i->second, true);
             newObject->SetScale({ 2.0f, 8.0f });

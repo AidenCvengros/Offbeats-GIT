@@ -57,7 +57,11 @@ Copyright (c) 2025 Aiden Cvengros
 /*************************************************************************************************/
 MenuOption::~MenuOption()
 {
-    optionVisual->SetToBeDestroyed(true);
+    _Debug->Print(Debug::MessageType::Debug, "Menu Option: Destroying");
+    if (optionVisual)
+    {
+        optionVisual->SetToBeDestroyed(true);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
