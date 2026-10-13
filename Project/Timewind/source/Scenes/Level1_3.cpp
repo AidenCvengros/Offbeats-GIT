@@ -84,6 +84,7 @@ void Level1_3::LoadScene()
     Texture* destructibleWallTexture = _TextureManager->AddTexture("Assets/Sprites/Wall_Cracked.png");
     Texture* keyTexture = _TextureManager->AddTexture("Assets/Sprites/Key.png");
     Texture* lockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LockedWall.png");
+    Texture* linkedLockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LinkedLockedWall.png");
     Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
     Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
     Texture* flagTexture = _TextureManager->AddTexture("Assets/Sprites/Flag.png");
@@ -148,6 +149,15 @@ void Level1_3::LoadScene()
             newObject = new LockedWall(32, 40, lockedWallTexture, { 0.6875f, 0.0625f, 0.1875f, 1.0f }, i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
             break;
+            // Door ) is the tall lock for key 1
+        case ')':
+            newObject = new LockedWall(32, 40, linkedLockedWallTexture, { 0.6875f, 0.0625f, 0.1875f, 1.0f }, i->second, true);
+            newObject->SetScale({ 2.0f, 8.0f });
+            _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 1, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 2, MapMatrix::TileStatus::LockedDoor, newObject);
+            _MapMatrix->SetTile(i->second.first, i->second.second - 3, MapMatrix::TileStatus::LockedDoor, newObject);
+            break;
         case 'b':
             newObject = new Bumper(bumperTexture, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), i->second);
             _MapMatrix->SetTile(i->second, MapMatrix::TileStatus::Sticker, newObject);
@@ -199,6 +209,7 @@ void Level1_3::RefreshScene()
     Texture* destructibleWallTexture = _TextureManager->AddTexture("Assets/Sprites/Wall_Cracked.png");
     Texture* keyTexture = _TextureManager->AddTexture("Assets/Sprites/Key.png");
     Texture* lockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LockedWall.png");
+    Texture* linkedLockedWallTexture = _TextureManager->AddTexture("Assets/Sprites/LinkedLockedWall.png");
     Texture* coinTexture = _TextureManager->AddTexture("Assets/Sprites/Coin.png");
     Texture* bumperTexture = _TextureManager->AddTexture("Assets/Sprites/Bumper.png");
     Texture* flagTexture = _TextureManager->AddTexture("Assets/Sprites/Flag.png");

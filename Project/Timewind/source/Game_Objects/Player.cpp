@@ -157,7 +157,13 @@ void Player::Update(double dt)
 		// Checks if the player input a teleport
 		if (_InputManager->CheckInputStatus(InputManager::Inputs::MovementTeleport) == InputManager::InputStatus::Pressed)
 		{
-			inventory->Teleport(this);
+			// Teleports the player
+			if (inventory->Teleport(this))
+			{
+				// If the player was teleported mid-boost, refreshes the boost
+				reducedGravity = 0.3f;
+				floating = false;
+			}
 		}
 
 		// Checks if the player is trying to move left
@@ -641,7 +647,10 @@ void Player::MovePlayer(double dt)
 		{
 			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(bottomLeftSideTile).y + 2.0f;// 15625f;
 
-			grounded = true;
+			if (reducedGravity > 0.0f)
+			{
+				grounded = true;
+			}
 			floating = false;
 
 			// Kills the player's velocity

@@ -2846,7 +2846,6 @@ Debug: Start of frame 943
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 944
-Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 945
@@ -4512,38 +4511,6 @@ Debug: Start of frame 1498
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 1499
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Set game state: Walking
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Player: Deleted
-Debug: Inventory: Deleted
-Debug: Texture: Deleted Assets/Sprites/Alice_Neutral.png
-Debug: Texture: Deleted Assets/Sprites/Wall2.png
-Debug: Texture: Deleted Assets/Sprites/Coin.png
-Debug: Texture: Deleted Assets/Sprites/Highlight_Box.png
-Debug: Texture: Deleted Assets/Sprites/Inventory_Boxes_Pixel.png
-Debug: Texture: Deleted 
-Debug: Texture manager cleared
-Debug: Texture: New texture loaded Assets/Sprites/Alice_Neutral.png
-Debug: Texture: New texture loaded Assets/Sprites/Wall2.png
-Debug: Texture: New texture loaded Assets/Sprites/Wall_Cracked.png
-Debug: Texture: New texture loaded Assets/Sprites/Key.png
-Debug: Texture: New texture loaded Assets/Sprites/LockedWall.png
-Debug: Texture: New texture loaded Assets/Sprites/LinkedLockedWall.png
-Debug: Texture: New texture loaded Assets/Sprites/Coin.png
-Debug: Texture: New texture loaded Assets/Sprites/Bumper.png
-Debug: Texture: New texture loaded Assets/Sprites/Flag.png
-Debug: Texture: New texture loaded 3925x58
-Debug: Texture: New texture loaded Assets/Sprites/Highlight_Box.png
-Debug: Texture: New texture loaded Assets/Sprites/Inventory_Boxes_Pixel.png
-Debug: Inventory: Initialized
-Debug: Player: Created
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 1500
@@ -4651,6 +4618,20 @@ Debug: Window::Draw end
 Debug: Start of frame 1534
 Debug: Window::Draw start
 Debug: Window::Draw end
+Debug: Texture: Deleted 
+Debug: Texture: Deleted 
+Debug: Window: Destroyed swap chain framebuffers
+Debug: Window: Destroyed swap chain framebuffers
+Debug: Window: Destroyed swap chain framebuffers
+Debug: Texture: New texture loaded 2560x1377
+Debug: Texture: New texture loaded 2560x1377
+Debug: Render Pass: Destroyed framebuffer
+Debug: Render Pass: Created framebuffer
+Debug: Render Pass: Destroyed framebuffer
+Debug: Render Pass: Created framebuffer
+Debug: Render Pass: Created swap chain pass framebuffer
+Debug: Render Pass: Created swap chain pass framebuffer
+Debug: Render Pass: Created swap chain pass framebuffer
 Debug: Start of frame 1535
 Debug: Window::Draw start
 Debug: Window::Draw end
@@ -5273,7 +5254,6 @@ Debug: Start of frame 1741
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 1742
-Debug: Inventory: Added key no. 33
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 1743
@@ -6564,7 +6544,6 @@ Debug: Start of frame 2171
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 2172
-Debug: Inventory: Added key no. 18
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 2173
@@ -7186,6 +7165,7 @@ Debug: Start of frame 2378
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 2379
+Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 2380
@@ -9289,6 +9269,40 @@ Debug: Start of frame 3079
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3080
+Debug: Menu Option: Destroying
+Debug: Menu Option: Destroying
+Debug: Menu Option: Destroying
+Debug: Menu Option: Destroying
+Debug: Menu Option: Destroying
+Debug: Set game state: Walking
+Debug: Menu Option: Destroying
+Debug: Menu Option: Destroying
+Debug: Menu Option: Destroying
+Debug: Player: Deleted
+Debug: Inventory: Deleted
+Debug: Texture: Deleted Assets/Sprites/Alice_Neutral.png
+Debug: Texture: Deleted Assets/Sprites/Wall2.png
+Debug: Texture: Deleted Assets/Sprites/Coin.png
+Debug: Texture: Deleted Assets/Sprites/Highlight_Box.png
+Debug: Texture: Deleted Assets/Sprites/Inventory_Boxes_Pixel.png
+Debug: Texture: Deleted 
+Debug: Texture manager cleared
+Debug: Texture: New texture loaded Assets/Sprites/Alice_Neutral.png
+Debug: Texture: New texture loaded Assets/Sprites/Wall2.png
+Debug: Texture: New texture loaded Assets/Sprites/Wall_Cracked.png
+Debug: Texture: New texture loaded Assets/Sprites/Key.png
+Debug: Texture: New texture loaded Assets/Sprites/LockedWall.png
+Debug: Texture: New texture loaded Assets/Sprites/LinkedLockedWall.png
+Debug: Texture: New texture loaded Assets/Sprites/Coin.png
+Debug: Texture: New texture loaded Assets/Sprites/Bumper.png
+Debug: Texture: New texture loaded Assets/Sprites/Flag.png
+Debug: Texture: New texture loaded Assets/Sprites/Portal_Crack.png
+Debug: Texture: New texture loaded 3925x58
+Debug: Texture: New texture loaded Assets/Sprites/Highlight_Box.png
+Debug: Texture: New texture loaded Assets/Sprites/Inventory_Boxes_Pixel.png
+Debug: Inventory: Initialized
+Debug: Player: Created
+Debug: FinishFlag: Flag Broken
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3081
@@ -9913,6 +9927,7 @@ Debug: Start of frame 3287
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3288
+Debug: Inventory: Added key no. 33
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3289
@@ -10450,7 +10465,6 @@ Debug: Start of frame 3466
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3467
-Debug: Inventory: Added key no. 44
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3468
@@ -11213,6 +11227,7 @@ Debug: Start of frame 3720
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3721
+Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3722
@@ -11558,6 +11573,7 @@ Debug: Start of frame 3835
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3836
+Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3837
@@ -11945,6 +11961,7 @@ Debug: Start of frame 3964
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3965
+Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 3966
@@ -12101,6 +12118,7 @@ Debug: Start of frame 4016
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4017
+Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4018
@@ -14033,6 +14051,7 @@ Debug: Start of frame 4660
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4661
+Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4662
@@ -14438,6 +14457,7 @@ Debug: Start of frame 4795
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4796
+Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4797
@@ -14849,6 +14869,7 @@ Debug: Start of frame 4932
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4933
+Debug: Inventory: Added key no. 24
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4934
@@ -14879,6 +14900,7 @@ Debug: Start of frame 4942
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4943
+Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4944
@@ -14987,6 +15009,7 @@ Debug: Start of frame 4978
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4979
+Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 4980
@@ -15362,7 +15385,6 @@ Debug: Start of frame 5103
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 5104
-Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 5105
@@ -15720,39 +15742,6 @@ Debug: Start of frame 5222
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 5223
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Set game state: Walking
-Debug: Player: Deleted
-Debug: Inventory: Deleted
-Debug: Texture: Deleted Assets/Sprites/Alice_Neutral.png
-Debug: Texture: Deleted Assets/Sprites/Wall2.png
-Debug: Texture: Deleted Assets/Sprites/Wall_Cracked.png
-Debug: Texture: Deleted Assets/Sprites/Key.png
-Debug: Texture: Deleted Assets/Sprites/LockedWall.png
-Debug: Texture: Deleted Assets/Sprites/LinkedLockedWall.png
-Debug: Texture: Deleted Assets/Sprites/Coin.png
-Debug: Texture: Deleted Assets/Sprites/Bumper.png
-Debug: Texture: Deleted Assets/Sprites/Flag.png
-Debug: Texture: Deleted Assets/Sprites/Highlight_Box.png
-Debug: Texture: Deleted Assets/Sprites/Inventory_Boxes_Pixel.png
-Debug: Texture: Deleted 
-Debug: Texture manager cleared
-Debug: Texture: New texture loaded Assets/Sprites/Alice_Neutral.png
-Debug: Texture: New texture loaded Assets/Sprites/Wall2.png
-Debug: Texture: New texture loaded Assets/Sprites/Wall_Cracked.png
-Debug: Texture: New texture loaded Assets/Sprites/Key.png
-Debug: Texture: New texture loaded Assets/Sprites/LockedWall.png
-Debug: Texture: New texture loaded Assets/Sprites/Coin.png
-Debug: Texture: New texture loaded Assets/Sprites/Bumper.png
-Debug: Texture: New texture loaded Assets/Sprites/Flag.png
-Debug: Texture: New texture loaded 3925x58
-Debug: Texture: New texture loaded Assets/Sprites/Highlight_Box.png
-Debug: Texture: New texture loaded Assets/Sprites/Inventory_Boxes_Pixel.png
-Debug: Inventory: Initialized
-Debug: Player: Created
-Debug: FinishFlag: Flag Broken
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 5224
@@ -16560,7 +16549,6 @@ Debug: Start of frame 5491
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 5492
-Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 5493
@@ -17251,7 +17239,6 @@ Debug: Start of frame 5721
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 5722
-Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 5723
@@ -18194,7 +18181,6 @@ Debug: Start of frame 6035
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6036
-Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6037
@@ -18366,6 +18352,7 @@ Debug: Start of frame 6092
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6093
+Debug: Inventory: Added key no. 17
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6094
@@ -18591,7 +18578,6 @@ Debug: Start of frame 6167
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6168
-Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6169
@@ -20728,6 +20714,7 @@ Debug: Start of frame 6879
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6880
+Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6881
@@ -20983,6 +20970,7 @@ Debug: Start of frame 6964
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6965
+Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 6966
@@ -23791,7 +23779,6 @@ Debug: Start of frame 7900
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 7901
-Debug: Inventory: Added key no. 32
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 7902
@@ -25568,6 +25555,8 @@ Debug: Start of frame 8492
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 8493
+Debug: Set game state: Cutscene
+Debug: Game State Manager: Refreshing current scene 1.5708
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 8494
@@ -25814,6 +25803,7 @@ Debug: Start of frame 8574
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 8575
+Debug: Set game state: Running
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 8576
@@ -26435,6 +26425,7 @@ Debug: Start of frame 8781
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 8782
+Debug: Inventory: Added key no. 33
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 8783
@@ -29048,7 +29039,6 @@ Debug: Start of frame 9652
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 9653
-Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 9654
@@ -29064,6 +29054,7 @@ Debug: Start of frame 9657
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 9658
+Debug: Inventory: Added key no. 17
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 9659
@@ -29250,7 +29241,6 @@ Debug: Start of frame 9719
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 9720
-Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 9721
@@ -29530,7 +29520,6 @@ Debug: Start of frame 9812
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 9813
-Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 9814
@@ -30158,7 +30147,6 @@ Debug: Start of frame 10021
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10022
-Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10023
@@ -30948,7 +30936,6 @@ Debug: Start of frame 10284
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10285
-Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10286
@@ -31243,7 +31230,6 @@ Debug: Start of frame 10382
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10383
-Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10384
@@ -32420,7 +32406,6 @@ Debug: Start of frame 10774
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10775
-Debug: Game State Manager: Set game state: Placing
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10776
@@ -32919,7 +32904,6 @@ Debug: Start of frame 10940
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10941
-Debug: Set game state: Walking
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10942
@@ -32932,6 +32916,7 @@ Debug: Start of frame 10944
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10945
+Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 10946
@@ -33916,8 +33901,6 @@ Debug: Start of frame 11272
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 11273
-Debug: Set game state: Cutscene
-Debug: Game State Manager: Refreshing current scene 1.5708
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 11274
@@ -34299,7 +34282,6 @@ Debug: Start of frame 11399
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 11400
-Debug: Set game state: Running
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 11401
@@ -34627,6 +34609,35 @@ Debug: Start of frame 11508
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 11509
+Debug: Menu Option: Destroying
+Debug: Menu Option: Destroying
+Debug: Menu Option: Destroying
+Debug: Set game state: Walking
+Debug: Player: Deleted
+Debug: Inventory: Deleted
+Debug: Texture: Deleted Assets/Sprites/Alice_Neutral.png
+Debug: Texture: Deleted Assets/Sprites/Wall2.png
+Debug: Texture: Deleted Assets/Sprites/Wall_Cracked.png
+Debug: Texture: Deleted Assets/Sprites/Key.png
+Debug: Texture: Deleted Assets/Sprites/LockedWall.png
+Debug: Texture: Deleted Assets/Sprites/LinkedLockedWall.png
+Debug: Texture: Deleted Assets/Sprites/Coin.png
+Debug: Texture: Deleted Assets/Sprites/Bumper.png
+Debug: Texture: Deleted Assets/Sprites/Flag.png
+Debug: Texture: Deleted Assets/Sprites/Portal_Crack.png
+Debug: Texture: Deleted Assets/Sprites/Highlight_Box.png
+Debug: Texture: Deleted Assets/Sprites/Inventory_Boxes_Pixel.png
+Debug: Texture: Deleted 
+Debug: Texture manager cleared
+Debug: Texture: New texture loaded Assets/Sprites/Alice_Neutral.png
+Debug: Texture: New texture loaded Assets/Sprites/Wall2.png
+Debug: Texture: New texture loaded 3925x58
+Debug: Texture: New texture loaded Assets/Sprites/Coin.png
+Debug: Texture: New texture loaded Assets/Sprites/Highlight_Box.png
+Debug: Texture: New texture loaded Assets/Sprites/Inventory_Boxes_Pixel.png
+Debug: Inventory: Initialized
+Debug: Player: Created
+Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 11510
@@ -35908,7 +35919,6 @@ Debug: Start of frame 11935
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 11936
-Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 11937
@@ -36200,6 +36210,7 @@ Debug: Start of frame 12032
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12033
+Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12034
@@ -36299,38 +36310,6 @@ Debug: Start of frame 12065
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12066
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Set game state: Walking
-Debug: Player: Deleted
-Debug: Inventory: Deleted
-Debug: Texture: Deleted Assets/Sprites/Alice_Neutral.png
-Debug: Texture: Deleted Assets/Sprites/Wall2.png
-Debug: Texture: Deleted Assets/Sprites/Wall_Cracked.png
-Debug: Texture: Deleted Assets/Sprites/Key.png
-Debug: Texture: Deleted Assets/Sprites/LockedWall.png
-Debug: Texture: Deleted Assets/Sprites/Coin.png
-Debug: Texture: Deleted Assets/Sprites/Bumper.png
-Debug: Texture: Deleted Assets/Sprites/Flag.png
-Debug: Texture: Deleted Assets/Sprites/Highlight_Box.png
-Debug: Texture: Deleted Assets/Sprites/Inventory_Boxes_Pixel.png
-Debug: Texture: Deleted 
-Debug: Texture manager cleared
-Debug: Texture: New texture loaded Assets/Sprites/Alice_Neutral.png
-Debug: Texture: New texture loaded Assets/Sprites/Wall2.png
-Debug: Texture: New texture loaded Assets/Sprites/Wall_Cracked.png
-Debug: Texture: New texture loaded Assets/Sprites/Key.png
-Debug: Texture: New texture loaded Assets/Sprites/LockedWall.png
-Debug: Texture: New texture loaded Assets/Sprites/Coin.png
-Debug: Texture: New texture loaded Assets/Sprites/Bumper.png
-Debug: Texture: New texture loaded Assets/Sprites/Flag.png
-Debug: Texture: New texture loaded 3925x58
-Debug: Texture: New texture loaded Assets/Sprites/Highlight_Box.png
-Debug: Texture: New texture loaded Assets/Sprites/Inventory_Boxes_Pixel.png
-Debug: Inventory: Initialized
-Debug: Player: Created
-Debug: FinishFlag: Flag Broken
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12067
@@ -36643,7 +36622,6 @@ Debug: Start of frame 12169
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12170
-Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12171
@@ -36782,35 +36760,6 @@ Debug: Start of frame 12215
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12216
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Menu Option: Destroying
-Debug: Set game state: Walking
-Debug: Player: Deleted
-Debug: Inventory: Deleted
-Debug: Texture: Deleted Assets/Sprites/Alice_Neutral.png
-Debug: Texture: Deleted Assets/Sprites/Wall2.png
-Debug: Texture: Deleted Assets/Sprites/Wall_Cracked.png
-Debug: Texture: Deleted Assets/Sprites/Key.png
-Debug: Texture: Deleted Assets/Sprites/LockedWall.png
-Debug: Texture: Deleted Assets/Sprites/Coin.png
-Debug: Texture: Deleted Assets/Sprites/Bumper.png
-Debug: Texture: Deleted Assets/Sprites/Flag.png
-Debug: Texture: Deleted Assets/Sprites/Highlight_Box.png
-Debug: Texture: Deleted Assets/Sprites/Inventory_Boxes_Pixel.png
-Debug: Texture: Deleted 
-Debug: Texture manager cleared
-Debug: Texture: New texture loaded Assets/Sprites/Alice_Neutral.png
-Debug: Texture: New texture loaded Assets/Sprites/Wall2.png
-Debug: Texture: New texture loaded 3925x58
-Debug: Texture: New texture loaded Assets/Sprites/Coin.png
-Debug: Texture: New texture loaded Assets/Sprites/Highlight_Box.png
-Debug: Texture: New texture loaded Assets/Sprites/Inventory_Boxes_Pixel.png
-Debug: Inventory: Initialized
-Debug: Player: Created
-Debug: Game State Manager: Set game state: Menu
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12217
@@ -36907,1258 +36856,6 @@ Debug: Start of frame 12247
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Start of frame 12248
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12249
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12250
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12251
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12252
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12253
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12254
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12255
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12256
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12257
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12258
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12259
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12260
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12261
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12262
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12263
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12264
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12265
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12266
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12267
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12268
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12269
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12270
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12271
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12272
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12273
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12274
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12275
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12276
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12277
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12278
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12279
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12280
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12281
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12282
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12283
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12284
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12285
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12286
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12287
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12288
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12289
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12290
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12291
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12292
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12293
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12294
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12295
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12296
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12297
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12298
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12299
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12300
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12301
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12302
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12303
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12304
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12305
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12306
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12307
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12308
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12309
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12310
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12311
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12312
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12313
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12314
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12315
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12316
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12317
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12318
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12319
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12320
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12321
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12322
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12323
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12324
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12325
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12326
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12327
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12328
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12329
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12330
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12331
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12332
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12333
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12334
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12335
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12336
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12337
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12338
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12339
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12340
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12341
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12342
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12343
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12344
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12345
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12346
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12347
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12348
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12349
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12350
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12351
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12352
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12353
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12354
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12355
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12356
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12357
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12358
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12359
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12360
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12361
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12362
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12363
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12364
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12365
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12366
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12367
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12368
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12369
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12370
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12371
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12372
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12373
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12374
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12375
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12376
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12377
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12378
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12379
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12380
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12381
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12382
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12383
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12384
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12385
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12386
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12387
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12388
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12389
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12390
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12391
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12392
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12393
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12394
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12395
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12396
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12397
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12398
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12399
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12400
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12401
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12402
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12403
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12404
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12405
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12406
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12407
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12408
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12409
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12410
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12411
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12412
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12413
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12414
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12415
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12416
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12417
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12418
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12419
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12420
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12421
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12422
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12423
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12424
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12425
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12426
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12427
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12428
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12429
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12430
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12431
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12432
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12433
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12434
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12435
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12436
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12437
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12438
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12439
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12440
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12441
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12442
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12443
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12444
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12445
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12446
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12447
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12448
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12449
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12450
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12451
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12452
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12453
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12454
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12455
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12456
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12457
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12458
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12459
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12460
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12461
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12462
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12463
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12464
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12465
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12466
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12467
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12468
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12469
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12470
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12471
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12472
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12473
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12474
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12475
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12476
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12477
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12478
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12479
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12480
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12481
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12482
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12483
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12484
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12485
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12486
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12487
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12488
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12489
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12490
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12491
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12492
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12493
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12494
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12495
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12496
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12497
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12498
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12499
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12500
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12501
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12502
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12503
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12504
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12505
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12506
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12507
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12508
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12509
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12510
-Debug: Game State Manager: Set game state: Menu
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12511
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12512
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12513
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12514
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12515
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12516
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12517
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12518
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12519
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12520
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12521
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12522
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12523
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12524
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12525
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12526
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12527
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12528
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12529
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12530
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12531
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12532
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12533
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12534
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12535
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12536
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12537
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12538
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12539
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12540
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12541
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12542
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12543
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12544
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12545
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12546
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12547
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12548
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12549
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12550
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12551
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12552
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12553
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12554
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12555
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12556
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12557
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12558
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12559
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12560
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12561
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12562
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12563
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12564
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12565
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12566
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12567
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12568
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12569
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12570
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12571
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12572
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12573
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12574
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12575
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12576
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12577
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12578
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12579
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12580
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12581
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12582
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12583
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12584
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12585
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12586
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12587
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12588
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12589
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12590
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12591
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12592
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12593
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12594
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12595
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12596
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12597
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12598
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12599
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12600
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12601
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12602
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12603
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12604
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12605
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12606
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12607
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12608
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12609
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12610
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12611
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12612
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12613
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12614
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12615
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12616
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12617
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12618
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12619
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12620
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12621
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12622
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12623
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12624
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12625
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12626
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12627
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12628
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12629
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12630
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12631
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12632
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12633
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12634
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12635
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12636
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12637
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12638
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12639
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12640
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12641
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12642
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12643
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12644
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12645
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12646
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12647
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12648
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12649
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12650
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12651
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12652
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12653
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12654
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12655
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12656
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12657
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12658
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12659
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12660
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12661
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12662
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12663
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12664
-Debug: Window::Draw start
-Debug: Window::Draw end
-Debug: Start of frame 12665
 Debug: Window::Draw start
 Debug: Window::Draw end
 Debug: Engine: Shutting down systems
