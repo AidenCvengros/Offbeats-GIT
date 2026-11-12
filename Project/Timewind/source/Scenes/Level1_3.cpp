@@ -102,7 +102,7 @@ void Level1_3::LoadScene()
     Camera* camera = new Camera(player->GetPosition(), 0.0f, glm::vec2(0.0f, 0.0f), player, 4.0f / 3.0f, glm::radians(50.0f));
     FinishFlag* finishFlag = new FinishFlag(flagTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, 104);
     finishFlag->SetScale({ 4.0f, 12.0f });
-    finishFlag->SetTimer(18.0f);
+    finishFlag->SetTimer(18.0f, false);
     GameObject* newDefaultSquare = new GameObject({ 0.0f, 0.0f }, 0.0f, { 2.0f, 2.0f }, 99, true, { 1.0f, 1.0f, 1.0f, 1.0f }, std::make_pair(0, 0));
     _GameObjectManager->AddGameObject(camera);
     _GameObjectManager->AddPlayerObject(player);
@@ -226,7 +226,7 @@ void Level1_3::RefreshScene()
     // Creates a new finish flag
     FinishFlag* finishFlag = new FinishFlag(flagTexture, { 1.0f, 1.0f, 1.0f, 1.0f }, { -1, -1 }, 104);
     finishFlag->SetScale({ 4.0f, 12.0f });
-    finishFlag->SetTimer(18.0f);
+    finishFlag->SetTimer(18.0f, true);
     _GameObjectManager->AddGameObject(finishFlag);
 
     // Refreshes the game object manager

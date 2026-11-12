@@ -73,9 +73,12 @@ public:
 
 		\param _canBePaused
 			Whether the timer pauses when the player is paused
+
+		\param startRunning
+			Whether the timer starts running as soon as it is created
 	*/
 	/*************************************************************************************************/
-	Timer(double _length, bool _canBePaused);
+	Timer(double _length, bool _canBePaused, bool startRunning = true);
 	
 	/*************************************************************************************************/
 	/*!
@@ -84,6 +87,33 @@ public:
 	*/
 	/*************************************************************************************************/
 	~Timer() {}
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Starts a paused timer
+	*/
+	/*************************************************************************************************/
+	void Start();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Pause the timer
+	*/
+	/*************************************************************************************************/
+	void Pause();
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Gets whether the timer is running (true) or is paused (false)
+
+		\return
+			Whether the timer is running
+	*/
+	/*************************************************************************************************/
+	bool GetIsRunning() { return running; }
 
 	/*************************************************************************************************/
 	/*!
@@ -97,7 +127,7 @@ public:
 			Whether the timer pauses when the player is paused
 	*/
 	/*************************************************************************************************/
-	void RestartTimer(double _length, bool _canBePaused);
+	void Restart(double _length, bool _canBePaused);
 
 	/*************************************************************************************************/
 	/*!
@@ -135,12 +165,22 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	double startingTime;						// When the timer was started
-	double length;								// How long the timer runs for
+	double length;								// How long the timer runs for. Will change if the timer is paused
+	double fullLength;							// How long the timer runs for in total.
 	bool canBePaused;							// Whether the timer is only used during regular gameplay
+	bool running;								// Whether the timer is currently running
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Sets the starting time (will differ based on whether we pause the timer with the game or not)
+	*/
+	/*************************************************************************************************/
+	void SetStartingTime();
 };
 
 //-------------------------------------------------------------------------------------------------

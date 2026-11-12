@@ -48,21 +48,49 @@ Copyright (c) 2025 Aiden Cvengros
 
 	\param _canBePaused
 		Whether the timer pauses when the player is paused
+
+	\param startRunning
+		Whether the timer starts running as soon as it is created
 */
 /*************************************************************************************************/
-Timer::Timer(double _length, bool _canBePaused) : length(_length), canBePaused(_canBePaused)
+Timer::Timer(double _length, bool _canBePaused, bool startRunning) : length(_length), fullLength(_length), canBePaused(_canBePaused), running(startRunning)
 {
-	// Checks if we are using the true time or unpaused time
-	if (canBePaused)
+	SetStartingTime();
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Starts a paused timer, or restarts a finished timer with the previous values. Does nothing if the timer is already running.
+*/
+/*************************************************************************************************/
+void Timer::Start()
+{
+	// Checks that we were paused in the first place or if the timer finished
+	if (!running || Finished())
 	{
-		// Fetches the starting time
-		startingTime = Engine::createEngine()->GetUnpausedTime();
+		// Sets the new starting time
+		SetStartingTime();
+		length = fullLength;
 	}
-	else
-	{
-		// Fetches the starting time
-		startingTime = Engine::createEngine()->GetTotalTime();
-	}
+
+	// Marks the timer as running
+	running = true;
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Pause the timer
+*/
+/*************************************************************************************************/
+void Timer::Pause()
+{
+	// Adjusts the length
+	length = GetTimeRemaining();
+
+	// Pauses the timer
+	running = false;
 }
 
 /*************************************************************************************************/
@@ -77,23 +105,15 @@ Timer::Timer(double _length, bool _canBePaused) : length(_length), canBePaused(_
 		Whether the timer pauses when the player is paused
 */
 /*************************************************************************************************/
-void Timer::RestartTimer(double _length, bool _canBePaused)
+void Timer::Restart(double _length, bool _canBePaused)
 {
 	// Sets the new variables
 	length = _length;
+	fullLength = _length;
 	canBePaused = _canBePaused;
 
-	// Checks if we are using the true time or unpaused time
-	if (canBePaused)
-	{
-		// Fetches the starting time
-		startingTime = Engine::createEngine()->GetUnpausedTime();
-	}
-	else
-	{
-		// Fetches the starting time
-		startingTime = Engine::createEngine()->GetTotalTime();
-	}
+	// Starts the timer
+	SetStartingTime();
 }
 
 /*************************************************************************************************/
@@ -107,15 +127,22 @@ void Timer::RestartTimer(double _length, bool _canBePaused)
 /*************************************************************************************************/
 double Timer::GetTimeRemaining()
 {
-	// Checks whether we are checking against paused or unpaused time
-	if (canBePaused)
+	// If it's running
+	if (running)
 	{
-		return std::max(0.0, Engine::createEngine()->GetUnpausedTime() - startingTime + length);
+		// Checks whether we are checking against paused or unpaused time
+		if (canBePaused)
+		{
+			return std::max(0.0, length - (Engine::createEngine()->GetUnpausedTime() - startingTime));
+		}
+		else
+		{
+			return std::max(0.0, length - (Engine::createEngine()->GetTotalTime() - startingTime));
+		}
 	}
-	else
-	{
-		return std::max(0.0, Engine::createEngine()->GetTotalTime() - startingTime + length);
-	}
+
+	// Otherwise returns the saved time remaining
+	return length;
 }
 
 /*************************************************************************************************/
@@ -129,17 +156,47 @@ double Timer::GetTimeRemaining()
 /*************************************************************************************************/
 bool Timer::Finished()
 {
-	// Checks whether we are checking against paused or unpaused time
-	if (canBePaused)
+	// Checks whether the timer isn't paused (or wasn't paused after we finished anyways)
+	if (running && length > 0.0)
 	{
-		return startingTime + length >= Engine::createEngine()->GetUnpausedTime();
+		// Checks whether we are checking against paused or unpaused time
+		if (canBePaused)
+		{
+			return startingTime + length < Engine::createEngine()->GetUnpausedTime();
+		}
+		else
+		{
+			return startingTime + length < Engine::createEngine()->GetTotalTime();
+		}
 	}
 	else
 	{
-		return startingTime + length >= Engine::createEngine()->GetTotalTime();
+		// If we are paused, then we aren't done
+		return false;
 	}
 }
 
 //-------------------------------------------------------------------------------------------------
 // Private Function Definitions
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets the starting time (will differ based on whether we pause the timer with the game or not)
+*/
+/*************************************************************************************************/
+void Timer::SetStartingTime()
+{
+	// Checks if we are using the true time or unpaused time
+	if (canBePaused)
+	{
+		// Fetches the starting time
+		startingTime = Engine::createEngine()->GetUnpausedTime();
+	}
+	else
+	{
+		// Fetches the starting time
+		startingTime = Engine::createEngine()->GetTotalTime();
+	}
+}

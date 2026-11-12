@@ -31,6 +31,7 @@ Copyright (c) 2023 Aiden Cvengros
 #include "../Gameplay/MenuOptions/GoToSceneOption.h"
 #include "../Gameplay/MenuOptions/RefreshSceneOption.h"
 #include "../Engine/GameStateManager.h"
+#include "../Game_Objects/TimerObject.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -60,38 +61,33 @@ Copyright (c) 2023 Aiden Cvengros
 void FinishFlag::Update(double dt)
 {
 	// Checks if this flag is timed
-	if (timed && _GameStateManager->GetGameState() <= GameStateManager::GameStates::Running)
+	if (timer && _GameStateManager->GetGameState() <= GameStateManager::GameStates::Running)
 	{
-		if (_GameStateManager->GetGameState() == GameStateManager::GameStates::Running)
-		{
-			timer -= dt;
-		}
-		else
-		{
-			timer = 0.0f;
-		}
-
 		// Checks if the timer has run out
-		if (timer <= 0.0f)
+		if (timer->GetTimer().Finished() || !timer->GetTimer().GetIsRunning())
 		{
-			// Stops running the timer
-			timed = false;
-			flagActive = false;
-			_Debug->Print(Debug::MessageType::Debug, "FinishFlag: Flag Broken");
-
-			// Makes like a dark, fucked up version of the finish flag haha. Just a glimpse into my dark reality. A full stare into my twisted perspective would make most simply go insane lmao
-			SetDrawPriority(150);
-			SetColor({ 0.9f, 0.0f, 0.5f, 0.7f });
-			SetRotation(157.0f);
-
-			// Creates a global effect that expands
-			GameObject* newGameObject = new GameObject(GetPosition(), 45.0f, { 0.1f, 0.1f }, 180, true, { 1.0f, 0.2f, 0.2f, 1.0f });
-			_GameObjectManager->AddGameObject(newGameObject);
-			newGameObject->ScaleTo({ 1000.0f, 1000.0f }, 5.0f, false);
-			newGameObject->SetDestroyOnRefresh(true);
-			_GameObjectManager->AddGameObject(new Text("ENTER", _TextureManager->GetDefaultFont(), 18, GetPosition() + glm::vec2{-2.0f, 4.0f}, 0.0f, {0.1f, 0.1f}, 95, {1.0f, 1.0f, 1.0f, 1.0f}));
+			// Breaks the flag
+			BreakFlag();
 		}
 	}
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Sets whether the game object should be destroyed
+
+	\param newToBeDestroyed
+		Whether the game object should be destroyed
+*/
+/*************************************************************************************************/
+void FinishFlag::SetToBeDestroyed(bool newToBeDestroyed)
+{
+	// Sets the normal to be destroyed flag
+	GameObject::SetToBeDestroyed(newToBeDestroyed);
+
+	// Also blows up the timer
+	timer->SetToBeDestroyed(newToBeDestroyed);
 }
 
 /*************************************************************************************************/
@@ -166,15 +162,59 @@ void FinishFlag::JumpToTargetScene()
 
 	\param timerLength
 		How long the timer runs
+
+	\param running
+		Whether we are in running or not
 */
 /*************************************************************************************************/
-void FinishFlag::SetTimer(double timerLength)
+void FinishFlag::SetTimer(double timerLength, bool running)
 {
-	// Set the timer and starts it
-	timer = timerLength;
-	timed = true;
+	// Checks if we don't already have a timer object
+	if (!timer)
+	{
+		// Set the timer and starts it
+		timer = new TimerObject(timerLength, true, _TextureManager->GetDefaultFont(), 32, { -4.0f, 4.0f }, 0.0f, { 0.1f, 0.1f }, 85, { 1.0f, 1.0f, 1.0f, 1.0f });
+		_GameObjectManager->AddGameObject(timer);
+		timer->SetFollowingCamera(true);
+	}
+	// Otherwise restarts the timer with the given parameters
+	else
+	{
+		timer->GetTimer().Restart(timerLength, true);
+	}
+
+	// If we don't start running, pauses the timer
+	if (!running)
+	{
+		timer->GetTimer().Pause();
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
 // Private Function Declarations
 //-------------------------------------------------------------------------------------------------
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Breaks the flag
+*/
+/*************************************************************************************************/
+void FinishFlag::BreakFlag()
+{
+	// Stops running the timer
+	flagActive = false;
+	_Debug->Print(Debug::MessageType::Debug, "FinishFlag: Flag Broken");
+
+	// Makes like a dark, fucked up version of the finish flag haha. Just a glimpse into my dark reality. A full stare into my twisted perspective would make most simply go insane lmao
+	SetDrawPriority(150);
+	SetColor({ 0.9f, 0.0f, 0.5f, 0.7f });
+	SetRotation(157.0f);
+
+	// Creates a global effect that expands
+	GameObject* newGameObject = new GameObject(GetPosition(), 45.0f, { 0.1f, 0.1f }, 180, true, { 1.0f, 0.2f, 0.2f, 1.0f });
+	_GameObjectManager->AddGameObject(newGameObject);
+	newGameObject->ScaleTo({ 1000.0f, 1000.0f }, 5.0f, false);
+	newGameObject->SetDestroyOnRefresh(true);
+	_GameObjectManager->AddGameObject(new Text("ENTER", _TextureManager->GetDefaultFont(), 18, GetPosition() + glm::vec2{ -2.0f, 4.0f }, 0.0f, { 0.1f, 0.1f }, 95, { 1.0f, 1.0f, 1.0f, 1.0f }));
+}

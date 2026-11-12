@@ -647,7 +647,7 @@ void Player::MovePlayer(double dt)
 		{
 			playerWorldPosition.y = ConvertMapCoordsToWorldCoords(bottomLeftSideTile).y + 2.0f;// 15625f;
 
-			if (reducedGravity > 0.0f)
+			if (reducedGravity <= 0.0f)
 			{
 				grounded = true;
 			}

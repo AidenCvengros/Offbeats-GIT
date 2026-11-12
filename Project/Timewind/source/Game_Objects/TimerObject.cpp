@@ -1,22 +1,26 @@
 /*************************************************************************************************/
 /*!
-\file FILL.cpp
+\file TimerObject.cpp
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2023.9.FILL
+\date 2026.11.7
 \brief
-    FILL
+    The game object for displaying a timer on screen
 
     Functions include:
         + FILL
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
 //-------------------------------------------------------------------------------------------------
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
+
+// Base includes
+#include "TimerObject.h"
+#include "../Engine/cppShortcuts.h"
 
 //-------------------------------------------------------------------------------------------------
 // Private Constants
@@ -31,31 +35,34 @@ Copyright (c) 2023 Aiden Cvengros
 //-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
-// Public Function Declarations
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
-// Private Function Declarations
-//-------------------------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------------------------
 // Public Function Definitions
 //-------------------------------------------------------------------------------------------------
 
 /*************************************************************************************************/
 /*!
-	\brief
-		FILL
-		
-	\param
-		FILL
-		
-	\return
-		FILL
+  \brief
+	Constructor for the timer object class
 */
 /*************************************************************************************************/
-void FILL ()
+TimerObject::TimerObject(double startingTime, bool pauseable, Font* font, int fontSize, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority, glm::vec4 color) : 
+	Text("00", font, fontSize, pos, rot, sca, drawPriority, color), timer(startingTime, pauseable)
 {
+
+}
+
+/*************************************************************************************************/
+/*!
+	\brief
+		Updates the game object. Can be overwritten by derived classes
+
+	\param dt
+		The time elapsed since the previous frame
+*/
+/*************************************************************************************************/
+void TimerObject::Update(double dt)
+{
+	// Updates the text to match the timer
+	SetText(std::to_string((int)timer.GetTimeRemaining()));
 }
 
 //-------------------------------------------------------------------------------------------------

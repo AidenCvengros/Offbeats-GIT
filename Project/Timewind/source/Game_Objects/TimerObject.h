@@ -1,33 +1,35 @@
 /*************************************************************************************************/
 /*!
-\file Entity.h
+\file TimerObject.h
 \author Aiden Cvengros
 \par email: ajcvengros\@gmail.com
-\date 2023.9.8
+\date 2026.11.7
 \brief
-    Holds the base entity class that makes up non-static or interactible objects on the map
+    The game object for displaying a timer on screen
 
-    Public Functions:
-        + Entity::Entity
-		+ Entity::~Entity
-		+ Entity::SetPosition
-		+ Entity::GetPosition
-		
-	Private Functions:
-		+ FILL
+    Functions include:
+        + FILL
 
-Copyright (c) 2023 Aiden Cvengros
+Copyright (c) 2025 Aiden Cvengros
 */
 /*************************************************************************************************/
 
-#ifndef Syncopatience_Entity_H_
-#define Syncopatience_Entity_H_
+#ifndef Syncopatience_TimerObject_H_
+#define Syncopatience_TimerObject_H_
 
 #pragma once
 
 //-------------------------------------------------------------------------------------------------
 // Include Header Files
 //-------------------------------------------------------------------------------------------------
+
+// Base include
+#include "../Engine/stdafx.h"
+
+// Additional includes
+#include "Text.h"
+#include "../Engine/Timer.h"
+#include <string>
 
 //-------------------------------------------------------------------------------------------------
 // Forward References
@@ -44,10 +46,10 @@ Copyright (c) 2023 Aiden Cvengros
 /*************************************************************************************************/
 /*!
 	\brief
-		The base entity class for objects on the map
+		the class for an on-screen timer game object
 */
 /*************************************************************************************************/
-class Entity
+class TimerObject : public Text
 {
 public:
 	//---------------------------------------------------------------------------------------------
@@ -58,12 +60,6 @@ public:
 	// Public Structures
 	//---------------------------------------------------------------------------------------------
 	
-	struct PosVec
-	{
-		float x; // The x position
-		float y; // The y position
-	};
-
 	//---------------------------------------------------------------------------------------------
 	// Public Variables
 	//---------------------------------------------------------------------------------------------
@@ -71,66 +67,50 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// Public Function Declarations
 	//---------------------------------------------------------------------------------------------
-
+  
 	/*************************************************************************************************/
 	/*!
-		\brief
-			Constructor for the entity class
+	  \brief
+	    Constructor for the timer object class
 	*/
 	/*************************************************************************************************/
-	Entity(float _posX, float _posY);
-
+	TimerObject(double startingTime, bool pauseable, Font* font, int fontSize, glm::vec2 pos, float rot, glm::vec2 sca, int drawPriority, glm::vec4 color);
+	
 	/*************************************************************************************************/
 	/*!
-		\brief
-			Destructor for the entity class
+	  \brief
+	    Destructor for timer object class
 	*/
 	/*************************************************************************************************/
-	~Entity();
+	~TimerObject() {}
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Sets the current position vector
+			Updates the game object. Can be overwritten by derived classes
 
-		\param newPosition
-			The new position for this entity
+		\param dt
+			The time elapsed since the previous frame
 	*/
 	/*************************************************************************************************/
-	void SetPosition(Entity::PosVec newPosition);
+	virtual void Update(double dt);
 
 	/*************************************************************************************************/
 	/*!
 		\brief
-			Sets the current position vector
-
-		\param newXPos
-			The new X position for this entity
-
-		\param newYPos
-			The new Y position for this entity
-	*/
-	/*************************************************************************************************/
-	void SetPosition(float newXPos, float newYPos);
-
-	/*************************************************************************************************/
-	/*!
-		\brief
-			Returns the current position vector
+			Gets the timer for this object
 
 		\return
-			The position of this entity
+			A reference to the timer
 	*/
 	/*************************************************************************************************/
-	Entity::PosVec GetPosition();
+	Timer& GetTimer() { return timer; }
 	
 private:
 	//---------------------------------------------------------------------------------------------
 	// Private Consts
 	//---------------------------------------------------------------------------------------------
 	
-	PosVec position;							// The position of the entity
-
 	//---------------------------------------------------------------------------------------------
 	// Private Structures
 	//---------------------------------------------------------------------------------------------
@@ -138,6 +118,8 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Private Variables
 	//---------------------------------------------------------------------------------------------
+
+	Timer timer;								// The timer the object is following
 	
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
@@ -152,4 +134,4 @@ private:
 // Public Functions
 //-------------------------------------------------------------------------------------------------
 
-#endif // Syncopatience_Entity_H_
+#endif // Syncopatience_TimerObject_H_

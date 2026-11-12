@@ -205,6 +205,7 @@
     <ClInclude Include="source\Game_Objects\Stickers\Sticker.h" />
     <ClInclude Include="source\Game_Objects\Stickers\Teleporter.h" />
     <ClInclude Include="source\Game_Objects\Text.h" />
+    <ClInclude Include="source\Game_Objects\TimerObject.h" />
     <ClInclude Include="source\Scenes\Level1_2.h" />
     <ClInclude Include="source\Scenes\Level1.h" />
     <ClInclude Include="source\Scenes\Level1_3.h" />
@@ -264,6 +265,7 @@
     <ClCompile Include="source\Game_Objects\Stickers\Sticker.cpp" />
     <ClCompile Include="source\Game_Objects\Stickers\Teleporter.cpp" />
     <ClCompile Include="source\Game_Objects\Text.cpp" />
+    <ClCompile Include="source\Game_Objects\TimerObject.cpp" />
     <ClCompile Include="source\Scenes\Level1_2.cpp" />
     <ClCompile Include="source\Scenes\Level1.cpp" />
     <ClCompile Include="source\Scenes\Level1_3.cpp" />

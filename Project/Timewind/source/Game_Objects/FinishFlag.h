@@ -34,6 +34,8 @@ Copyright (c) 2023 Aiden Cvengros
 // Forward References
 //-------------------------------------------------------------------------------------------------
 
+class TimerObject;
+
 //-------------------------------------------------------------------------------------------------
 // Public Constants
 //-------------------------------------------------------------------------------------------------
@@ -94,8 +96,8 @@ public:
 			The scene the player will be sent to
 	*/
 	/*************************************************************************************************/
-	FinishFlag(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(pos, rot, sca, 99, facingRight_, texture_, color_, mapCoords_), targetScene(_targetScene), timed(false), timer(0.0), flagActive(true) {}
-	FinishFlag(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(40, texture_, color_, mapCoords_), targetScene(_targetScene), timed(false), timer(0.0), flagActive(true) {}
+	FinishFlag(glm::vec2 pos, float rot, glm::vec2 sca, bool facingRight_, Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(pos, rot, sca, 99, facingRight_, texture_, color_, mapCoords_), targetScene(_targetScene), timer(NULL), flagActive(true) {}
+	FinishFlag(Texture* texture_, glm::vec4 color_, std::pair<int, int> mapCoords_, int _targetScene) : GameObject(40, texture_, color_, mapCoords_), targetScene(_targetScene), timer(NULL), flagActive(true) {}
 	
 	/*************************************************************************************************/
 	/*!
@@ -119,6 +121,17 @@ public:
 	/*************************************************************************************************/
 	/*!
 		\brief
+			Sets whether the game object should be destroyed
+
+		\param newToBeDestroyed
+			Whether the game object should be destroyed
+	*/
+	/*************************************************************************************************/
+	virtual void SetToBeDestroyed(bool newToBeDestroyed);
+
+	/*************************************************************************************************/
+	/*!
+		\brief
 			Activates the flag to go to the next scene
 	*/
 	/*************************************************************************************************/
@@ -131,9 +144,12 @@ public:
 
 		\param timerLength
 			How long the timer runs
+
+		\param running
+			Whether we are in running or not
 	*/
 	/*************************************************************************************************/
-	void SetTimer(double timerLength);
+	void SetTimer(double timerLength, bool running);
 	
 private:
 	//---------------------------------------------------------------------------------------------
@@ -149,13 +165,20 @@ private:
 	//---------------------------------------------------------------------------------------------
 
 	int targetScene;							// The scene that this flag sends the player to
-	bool timed;									// Whether the finish flag is timed
-	double timer;								// How long until the finish flag glitches
+	TimerObject* timer;							// The timer for the flag glitching. Will be displayed on screen
 	bool flagActive;							// Whether the flag takes you to the next level
 
 	//---------------------------------------------------------------------------------------------
 	// Private Function Declarations
 	//---------------------------------------------------------------------------------------------
+
+	/*************************************************************************************************/
+	/*!
+		\brief
+			Breaks the flag
+	*/
+	/*************************************************************************************************/
+	void BreakFlag();
 };
 
 //-------------------------------------------------------------------------------------------------

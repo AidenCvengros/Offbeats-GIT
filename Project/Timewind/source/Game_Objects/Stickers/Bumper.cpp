@@ -80,7 +80,7 @@ bool Bumper::Hit()
 		// Sets up a new timer
 		if (bumperTimer)
 		{
-			bumperTimer->RestartTimer(0.4, true);
+			bumperTimer->Restart(0.4, true);
 		}
 		else
 		{

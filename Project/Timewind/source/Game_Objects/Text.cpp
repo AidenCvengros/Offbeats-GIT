@@ -101,6 +101,7 @@ Text::~Text()
 /*************************************************************************************************/
 void Text::SetText(const std::string& newText)
 {
+	// Checks that there is text and that that text is changed
 	if (newText.length() > 0)
 	{
 		// Sets the text variable
